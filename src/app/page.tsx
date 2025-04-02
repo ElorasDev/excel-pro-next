@@ -1,12 +1,7 @@
-
-import Footer from '@/components/organisms/Footer/Footer';
-import Header from './../components/organisms/Header/Header';
-
 export default function Home() {
   return (
     <div>
-        <Header />
-        <Footer />
+          hello world
     </div>
   );
 }
