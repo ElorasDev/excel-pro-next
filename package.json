@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
+    "test": "jest",
     "build-storybook": "storybook build"
   },
   "dependencies": {
