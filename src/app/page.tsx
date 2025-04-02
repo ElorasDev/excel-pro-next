@@ -5,8 +5,7 @@ import Header from './../components/organisms/Header/Header';
 export default function Home() {
   return (
     <div>
-        <Header />
-        <Footer />
+          hello world
     </div>
   );
 }
