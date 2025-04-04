@@ -21,7 +21,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantClasses = {
       primary: 'bg-primary hover:bg-red-700 transition-all duration-500 text-white border-transparent',
-      white: 'bg-white hover:bg-primary hover:text-white transition-all duration-500 text-black border-[#D5D7DA]',
+      white: 'bg-white hover:bg-primary hover:border-primary hover:text-white transition-all duration-500 text-black border-[#D5D7DA]',
     };
 
     return (
