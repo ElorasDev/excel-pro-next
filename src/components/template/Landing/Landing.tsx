@@ -15,7 +15,7 @@ const Landing = () => {
         <section className="mx-4">
             <BannerSlider />
         </section>
-        <section>
+        <section className="my-24">
             <HeroSection />
         </section>
         <section className="mt-9">
