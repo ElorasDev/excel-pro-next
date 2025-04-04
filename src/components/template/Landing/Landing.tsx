@@ -27,7 +27,7 @@ const Landing = () => {
         <section>
           <SummeryPrograms />
         </section>
-        <section>
+        <section className="mx-4">
           <WhyCooseUs />
         </section>
         <section>
