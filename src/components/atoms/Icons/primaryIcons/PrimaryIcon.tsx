@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import Image from "next/image";
 
 interface PrimaryIconProps {
-  number?: string;
+  number?: string | number;
   text?: string;
   icon: string;
   width?: number;

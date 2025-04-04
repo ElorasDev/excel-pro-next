@@ -1,18 +1,36 @@
 "use client";
 import { NextPage } from "next";
 import { useRouter } from "next/navigation";
-
-
-/// ProgramCard Component (Reusable molecule-level component for displaying program details)
+import { motion, useInView  } from "framer-motion"; // اضافه کردن framer-motion برای انیمیشن‌ها
 import ProgramCard from "@/components/molecules/ProgramCard/ProgramCard";
 import { Button } from "@/components/atoms/Button/Button";
 import { programs } from "./data";
+import { useRef } from "react";
 
 const SummeryPrograms: NextPage = () => {
   const router = useRouter();
 
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeOut" } },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut", delay: 0.2 } },
+  };
+
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, amount: 0.3 });
+
   return (
-    <section className="py-12 px-4 max-w-7xl mx-auto">
+    <motion.section
+      className="py-12 px-4 max-w-7xl mx-auto"
+      ref={ref} // اتصال به مرجع Intersection Observer
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"} // انیمیشن فقط زمانی که سکشن در دید است
+      variants={sectionVariants}
+    >
       <div className="flex justify-between items-center mb-10">
         <h2 className="text-md lg:text-4xl md:text-2xl sm:text-md font-bold text-gray-900">
           Our programs
@@ -43,21 +61,27 @@ const SummeryPrograms: NextPage = () => {
       </div>
 
       {/* Grid layout for displaying multiple program cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        initial="hidden"
+        animate={inView ? "visible" : "hidden"} // انیمیشن برای کارت‌ها
+        variants={sectionVariants}
+      >
         {programs.map((program, index) => (
-          <ProgramCard
-            key={index}
-            ageGroup={program.ageGroup}
-            backgroundClass={program.backgroundClass}
-            textColorClass={program.textColorClass}
-            schedule={program.schedule}
-            gameInfo={program.gameInfo}
-            tag={program.tag}
-            imageSrc={program.imageSrc}
-          />
+          <motion.div key={index} variants={cardVariants}>
+            <ProgramCard
+              ageGroup={program.ageGroup}
+              backgroundClass={program.backgroundClass}
+              textColorClass={program.textColorClass}
+              schedule={program.schedule}
+              gameInfo={program.gameInfo}
+              tag={program.tag}
+              imageSrc={program.imageSrc}
+            />
+          </motion.div>
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 };
 

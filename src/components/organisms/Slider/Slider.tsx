@@ -28,7 +28,7 @@ const Slider: NextPage<SliderProps> = ({ currentSlide, setCurrentSlide }) => {
   }, [setCurrentSlide]); // Depend on setCurrentSlide to trigger effect on updates
 
   return (
-    <div className="relative w-full md:w-3/4 h-full bg-gray-900 rounded-lg shadow-xl overflow-hidden">
+    <div className="relative w-min-full md:w-3/4 h-auto min-h-[250px] sm:min-h-[250px] md:min-h-[500px] bg-gray-900 rounded-lg shadow-xl overflow-hidden">
       <div
         className="flex h-full transition-transform duration-500 ease-in-out"
         // Dynamic transform property to slide between slides based on currentSlide index
