@@ -26,9 +26,9 @@ const SummeryPrograms: NextPage = () => {
   return (
     <motion.section
       className="py-12 px-4 max-w-7xl mx-auto"
-      ref={ref} // اتصال به مرجع Intersection Observer
+      ref={ref}
       initial="hidden"
-      animate={inView ? "visible" : "hidden"} // انیمیشن فقط زمانی که سکشن در دید است
+      animate={inView ? "visible" : "hidden"} 
       variants={sectionVariants}
     >
       <div className="flex justify-between items-center mb-10">
@@ -64,7 +64,7 @@ const SummeryPrograms: NextPage = () => {
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         initial="hidden"
-        animate={inView ? "visible" : "hidden"} // انیمیشن برای کارت‌ها
+        animate={inView ? "visible" : "hidden"}
         variants={sectionVariants}
       >
         {programs.map((program, index) => (
