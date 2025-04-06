@@ -5,8 +5,7 @@ import Image from "next/image";
 import Testimonial from "@/components/organisms/Testimonial/Testimonial";
 import { motion } from "framer-motion";
 import { AnimatedSection } from "@/components/atoms/AnimatedSection/AnimatedSection";
-
-
+import FixedRegisterButton from "@/components/atoms/FixedRegisterButton/FixedRegisterButton";
 
 interface ProgramType {
   decodedSlug: string;
@@ -180,8 +179,7 @@ const ProgramDetails: NextPage<ProgramType> = ({ program, decodedSlug }) => {
             <h2 className="text-xl font-bold text-gray-900">Program Outline</h2>
           </div>
           <p className="mt-4 text-gray-700">{program.programOutline.description}</p>
-          <p className="mt-4 text-gray-700">{program.programOutline.additionalDetails}</p>
-        
+          
           <motion.div 
             className="mt-6 border-l-4 border-red-500 pl-4 py-2"
             initial={{ opacity: 0, x: -20 }}
@@ -209,6 +207,8 @@ const ProgramDetails: NextPage<ProgramType> = ({ program, decodedSlug }) => {
         <Testimonial />
       </div>
       
+      {/* Fixed Register Button */}
+      <FixedRegisterButton />
     </section>
   );
 };
