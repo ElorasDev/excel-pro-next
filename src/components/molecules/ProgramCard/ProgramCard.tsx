@@ -1,4 +1,5 @@
 "use client";
+import { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -21,7 +22,7 @@ interface ProgramCardProps {
   imageSrc: string;
 }
 
-const ProgramCard: React.FC<ProgramCardProps> = ({
+const ProgramCard: NextPage<ProgramCardProps> = ({
   ageGroup,
   backgroundClass,
   textColorClass,
@@ -66,7 +67,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
             <p className="text-lg">{gameInfo}</p>
 
             {/* Link to the program's detailed page */}
-            <Link href={`/programs/${ageGroup.toLowerCase().replace(/\s+/g, "-")}`}>
+            <Link href={`/program/${ageGroup.toLowerCase().replace(/\s+/g, '')}`}>
               <button className="mt-6 px-8 py-3 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors">
                 Detail
               </button>

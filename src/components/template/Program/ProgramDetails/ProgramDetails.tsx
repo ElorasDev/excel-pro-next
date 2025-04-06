@@ -1,0 +1,216 @@
+"use client"
+import { NextPage } from "next";
+import Link from "next/link";
+import Image from "next/image";
+import Testimonial from "@/components/organisms/Testimonial/Testimonial";
+import { motion } from "framer-motion";
+import { AnimatedSection } from "@/components/atoms/AnimatedSection/AnimatedSection";
+
+
+
+interface ProgramType {
+  decodedSlug: string;
+  program: {
+    ageGroup: string;
+    team_image: string;
+    schedule: string[];
+    gameInfo: string;
+    description: string;
+    programOutline: {
+      description: string;
+      additionalDetails?: string;
+    };
+    playerUniformsEquipment: string;
+  };
+}
+
+const ProgramDetails: NextPage<ProgramType> = ({ program, decodedSlug }) => {
+  return (
+    <section>
+      {/* Hero Section with Staggered Animation */}
+      <motion.div 
+        className="bg-gray-50 px-4 md:px-8 pt-4 h-[440px]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        style={{
+          backgroundImage: 'url("/images/other/tech-bg.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'repeat',
+          backgroundColor: "#FFF3F2",
+        }}
+      >
+        <div>
+          <motion.div 
+            className="max-w-7xl mx-auto flex items-center text-sm text-gray-500"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
+            <Link href="/" className="hover:text-gray-700">Home</Link>
+            <span className="mx-2">/</span>
+            <Link href="/programs" className="hover:text-gray-700">Programs</Link>
+            <span className="mx-2">/</span>
+            <span className="text-red-500 font-medium">{decodedSlug}</span>
+          </motion.div>
+        </div>
+
+        {/* Program category tag with animation */}
+        <motion.div 
+          className="max-w-7xl mx-auto px-4 md:px-8 mt-6 text-center"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <div className="inline-block px-3 py-1 bg-red-100 text-red-500 text-sm font-medium rounded-xl">
+            Programs
+          </div>
+        </motion.div>
+
+        {/* Program title with animation */}
+        <motion.div 
+          className="max-w-7xl mx-auto px-4 md:px-8 mt-4 text-center my-10"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+        >
+          <h1 className="text-4xl font-bold text-gray-900">{program.ageGroup}</h1>
+        </motion.div>
+      </motion.div>
+
+      {/* Program image and details with floating up animation */}
+      <AnimatedSection className="max-w-7xl mx-auto px-4 md:px-8 mt-[-230px]" delay={0.8}>
+        <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+          <div className="relative w-full h-64 md:h-72 lg:h-96">
+            <Image 
+              src={program.team_image} 
+              alt={`${program.ageGroup} Program`}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover object-center" 
+              priority
+              quality="100"
+            />
+            {/* Schedule information overlay with staggered animations */}
+            <motion.div 
+              className="absolute bottom-0 left-0 right-0 flex flex-wrap items-center justify-center p-4 gap-8 bg-gradient-to-t from-black/30 to-transparent text-white"
+            >
+              {program.schedule.map((schedule, index) => (
+                <motion.div 
+                  key={index} 
+                  className="flex items-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1 + index * 0.2, duration: 0.6 }}
+                >
+                  <div className="flex items-center justify-center w-8 h-8 mr-2 rounded-full bg-black/40">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </div>
+                  <span>{schedule}</span>
+                </motion.div>
+              ))}
+              <motion.div 
+                className="flex items-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 + program.schedule.length * 0.2, duration: 0.6 }}
+              >
+                <div className="flex items-center justify-center w-8 h-8 mr-2 rounded-full bg-black/40">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 7v5l3 3"></path>
+                  </svg>
+                </div>
+                <span>{program.gameInfo}</span>
+              </motion.div>
+            </motion.div>
+          </div>
+        </div>
+      </AnimatedSection>
+
+      {/* What is it section with fade-in animations */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-16">
+        <div>
+          {/* Banner image with scale animation */}
+          <AnimatedSection className="flex flex-col items-center justify-center h-64 w-full md:w-full relative overflow-hidden rounded-lg" direction="left">
+            <motion.div 
+              className="w-full h-full"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Image
+                src="/images/other/program_banner.png"
+                alt="Soccer player silhouette"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover object-center" 
+                priority
+                quality="100"
+              />
+            </motion.div>
+          </AnimatedSection>
+
+          {/* Content with fade-in and slide animations */}
+          <AnimatedSection className="md:col-span-5 flex flex-col items-start mt-4" delay={0.2} direction="right">
+            <div className="flex justify-between items-start w-full">
+              <h2 className="text-xl font-bold text-gray-900">What is it?</h2>
+              <motion.svg 
+                className="w-6 h-6 text-gray-500" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+                whileHover={{ x: 10, transition: { duration: 0.3 } }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </motion.svg>
+            </div>
+            <p className="mt-4 text-gray-700">
+              {program.description}
+            </p>
+          </AnimatedSection>
+        </div>
+
+        {/* Program Outline with fade-in animation */}
+        <AnimatedSection className="mt-16" delay={0.3}>
+          <div className="flex justify-between items-start w-full">
+            <h2 className="text-xl font-bold text-gray-900">Program Outline</h2>
+          </div>
+          <p className="mt-4 text-gray-700">{program.programOutline.description}</p>
+          <p className="mt-4 text-gray-700">{program.programOutline.additionalDetails}</p>
+        
+          <motion.div 
+            className="mt-6 border-l-4 border-red-500 pl-4 py-2"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <p className="text-gray-700">
+              {program.programOutline.additionalDetails || 'No additional details available.'}
+            </p>
+          </motion.div>
+        </AnimatedSection>
+
+        {/* Uniform and Equipment with fade-in animation */}
+        <AnimatedSection className="mt-16" delay={0.4} direction="up">
+          <div className="flex justify-between items-start w-full">
+            <h2 className="text-xl font-bold text-gray-900">Player Uniforms and Equipment</h2>
+          </div>
+          <p className="mt-4 text-gray-700">{program.playerUniformsEquipment}</p>
+        </AnimatedSection>
+      </div>
+
+      {/* Testimonial section without animation as requested */}
+      <div className="my-8">
+        <Testimonial />
+      </div>
+      
+    </section>
+  );
+};
+
+export default ProgramDetails;

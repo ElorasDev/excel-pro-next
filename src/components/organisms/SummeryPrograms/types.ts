@@ -12,6 +12,18 @@ export interface ProgramType {
     textColorClass: string;
     schedule: string[];
     gameInfo: string;
-    tag: ProgramTag;
+    tag: {
+      icon: React.ReactNode | null;
+      text: string;
+      className: string;
+    };
     imageSrc: string;
-}
+    team_image: string; 
+    description: string;
+    programOutline: {
+        description: string;
+        additionalDetails?: string;
+    },
+    playerUniformsEquipment: string;    
+  }
+  
