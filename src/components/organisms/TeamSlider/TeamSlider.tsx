@@ -39,16 +39,16 @@ const TeamSlider: NextPage<SliderProps> = ({ teamImages }) => {
       >
         {[...teamImages, ...teamImages].slice(0, 12).map((image, index) => (
           <SwiperSlide key={`team-${index}`}>
-<div className="rounded-lg overflow-hidden shadow-md">
-  <Image
-    src={image.src}
-    alt={image.alt}
-    width={500}
-    height={300}
-    className="w-full h-auto" // Responsive width, auto height
-    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
-  />
-</div>
+            <div className="rounded-lg overflow-hidden shadow-md">
+              <Image
+                src={image.src}
+                alt={image.alt}
+                width={500}
+                height={300}
+                className="w-full h-auto" // Responsive width, auto height
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+              />
+            </div>
           </SwiperSlide>
         ))}
       </Swiper>
