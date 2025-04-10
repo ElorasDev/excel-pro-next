@@ -50,7 +50,7 @@ const Header = () => {
           </div>
           
           {/* Menu - Center */}
-          <div className="flex-1 flex justify-center">
+          <div className="flex-1 flex justify-center mr-0 md:mr-5">
             <Menu />
           </div>
           
@@ -130,9 +130,10 @@ const Header = () => {
               exit="closed"
               variants={menuVariants}
               className="md:hidden overflow-hidden"
+              
             >
               <div className="py-4">
-                <Menu orientation="vertical" />
+                <Menu orientation="vertical" onClicked={toggleMenu}/>
                 {/* Button below menu when open */}
                 <motion.div
                   className="mt-4 flex justify-center"
@@ -141,7 +142,7 @@ const Header = () => {
                   animate="open"
                   exit="closed"
                 >
-                  <Button className="rounded-xl w-full mt-5">
+                  <Button className="rounded-xl w-full mt-5" onClick={toggleMenu}>
                       Enroll now
                   </Button>
                 </motion.div>
