@@ -39,7 +39,7 @@ const SummeryPrograms: NextPage = () => {
         <Button
           variant="white"
           className="rounded-xl font-normal flex items-center mx-2"
-          onClick={() => router.push("/programs")}
+          onClick={() => router.push("/program")}
         >
           View all programs
           <svg
