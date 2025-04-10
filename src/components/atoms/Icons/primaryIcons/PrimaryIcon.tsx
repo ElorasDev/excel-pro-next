@@ -33,6 +33,7 @@ const PrimaryIcon: NextPage<PrimaryIconProps> = forwardRef(
             width={width} 
             height={height} 
             className="max-w-full max-h-full object-contain"
+            quality="100"
           />
         </div>
 
