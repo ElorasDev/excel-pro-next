@@ -13,7 +13,7 @@ interface StripeProviderProps {
 export default function StripeProvider({ children }: StripeProviderProps) {
   const options = {
     appearance: {
-      theme: "stripe" as "stripe",
+      theme: "stripe" as const,
       variables: {
         colorPrimary: '#3b82f6', // blue-500
       },

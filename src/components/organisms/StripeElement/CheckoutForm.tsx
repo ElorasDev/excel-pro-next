@@ -1,10 +1,11 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, useCallback } from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useDivisionStore } from "@/stores/divisionStore";
 import useUserFormStore from "@/stores/UserFormStore";
+import type { StripeCardElementChangeEvent } from "@stripe/stripe-js";
 
 // Map division to backend pricing plan
 const divisionToPlanMapping: Record<string, string> = {
@@ -15,14 +16,27 @@ const divisionToPlanMapping: Record<string, string> = {
 
 type SubscriptionPlan = "U7_U12" | "U13_U14" | "U15_U17";
 
-const plans: Record<
-  SubscriptionPlan,
-  {
-    title: string;
-    price: string;
-    features: string[];
-  }
-> = {
+interface BillingAddress {
+  line1: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+}
+
+interface BillingDetails {
+  name: string;
+  email: string;
+  address: BillingAddress;
+}
+
+interface Plan {
+  title: string;
+  price: string;
+  features: string[];
+}
+
+const plans: Record<SubscriptionPlan, Plan> = {
   U7_U12: {
     title: "U7-U12",
     price: "$100/month",
@@ -77,7 +91,7 @@ const CheckoutForm: NextPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>("U7_U12"); // Default value
   const [initialized, setInitialized] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [billingDetails, setBillingDetails] = useState({
+  const [billingDetails, setBillingDetails] = useState<BillingDetails>({
     name: "",
     email: "",
     address: {
@@ -88,6 +102,54 @@ const CheckoutForm: NextPage = () => {
       country: "US",
     },
   });
+
+  // Function to update payment status and redirect - defined with useCallback
+  const updatePaymentStatusAndRedirect = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      // Get stored userId from localStorage
+      const userIdParam = localStorage.getItem("userId");
+      
+      if (!userIdParam) {
+        setMessage("User information not found. Please register again.");
+        setTimeout(() => router.push("/register"), 3000);
+        return;
+      }
+
+      // You could have an API endpoint to update the user's payment status
+      const response = await fetch(`http://localhost:3001/users/${userIdParam}/update-payment-status`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          paymentStatus: "succeeded",
+          stripeCustomerId: userForm.stripeCustomerId || ""
+        }),
+        credentials: "include",
+        mode: "cors",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Failed to update payment status:", errorData);
+        setMessage("Payment recorded but failed to update account. Please contact support.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Payment status update successful
+      setMessage("Registration and payment successful! Redirecting to homepage...");
+      
+      // Redirect to home page after a short delay
+      setTimeout(() => router.push("/"), 2000);
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      setMessage("Error updating payment status. Please contact support.");
+      setIsLoading(false);
+    }
+  }, [router, userForm.stripeCustomerId]);
 
   // Load user ID from localStorage when component mounts
   useEffect(() => {
@@ -173,57 +235,9 @@ const CheckoutForm: NextPage = () => {
         setMessage(statusMessages[paymentIntent.status] || "Something went wrong.");
       });
     }
-  }, [stripe, router]);
+  }, [stripe, router, updatePaymentStatusAndRedirect]);
 
-  // Function to update payment status and redirect
-  const updatePaymentStatusAndRedirect = async () => {
-    try {
-      setIsLoading(true);
-
-      // Get stored userId from localStorage
-      const userIdParam = localStorage.getItem("userId");
-      
-      if (!userIdParam) {
-        setMessage("User information not found. Please register again.");
-        setTimeout(() => router.push("/register"), 3000);
-        return;
-      }
-
-      // You could have an API endpoint to update the user's payment status
-      const response = await fetch(`http://localhost:3001/users/${userIdParam}/update-payment-status`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          paymentStatus: "succeeded",
-          stripeCustomerId: userForm.stripeCustomerId || ""
-        }),
-        credentials: "include",
-        mode: "cors",
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Failed to update payment status:", errorData);
-        setMessage("Payment recorded but failed to update account. Please contact support.");
-        setIsLoading(false);
-        return;
-      }
-
-      // Payment status update successful
-      setMessage("Registration and payment successful! Redirecting to homepage...");
-      
-      // Redirect to home page after a short delay
-      setTimeout(() => router.push("/"), 2000);
-    } catch (error) {
-      console.error("Error updating payment status:", error);
-      setMessage("Error updating payment status. Please contact support.");
-      setIsLoading(false);
-    }
-  };
-
-  const handleCardChange = async (event: any) => {
+  const handleCardChange = (event: StripeCardElementChangeEvent) => {
     setMessage(event.error ? event.error.message : null);
   };
 
@@ -247,12 +261,24 @@ const CheckoutForm: NextPage = () => {
     }
   };
 
-  const checkPaymentIntentStatus = async (clientSecret: string) => {
+  interface PaymentIntentResult {
+    paymentIntent?: {
+      status: string;
+    };
+    code?: string;
+    type?: string;
+    payment_intent?: {
+      status: string;
+    };
+    message?: string;
+  }
+
+  const checkPaymentIntentStatus = async (clientSecret: string): Promise<boolean> => {
     if (!stripe) return false;
 
     try {
       const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
-      return paymentIntent && paymentIntent.status === "succeeded";
+      return !!paymentIntent && paymentIntent.status === "succeeded";
     } catch (error) {
       console.error("Error checking payment intent status:", error);
       return false;
@@ -414,11 +440,12 @@ const CheckoutForm: NextPage = () => {
                 throw new Error(`Payment status: ${paymentIntent.status}. Please try again.`);
               }
             }
-          } catch (confirmErr: any) {
+          } catch (confirmErr) {
             // Check if this error means the payment was successful
+            const paymentErr = confirmErr as PaymentIntentResult;
             if (
-              confirmErr.code === "payment_intent_unexpected_state" &&
-              confirmErr.payment_intent?.status === "succeeded"
+              paymentErr.code === "payment_intent_unexpected_state" &&
+              paymentErr.payment_intent?.status === "succeeded"
             ) {
               console.log("Payment was already successful despite error, redirecting");
               updatePaymentStatusAndRedirect();
@@ -432,12 +459,13 @@ const CheckoutForm: NextPage = () => {
       } else {
         setMessage("Subscription initiated. Please check your email for confirmation.");
       }
-    } catch (err: any) {
+    } catch (err) {
       // Check for Stripe error after confirmation
+      const stripeErr = err as PaymentIntentResult;
       if (
-        err.type === "invalid_request_error" &&
-        err.code === "payment_intent_unexpected_state" &&
-        err.payment_intent?.status === "succeeded"
+        stripeErr.type === "invalid_request_error" &&
+        stripeErr.code === "payment_intent_unexpected_state" &&
+        stripeErr.payment_intent?.status === "succeeded"
       ) {
         // Update payment status and redirect
         updatePaymentStatusAndRedirect();
@@ -445,7 +473,7 @@ const CheckoutForm: NextPage = () => {
       }
 
       console.error("Subscription Error:", err);
-      setMessage(err.message || "Failed to create subscription. Please try again.");
+      setMessage((err as Error).message || "Failed to create subscription. Please try again.");
     } finally {
       setIsLoading(false);
     }
