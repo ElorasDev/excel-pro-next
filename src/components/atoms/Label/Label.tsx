@@ -1,23 +1,26 @@
-import { forwardRef } from "react";
+import React from "react";
 
 interface LabelProps {
-    htmlFor: string;
-    text: string;
-    isFocused: boolean;
-  }
-  export const Label = forwardRef<HTMLLabelElement, LabelProps>(
-    ({ htmlFor, text, isFocused }, ref) => (
-      <label
-        ref={ref}
-        htmlFor={htmlFor}
-        className={`absolute transition-all duration-200 ${
-          isFocused
-            ? '-top-2 left-2 text-xs bg-white px-1 text-gray-700'
-            : 'top-3 left-3 text-gray-500'
-        }`}
-      >
-        {text}
-      </label>
-    )
-  );
-  Label.displayName = 'Label';
+  htmlFor: string;
+  text: string;
+  isFocused: boolean;
+  hasValue?: boolean;
+}
+
+export const Label: React.FC<LabelProps> = ({ 
+  htmlFor, 
+  text, 
+  isFocused, 
+  hasValue = false 
+}) => (
+  <label
+    htmlFor={htmlFor}
+    className={`absolute transition-all duration-200 z-10 ${
+      isFocused || hasValue
+        ? 'text-xs -top-2.5 left-2 bg-white px-1 text-gray-600'
+        : 'text-base text-gray-500 top-3 left-3 pointer-events-none'
+    }`}
+  >
+    {text}
+  </label>
+);
