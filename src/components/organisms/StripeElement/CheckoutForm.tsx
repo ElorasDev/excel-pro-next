@@ -241,19 +241,28 @@ const CheckoutForm: NextPage = () => {
     setMessage(event.error ? event.error.message : null);
   };
 
+  // Define a type for nested object in BillingDetails
+  type NestedBillingDetailValue = string | BillingAddress | Record<string, string>;
+
   const handleBillingDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
+  
     if (name.includes(".")) {
       const [parent, child] = name.split(".");
-      setBillingDetails((prev) => ({
-        ...prev,
-        [parent]: {
-          ...(prev[parent as keyof typeof prev] as Record<string, any>),
-          [child]: value,
-        },
-      }));
+      
+      // Since we know the structure of BillingDetails, we can handle each possible parent field
+      if (parent === "address") {
+        setBillingDetails((prev) => ({
+          ...prev,
+          address: {
+            ...prev.address,
+            [child]: value,
+          },
+        }));
+      } 
+      // If new nested fields are added in the future, add more conditions here
     } else {
+      // Handle top-level fields (name, email)
       setBillingDetails((prev) => ({
         ...prev,
         [name]: value,
