@@ -5,7 +5,6 @@ import useUserFormStore from "@/stores/UserFormStore";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useDivisionStore } from "@/stores/divisionStore";
 
 const validationSchema = Yup.object({
@@ -41,7 +40,6 @@ const normalizeDivision = (str: string): string => {
 const Acknowledgment: NextPage = () => {
   const { setStep, step } = useRegisterStepStore();
   const { division } = useDivisionStore();
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   

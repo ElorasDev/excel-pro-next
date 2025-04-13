@@ -2,7 +2,6 @@
 import { useRegisterStepStore } from "@/stores/registerStepStore";
 import Step from "@/components/atoms/Step/Step";
 import { steps } from "./data";
-import StripeElement from "../../StripeElement/StripeProvider";
 import PaymentPage from "../../StripeElement/PaymentPage";
 import useUserFormStore from "@/stores/UserFormStore"; // make sure the path matches your file system
 
