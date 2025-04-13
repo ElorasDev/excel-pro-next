@@ -242,7 +242,7 @@ const CheckoutForm: NextPage = () => {
   };
 
   // Define a type for nested object in BillingDetails
-  type NestedBillingDetailValue = string | BillingAddress | Record<string, string>;
+  // type NestedBillingDetailValue = string | BillingAddress | Record<string, string>;
 
   const handleBillingDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
