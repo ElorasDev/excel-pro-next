@@ -208,7 +208,7 @@ const ProgramDetails: NextPage<ProgramType> = ({ program, decodedSlug }) => {
       </div>
       
       {/* Fixed Register Button */}
-      <FixedRegisterButton />
+      <FixedRegisterButton  _division={program.ageGroup} />
     </section>
   );
 };
