@@ -356,13 +356,13 @@ const Overview = () => {
   }, [activeFilters, searchQuery, originalPlayers]);
 
   return (
-    <div className="p-4 md:p-6 bg-white min-h-screen">
+    <div className="p-4 md:p-6 bg-white min-h-screen rounded-lg">
       {/* Header Section */}
       <div className="mb-6 flex flex-col sm:flex-row sm:justify-between">
         <div className="flex flex-col mb-4 sm:mb-0">
           <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome, Reza</h1>
           <p className="text-gray-500 text-sm md:text-base">
-            Track, and manage your players and programs
+            Track, and manage your players
           </p>
         </div>
 

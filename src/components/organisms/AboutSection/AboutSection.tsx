@@ -12,48 +12,57 @@ import SummeryServices from "@/components/organisms/SummeryServices/SummeryServi
 import TeamSlider from "../../organisms/TeamSlider/TeamSlider";
 import TeamSection from "@/components/molecules/TeamSection/TeamSection";
 
-// Update this type to match TeamImages in TeamSlider.tsx
-type TeamImage = {
-  id: string; // Changed to string to match the expected type
-  src: string;
-  alt: string;
-};
+interface AboutSectionProps {
+  teamImages: {
+    id: string;
+    title: string;
+    file_name: string;
+    storage_filename: string;
+    image_url: string;
+    file_path: string;
+    mime_type: string;
+    file_size: number;
+    caption: string | null;
+    created_at?: string;
+    updated_at?: string;
+  }[];
+}
 
 // Animation variants for different sections
 const fadeInUp = {
   hidden: { opacity: 0, y: 60 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
-    transition: { 
-      duration: 0.8, 
-      ease: "easeOut" 
-    }
-  }
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+    },
+  },
 };
 
 const fadeInLeft = {
   hidden: { opacity: 0, x: -60 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     x: 0,
-    transition: { 
-      duration: 0.8, 
-      ease: "easeOut" 
-    }
-  }
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+    },
+  },
 };
 
 const fadeInRight = {
   hidden: { opacity: 0, x: 60 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     x: 0,
-    transition: { 
-      duration: 0.8, 
-      ease: "easeOut" 
-    }
-  }
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+    },
+  },
 };
 
 const staggerChildren = {
@@ -61,67 +70,23 @@ const staggerChildren = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2
-    }
-  }
+      staggerChildren: 0.2,
+    },
+  },
 };
 
-const AboutSection: NextPage = () => {
+const AboutSection: NextPage<AboutSectionProps> = ({ teamImages }) => {
   // Refs for sections to detect viewport entry
   const aboutSectionRef = useRef(null);
   const statsRef = useRef(null);
   const servicesRef = useRef(null);
   const teamSectionRef = useRef(null);
-  
+
   // Check if sections are in view
   const isAboutInView = useInView(aboutSectionRef, { once: true, amount: 0.3 });
   const isStatsInView = useInView(statsRef, { once: true, amount: 0.3 });
   const isServicesInView = useInView(servicesRef, { once: true, amount: 0.1 });
   const isTeamInView = useInView(teamSectionRef, { once: true, amount: 0.1 });
-  
-  // Convert all numeric IDs to strings to match the expected type
-  const teamImages: TeamImage[] = [
-    {
-      id: "1",
-      src: "/images/person/team/u7.png",
-      alt: "Coach with young players in red uniforms",
-    },
-    {
-      id: "2",
-      src: "/images/person/team/u7.png",
-      alt: "Team in black uniforms",
-    },
-    {
-      id: "3",
-      src: "/images/person/team/u7.png",
-      alt: "Youth team in blue uniforms",
-    },
-    {
-      id: "4",
-      src: "/images/person/team/u7.png",
-      alt: "Youth team in yellow uniforms",
-    },
-    {
-      id: "5",
-      src: "/images/person/team/u7.png",
-      alt: "Youth team in blue uniforms second image",
-    },
-    {
-      id: "6",
-      src: "/images/person/team/u7.png",
-      alt: "Youth team in yellow uniforms second image",
-    },
-    {
-      id: "7",
-      src: "/images/person/team/u7.png",
-      alt: "Coach with young players second image",
-    },
-    {
-      id: "8",
-      src: "/images/person/team/u7.png",
-      alt: "Team in black uniforms second image",
-    },
-  ];
 
   return (
     <>
@@ -152,7 +117,7 @@ const AboutSection: NextPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.7 }}
           >
-            <motion.span 
+            <motion.span
               className="inline-block px-3 py-1 bg-red-100 text-red-500 text-sm font-medium rounded-xl mb-4"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -160,7 +125,7 @@ const AboutSection: NextPage = () => {
             >
               Programs
             </motion.span>
-            <motion.h1 
+            <motion.h1
               className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -171,7 +136,7 @@ const AboutSection: NextPage = () => {
           </motion.div>
         </div>
       </motion.div>
-      
+
       {/* Slider */}
       <div className="w-full py-8 relative overflow-hidden -mt-[120px] sm:-mt-[130px] md:-mt-[150px]">
         <div className="relative z-10">
@@ -191,15 +156,15 @@ const AboutSection: NextPage = () => {
           </div>
         </div>
       </div>
-      
+
       {/* About Us Section */}
-      <div 
+      <div
         ref={aboutSectionRef}
         className="w-full flex flex-col md:flex-row gap-8 md:gap-16 items-start py-16 md:py-24"
       >
         <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start w-full">
           {/* Left side with animated image and cards */}
-          <motion.div 
+          <motion.div
             className="w-full md:w-1/2 relative pl-0 md:pl-0 md:ml-0"
             variants={fadeInLeft}
             initial="hidden"
@@ -207,25 +172,33 @@ const AboutSection: NextPage = () => {
           >
             <div className="relative w-full">
               {/* Top white card */}
-              <motion.div 
+              <motion.div
                 className="absolute -top-10 left-0 right-20 h-24 bg-gray-50 rounded-3xl z-0"
                 initial={{ opacity: 0, y: -20 }}
-                animate={isAboutInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+                animate={
+                  isAboutInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }
+                }
                 transition={{ duration: 0.7, delay: 0.2 }}
               ></motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 className="absolute top-0 bottom-20 -right-6 w-24 h-full bg-gray-50 rounded-3xl z-0"
                 initial={{ opacity: 0, x: 20 }}
-                animate={isAboutInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+                animate={
+                  isAboutInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }
+                }
                 transition={{ duration: 0.7, delay: 0.3 }}
               ></motion.div>
 
               {/* Main image */}
-              <motion.div 
+              <motion.div
                 className="relative w-full z-10"
                 initial={{ opacity: 0, scale: 0.95 }}
-                animate={isAboutInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+                animate={
+                  isAboutInView
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 0, scale: 0.95 }
+                }
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
                 <Image
@@ -240,13 +213,13 @@ const AboutSection: NextPage = () => {
           </motion.div>
 
           {/* Right side text */}
-          <motion.div 
+          <motion.div
             className="w-full md:w-1/2 px-4 md:px-0 md:pr-4"
             variants={fadeInRight}
             initial="hidden"
             animate={isAboutInView ? "visible" : "hidden"}
           >
-            <motion.h2 
+            <motion.h2
               className="text-red-500 font-bold uppercase mb-4"
               initial={{ opacity: 0 }}
               animate={isAboutInView ? { opacity: 1 } : { opacity: 0 }}
@@ -254,17 +227,19 @@ const AboutSection: NextPage = () => {
             >
               ABOUT US
             </motion.h2>
-            
-            <motion.h3 
+
+            <motion.h3
               className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 break-words"
               initial={{ opacity: 0, y: 30 }}
-              animate={isAboutInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              animate={
+                isAboutInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
+              }
               transition={{ duration: 0.6, delay: 0.3 }}
             >
               WELCOME TO Excel Pro Soccer
             </motion.h3>
-            
-            <motion.div 
+
+            <motion.div
               className="text-gray-700 space-y-4"
               initial={{ opacity: 0 }}
               animate={isAboutInView ? { opacity: 1 } : { opacity: 0 }}
@@ -274,7 +249,7 @@ const AboutSection: NextPage = () => {
                 Excel Pro is the largest Iranian-Based soccer academy in
                 Toronto, managed by former Persepolis FC player, Reza Abedian.
                 At Excel Pro Soccer Academy, we have been training youths from
-                age 8 all the way to 18 years old.
+                age +5 all the way to 18 years old.
               </p>
               <p className="break-words max-w-full">
                 Excel Pro Soccer Academy is a soccer school based in Toronto.
@@ -285,10 +260,12 @@ const AboutSection: NextPage = () => {
                 tailored to each of its players individual needs.
               </p>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={isAboutInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              animate={
+                isAboutInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+              }
               transition={{ duration: 0.5, delay: 0.7 }}
             >
               <Button className="mt-8 text-white font-medium py-3 px-6 rounded-lg transition duration-300">
@@ -298,9 +275,9 @@ const AboutSection: NextPage = () => {
           </motion.div>
         </div>
       </div>
-      
+
       {/* Stats */}
-      <motion.div 
+      <motion.div
         ref={statsRef}
         className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 px-4 sm:px-6 lg:px-8 bg-[#F9F9F9] py-16"
         variants={staggerChildren}
@@ -340,9 +317,9 @@ const AboutSection: NextPage = () => {
           />
         </motion.div>
       </motion.div>
-      
+
       {/* Services Section with wrapper for animations */}
-      <motion.div 
+      <motion.div
         ref={servicesRef}
         initial={{ opacity: 0 }}
         animate={isServicesInView ? { opacity: 1 } : { opacity: 0 }}
@@ -350,9 +327,9 @@ const AboutSection: NextPage = () => {
       >
         <SummeryServices />
       </motion.div>
-      
+
       {/* Team Section with wrapper for animations */}
-      <motion.div 
+      <motion.div
         ref={teamSectionRef}
         initial={{ opacity: 0, y: 50 }}
         animate={isTeamInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}

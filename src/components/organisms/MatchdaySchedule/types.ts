@@ -1,9 +1,10 @@
 
 export interface MatchdayType {
     id: number;
-    ageGroup: string;
+    age_category: string;
     location: string;
-    teams: string[];
-    date: string;
+    team1: string;
+    team2: string;
+    match_date: string;
     address: string;
 }

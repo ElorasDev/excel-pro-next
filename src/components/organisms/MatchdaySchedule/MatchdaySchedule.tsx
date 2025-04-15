@@ -3,14 +3,20 @@ import { useState } from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { matchdayData } from "./data";
 import MatchCard from "@/components/molecules/MatchCard/MatchCard";
 import { Search, Calendar, List } from "lucide-react";
 import { Button } from "@/components/atoms/Button/Button";
 import MatchCalendar from "../MatchCalendar/MatchCalendar";
 import AnimatedCard from "@/components/atoms/AnimatedCard/AnimatedCard";
+import { MatchdayType } from "./types";
 
-const MatchdaySchedule: NextPage = () => {
+interface MatchdayScheduleProps {
+  matchdayData: MatchdayType[];
+}
+
+const MatchdaySchedule: NextPage<MatchdayScheduleProps> = ({
+  matchdayData,
+}) => {
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [calendarMode, setCalendarMode] = useState(false);
@@ -24,32 +30,68 @@ const MatchdaySchedule: NextPage = () => {
     { id: "u15-17", label: "U15 - 17" },
   ];
 
+  // Format date function
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    
+    return date.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }) + ', ' + date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   // Filter matches based on selected age group and search query
   const filteredMatches = matchdayData.filter((match) => {
     // Filter by age group
     if (selectedAgeGroup !== "all") {
-      if (selectedAgeGroup === "u7-12" && !match.ageGroup.includes("U7 - U12"))
-        return false;
-      if (
-        selectedAgeGroup === "u13-14" &&
-        !match.ageGroup.includes("U13 - U14")
-      )
-        return false;
-      if (
-        selectedAgeGroup === "u15-17" &&
-        !match.ageGroup.includes("U15 - U17")
-      )
-        return false;
+      const ageCategory = match.age_category.toUpperCase();
+      
+      if (selectedAgeGroup === "u7-12") {
+        // Check if the age category contains numbers between 7-12 or the range text
+        const hasU7to12 = /U(7|8|9|10|11|12)\b/.test(ageCategory) || 
+                           ageCategory.includes("U7 - U12") ||
+                           ageCategory.includes("U7-U12");
+        if (!hasU7to12) return false;
+      }
+      
+      if (selectedAgeGroup === "u13-14") {
+        // Check if the age category contains U13 or U14 or the range text
+        const hasU13to14 = /U(13|14)\b/.test(ageCategory) || 
+                            ageCategory.includes("U13 - U14") ||
+                            ageCategory.includes("U13-U14");
+        if (!hasU13to14) return false;
+      }
+      
+      if (selectedAgeGroup === "u15-17") {
+        // Check if the age category contains numbers between 15-17 or the range text
+        const hasU15to17 = /U(15|16|17)\b/.test(ageCategory) || 
+                            ageCategory.includes("U15 - U17") ||
+                            ageCategory.includes("U15-U17");
+        if (!hasU15to17) return false;
+      }
     }
 
     // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        match.teams.some((team) => team.toLowerCase().includes(query)) ||
-        match.location.toLowerCase().includes(query) ||
-        match.address.toLowerCase().includes(query)
-      );
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase().trim();
+      const team1 = (match.team1 || "").toLowerCase();
+      const team2 = (match.team2 || "").toLowerCase();
+      const location = (match.location || "").toLowerCase();
+      const address = (match.address || "").toLowerCase();
+      
+      // Check if any of the fields contain the search query
+      const matchesSearch = 
+        team1.includes(query) || 
+        team2.includes(query) || 
+        location.includes(query) || 
+        address.includes(query);
+        
+      if (!matchesSearch) return false;
     }
 
     return true;
@@ -114,20 +156,7 @@ const MatchdaySchedule: NextPage = () => {
       {/* Matches Section */}
       <section className="relative min-h-[300px]">
         <AnimatePresence mode="wait">
-          {filteredMatches.length === 0 ? (
-            <motion.div
-              key="no-matches"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="text-center py-10"
-            >
-              <p className="text-lg text-gray-500">
-                No matches found. Try adjusting your filters.
-              </p>
-            </motion.div>
-          ) : calendarMode ? (
+          {calendarMode ? (
             <motion.div
               key="calendar"
               initial={{ opacity: 0, x: 50 }}
@@ -138,6 +167,7 @@ const MatchdaySchedule: NextPage = () => {
               <MatchCalendar
                 selectedAgeGroup={selectedAgeGroup}
                 searchQuery={searchQuery}
+                matchdayData={matchdayData}
               />
             </motion.div>
           ) : (
@@ -148,20 +178,35 @@ const MatchdaySchedule: NextPage = () => {
               exit={{ opacity: 0, x: 50 }}
               transition={{ duration: 0.4 }}
             >
-              {filteredMatches.map((match) => (
-                <AnimatedCard key={match.id}>
-                  <div className="my-10 mx-5">
-                    <MatchCard
-                      ageGroup={match.ageGroup}
-                      location={match.location}
-                      teams={match.teams}
-                      date={match.date}
-                      address={match.address}
-                      id={match.id}
-                    />
-                  </div>
-                </AnimatedCard>
-              ))}
+              {filteredMatches.length === 0 ? (
+                <motion.div
+                  key="no-matches-list"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-center py-10"
+                >
+                  <p className="text-lg text-gray-500">
+                    No matches found. Try adjusting your filters.
+                  </p>
+                </motion.div>
+              ) : (
+                filteredMatches.map((match) => (
+                  <AnimatedCard key={match.id}>
+                    <div className="my-10 mx-5">
+                      <MatchCard
+                        ageGroup={match.age_category}
+                        location={match.location}
+                        teams={[match.team1, match.team2]}
+                        date={formatDate(match.match_date)}
+                        address={match.address}
+                        id={match.id}
+                      />
+                    </div>
+                  </AnimatedCard>
+                ))
+              )}
             </motion.div>
           )}
         </AnimatePresence>

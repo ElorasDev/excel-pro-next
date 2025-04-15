@@ -1,20 +1,19 @@
-'use client';
-import { NextPage } from 'next';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaFilter, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
-import { IoMdClose } from 'react-icons/io';
+"use client";
+import { NextPage } from "next";
+import { useState } from "react";
+import { FaFilter, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
+import { IoMdClose } from "react-icons/io";
 import Modal from "@/components/atoms/Modal/Modal";
-import { Button } from '@/components/atoms/Button/Button';
-import { 
-  useMatchList, 
-  useCreateMatch, 
-  useUpdateMatch, 
-  useDeleteMatch, 
-  useMatchDateFormatters 
-} from '@/hooks/useMatch/Match';
-import { Match } from '@/stores/matchStor/index';
-import { AgeCategory } from '@/stores/matchStor/enums/enums';
+import { Button } from "@/components/atoms/Button/Button";
+import {
+  useMatchList,
+  useCreateMatch,
+  useUpdateMatch,
+  useDeleteMatch,
+  useMatchDateFormatters,
+} from "@/hooks/useMatch/Match";
+import { Match } from "@/stores/matchStor/index";
+import { AgeCategory } from "@/stores/matchStor/enums/enums";
 
 const Matches: NextPage = () => {
   // Use custom hooks for state management
@@ -29,38 +28,35 @@ const Matches: NextPage = () => {
     toggleSort,
     clearFilters,
     matchTypes,
-    refresh
+    refresh,
   } = useMatchList();
-  const router = useRouter();
-  
+
   const {
     formData: createFormData,
     handleInputChange: handleCreateInputChange,
     handleAddMatch,
-    resetForm: resetCreateForm
+    resetForm: resetCreateForm,
   } = useCreateMatch();
-  
-  const {
-    deleteMatch
-  } = useDeleteMatch();
-  
+
+  const { deleteMatch } = useDeleteMatch();
+
   const { formatDate, formatDateForInput } = useMatchDateFormatters();
-  
+
   // Modal states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [currentMatch, setCurrentMatch] = useState<Match | null>(null);
-  
+
   // Edit form state (using hook)
   const {
     formData: editFormData,
     handleInputChange: handleEditInputChange,
     handleUpdateMatch,
-    setFormData: setEditFormData
+    setFormData: setEditFormData,
   } = useUpdateMatch();
-  
+
   // Open edit modal
   const openEditModal = (match: Match) => {
     setCurrentMatch(match);
@@ -71,17 +67,17 @@ const Matches: NextPage = () => {
       age_category: match.age_category,
       team1: match.team1,
       team2: match.team2,
-      description: match.description
+      description: match.description,
     });
     setIsEditModalOpen(true);
   };
-  
+
   // Open delete modal
   const openDeleteModal = (match: Match) => {
     setCurrentMatch(match);
     setIsDeleteModalOpen(true);
   };
-  
+
   // Add a match
   const onAddMatch = async () => {
     const result = await handleAddMatch();
@@ -90,40 +86,42 @@ const Matches: NextPage = () => {
       refresh(); // Refresh list
     }
   };
-  
+
   // Update a match
   const onUpdateMatch = async () => {
     if (!currentMatch) return;
-    
+
     const result = await handleUpdateMatch(currentMatch.id);
     if (result) {
       setIsEditModalOpen(false);
       refresh(); // Refresh list
     }
   };
-  
+
   // Delete a match
   const onDeleteMatch = async () => {
     if (!currentMatch) return;
-    
+
     const success = await deleteMatch(currentMatch.id);
-    router.push("/matchday");
     if (success) {
       setIsDeleteModalOpen(false);
-      refresh();
+      await refresh();
+      window.location.reload();
     }
   };
 
   return (
-    <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white">
+    <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Matches</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+            Matches
+          </h1>
           <p className="text-gray-500">Manage your matches</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button 
+          <Button
             onClick={() => {
               resetCreateForm();
               setIsAddModalOpen(true);
@@ -140,40 +138,44 @@ const Matches: NextPage = () => {
       <div className="flex flex-col md:flex-row md:justify-between mb-6 gap-4">
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => toggleSort('newest')}
+            onClick={() => toggleSort("newest")}
             className={`px-3 py-2 rounded-md flex items-center gap-2 text-sm ${
-              sortBy === 'newest' ? 'bg-gray-100' : 'bg-white border border-gray-200'
+              sortBy === "newest"
+                ? "bg-gray-100"
+                : "bg-white border border-gray-200"
             }`}
           >
             <span>Newest</span>
-            {sortBy === 'newest' && (
-              <IoMdClose 
-                className="text-gray-500" 
+            {sortBy === "newest" && (
+              <IoMdClose
+                className="text-gray-500"
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleSort('newest');
+                  toggleSort("newest");
                 }}
               />
             )}
           </button>
           <button
-            onClick={() => toggleSort('oldest')}
+            onClick={() => toggleSort("oldest")}
             className={`px-3 py-2 rounded-md flex items-center gap-2 text-sm ${
-              sortBy === 'oldest' ? 'bg-gray-100' : 'bg-white border border-gray-200'
+              sortBy === "oldest"
+                ? "bg-gray-100"
+                : "bg-white border border-gray-200"
             }`}
           >
             <span>Oldest</span>
-            {sortBy === 'oldest' && (
-              <IoMdClose 
-                className="text-gray-500" 
+            {sortBy === "oldest" && (
+              <IoMdClose
+                className="text-gray-500"
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleSort('oldest');
+                  toggleSort("oldest");
                 }}
               />
             )}
           </button>
-          <button 
+          <button
             onClick={() => setIsFilterModalOpen(true)}
             className="px-3 py-2 rounded-md bg-white border border-gray-200 flex items-center gap-2 text-sm"
           >
@@ -181,7 +183,7 @@ const Matches: NextPage = () => {
             <span>More Filters</span>
           </button>
           {(sortBy || filterType) && (
-            <button 
+            <button
               onClick={clearFilters}
               className="px-3 py-2 rounded-md text-blue-500 text-sm"
             >
@@ -199,8 +201,8 @@ const Matches: NextPage = () => {
           />
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           {searchQuery && (
-            <button 
-              onClick={() => setSearchQuery('')}
+            <button
+              onClick={() => setSearchQuery("")}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             >
               <IoMdClose />
@@ -209,9 +211,9 @@ const Matches: NextPage = () => {
         </div>
       </div>
 
-      {/* Matches Table */}
+      {/* Matches Table with Fixed Height and Scrolling */}
       <div className="bg-white rounded-xl overflow-hidden border border-gray-100">
-        <div className="hidden md:grid md:grid-cols-5 px-4 py-3 bg-white border-b border-gray-100 text-gray-600 font-medium">
+        <div className="hidden md:grid md:grid-cols-5 px-4 py-3 bg-white border-b border-gray-100 text-gray-600 font-medium sticky top-0 z-10">
           <div>Category</div>
           <div>Location</div>
           <div>Date</div>
@@ -219,78 +221,80 @@ const Matches: NextPage = () => {
           <div></div>
         </div>
 
-        {loading ? (
-          <div className="py-8 text-center text-gray-500">
-            Loading matches...
-          </div>
-        ) : filteredMatches.length > 0 ? (
-          filteredMatches.map((match: Match) => (
-            <div 
-              key={match.id} 
-              className="grid grid-cols-1 md:grid-cols-5 px-4 py-4 items-center border-b border-gray-100 last:border-0"
-            >
-              {/* Mobile view - stacked layout */}
-              <div className="md:hidden grid grid-cols-2 gap-2 mb-3">
-                <div className="font-medium">Category:</div>
-                <div>{match.age_category}</div>
-                
-                <div className="font-medium">Location:</div>
-                <div>
-                  {match.location}
+        <div className="max-h-[500px] overflow-y-auto">
+          {loading ? (
+            <div className="py-8 text-center text-gray-500">
+              Loading matches...
+            </div>
+          ) : filteredMatches.length > 0 ? (
+            filteredMatches.map((match: Match) => (
+              <div
+                key={match.id}
+                className="grid grid-cols-1 md:grid-cols-5 px-4 py-4 items-center border-b border-gray-100 last:border-0"
+              >
+                {/* Mobile view - stacked layout */}
+                <div className="md:hidden grid grid-cols-2 gap-2 mb-3">
+                  <div className="font-medium">Category:</div>
+                  <div>{match.age_category}</div>
+
+                  <div className="font-medium">Location:</div>
+                  <div>{match.location}</div>
+
+                  <div className="font-medium">Date:</div>
+                  <div>{formatDate(match.match_date)}</div>
+
+                  <div className="font-medium">Teams:</div>
+                  <div className="flex items-center gap-1">
+                    <span>{match.team1}</span>
+                    <span className="mx-1">vs</span>
+                    <span>{match.team2}</span>
+                  </div>
+
+                  {match.description && (
+                    <>
+                      <div className="font-medium">Description:</div>
+                      <div>{match.description}</div>
+                    </>
+                  )}
                 </div>
-                
-                <div className="font-medium">Date:</div>
-                <div>{formatDate(match.match_date)}</div>
-                
-                <div className="font-medium">Teams:</div>
-                <div className="flex items-center gap-1">
+
+                {/* Desktop view - row layout */}
+                <div className="hidden md:block font-medium">
+                  {match.age_category}
+                </div>
+                <div className="hidden md:block">{match.location}</div>
+                <div className="hidden md:block">
+                  {formatDate(match.match_date)}
+                </div>
+                <div className="hidden md:flex items-center gap-1">
                   <span>{match.team1}</span>
-                  <span className="mx-1">vs</span>
+                  <span className="mx-1">VS</span>
                   <span>{match.team2}</span>
                 </div>
-                
-                {match.description && (
-                  <>
-                    <div className="font-medium">Description:</div>
-                    <div>{match.description}</div>
-                  </>
-                )}
+
+                {/* Actions are the same in both views */}
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => openEditModal(match)}
+                    className="p-2 text-gray-500 hover:text-blue-500 rounded-md"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(match)}
+                    className="p-2 text-gray-500 hover:text-red-500 rounded-md"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
               </div>
-              
-              {/* Desktop view - row layout */}
-              <div className="hidden md:block font-medium">{match.age_category}</div>
-              <div className="hidden md:block">
-                {match.location}
-              </div>
-              <div className="hidden md:block">{formatDate(match.match_date)}</div>
-              <div className="hidden md:flex items-center gap-1">
-                <span>{match.team1}</span>
-                <span className="mx-1">VS</span>
-                <span>{match.team2}</span>
-              </div>
-              
-              {/* Actions are the same in both views */}
-              <div className="flex justify-end gap-2">
-                <button 
-                  onClick={() => openEditModal(match)}
-                  className="p-2 text-gray-500 hover:text-blue-500 rounded-md"
-                >
-                  <FaEdit />
-                </button>
-                <button 
-                  onClick={() => openDeleteModal(match)}
-                  className="p-2 text-gray-500 hover:text-red-500 rounded-md"
-                >
-                  <FaTrash />
-                </button>
-              </div>
+            ))
+          ) : (
+            <div className="py-8 text-center text-gray-500">
+              No matches found. Try adjusting your filters or search criteria.
             </div>
-          ))
-        ) : (
-          <div className="py-8 text-center text-gray-500">
-            No matches found. Try adjusting your filters or search criteria.
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Add Match Modal */}
@@ -318,7 +322,7 @@ const Matches: NextPage = () => {
               ))}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Location Name
@@ -332,7 +336,7 @@ const Matches: NextPage = () => {
               placeholder="Stadium or venue name"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Address
@@ -346,7 +350,7 @@ const Matches: NextPage = () => {
               placeholder="Full address"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Date and Time
@@ -359,7 +363,7 @@ const Matches: NextPage = () => {
               className="w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -388,21 +392,21 @@ const Matches: NextPage = () => {
               />
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description (optional)
             </label>
             <textarea
               name="description"
-              value={createFormData.description || ''}
+              value={createFormData.description || ""}
               onChange={handleCreateInputChange}
               className="w-full p-2 border border-gray-300 rounded-md"
               rows={3}
               placeholder="Additional match details"
             />
           </div>
-          
+
           <div className="flex justify-end gap-3 pt-4">
             <button
               onClick={() => setIsAddModalOpen(false)}
@@ -419,7 +423,7 @@ const Matches: NextPage = () => {
           </div>
         </div>
       </Modal>
-      
+
       {/* Edit Match Modal */}
       <Modal
         isOpen={isEditModalOpen}
@@ -445,7 +449,7 @@ const Matches: NextPage = () => {
               ))}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Location Name
@@ -459,7 +463,7 @@ const Matches: NextPage = () => {
               placeholder="Stadium or venue name"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Address
@@ -473,7 +477,7 @@ const Matches: NextPage = () => {
               placeholder="Full address"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Date and Time
@@ -486,7 +490,7 @@ const Matches: NextPage = () => {
               className="w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -515,21 +519,21 @@ const Matches: NextPage = () => {
               />
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description (optional)
             </label>
             <textarea
               name="description"
-              value={editFormData.description || ''}
+              value={editFormData.description || ""}
               onChange={handleEditInputChange}
               className="w-full p-2 border border-gray-300 rounded-md"
               rows={3}
               placeholder="Additional match details"
             />
           </div>
-          
+
           <div className="flex justify-end gap-3 pt-4">
             <button
               onClick={() => setIsEditModalOpen(false)}
@@ -546,7 +550,7 @@ const Matches: NextPage = () => {
           </div>
         </div>
       </Modal>
-      
+
       {/* Delete Confirmation Modal */}
       <Modal
         isOpen={isDeleteModalOpen}
@@ -556,10 +560,11 @@ const Matches: NextPage = () => {
         <div className="space-y-4">
           <p>Are you sure you want to delete this match?</p>
           <p className="font-semibold">
-            {currentMatch?.team1} vs {currentMatch?.team2} ({currentMatch?.age_category})
+            {currentMatch?.team1} vs {currentMatch?.team2} (
+            {currentMatch?.age_category})
           </p>
           <p className="text-sm text-gray-500">This action cannot be undone.</p>
-          
+
           <div className="flex justify-end gap-3 pt-4">
             <button
               onClick={() => setIsDeleteModalOpen(false)}
@@ -576,7 +581,7 @@ const Matches: NextPage = () => {
           </div>
         </div>
       </Modal>
-      
+
       {/* Filter Modal */}
       <Modal
         isOpen={isFilterModalOpen}
@@ -601,7 +606,7 @@ const Matches: NextPage = () => {
               ))}
             </div>
           </div>
-          
+
           <div>
             <h3 className="font-medium mb-2">Sort By</h3>
             <div className="space-y-2">
@@ -609,8 +614,8 @@ const Matches: NextPage = () => {
                 <input
                   type="radio"
                   id="sort-newest"
-                  checked={sortBy === 'newest'}
-                  onChange={() => toggleSort('newest')}
+                  checked={sortBy === "newest"}
+                  onChange={() => toggleSort("newest")}
                   className="mr-2"
                 />
                 <label htmlFor="sort-newest">Newest</label>
@@ -619,15 +624,15 @@ const Matches: NextPage = () => {
                 <input
                   type="radio"
                   id="sort-oldest"
-                  checked={sortBy === 'oldest'}
-                  onChange={() => toggleSort('oldest')}
+                  checked={sortBy === "oldest"}
+                  onChange={() => toggleSort("oldest")}
                   className="mr-2"
                 />
                 <label htmlFor="sort-oldest">Oldest</label>
               </div>
             </div>
           </div>
-          
+
           <div className="flex justify-end gap-3 pt-4">
             <button
               onClick={clearFilters}

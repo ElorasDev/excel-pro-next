@@ -3,212 +3,296 @@ import { useState, useEffect } from "react";
 import { NextPage } from "next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/atoms/Button/Button";
-import { matchdayData } from "../MatchdaySchedule/data";
-
-
-type CalendarMatch = {
-  id: string;
-  date: Date;
-  ageGroup: string;
-  time: string;
-  teams: string[];
-};
+import { MatchdayType } from "../MatchdaySchedule/types";
 
 interface CalendarViewProps {
   selectedAgeGroup: string;
   searchQuery: string;
+  matchdayData?: MatchdayType[];
 }
 
 const MatchCalendar: NextPage<CalendarViewProps> = ({
   selectedAgeGroup,
   searchQuery,
+  matchdayData = [],
 }) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 2, 1)); // مارس 2025
-  const [processedMatches, setProcessedMatches] = useState<CalendarMatch[]>([]);
-  const [calendarDays, setCalendarDays] = useState<Array<{ day: number; isCurrentMonth: boolean; matches: CalendarMatch[] }>>([]);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [processedMatches, setProcessedMatches] = useState<MatchdayType[]>([]);
+  const [calendarDays, setCalendarDays] = useState<
+    Array<{
+      day: number;
+      isCurrentMonth: boolean;
+      hasU7to12: boolean;
+      hasU13to14: boolean;
+      hasU15to17: boolean;
+    }>
+  >([]);
+  const [hasFilteredMatches, setHasFilteredMatches] = useState(true);
 
-  // پردازش مسابقات و فیلتر کردن آنها
+  // Process and filter matches when data, filters, or search query changes
   useEffect(() => {
-    console.log("پردازش مسابقات...");
-    console.log("تعداد کل مسابقات:", matchdayData.length);
-    
-    // فیلتر کردن مسابقات بر اساس گروه سنی و جستجو
+    if (!matchdayData || matchdayData.length === 0) {
+      setProcessedMatches([]);
+      setHasFilteredMatches(false);
+      return;
+    }
+
     const filtered = matchdayData.filter((match) => {
-      // فیلتر بر اساس گروه سنی
-      if (selectedAgeGroup !== "all") {
-        if (selectedAgeGroup === "u7-12" && !match.ageGroup.includes("U7 - U12"))
-          return false;
-        if (
-          selectedAgeGroup === "u13-14" &&
-          !match.ageGroup.includes("U13 - U14")
-        )
-          return false;
-        if (
-          selectedAgeGroup === "u15-17" &&
-          !match.ageGroup.includes("U15 - U17")
-        )
-          return false;
+      // Make sure match has all required properties
+      if (
+        !match ||
+        !match.age_category ||
+        !match.team1 ||
+        !match.team2 ||
+        !match.match_date
+      ) {
+        return false;
       }
 
-      // فیلتر بر اساس عبارت جستجو
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        return (
-          match.teams.some((team) => team.toLowerCase().includes(query)) ||
-          match.location.toLowerCase().includes(query) ||
-          match.address.toLowerCase().includes(query)
-        );
+      // Filter by search query
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase().trim();
+        const team1 = (match.team1 || "").toLowerCase();
+        const team2 = (match.team2 || "").toLowerCase();
+        const location = (match.location || "").toLowerCase();
+        const address = (match.address || "").toLowerCase();
+
+        // Check if any of the fields contain the search query
+        const matchesSearch =
+          team1.includes(query) ||
+          team2.includes(query) ||
+          location.includes(query) ||
+          address.includes(query);
+
+        if (!matchesSearch) return false;
       }
 
       return true;
     });
-    
-    console.log("تعداد مسابقات پس از فیلتر:", filtered.length);
 
-    // تبدیل داده‌های مسابقات به فرمت مورد نیاز تقویم
-    const processed = filtered.map((match) => {
-      try {
-        // تجزیه تاریخ با قالب "DD/MM/YY HH:MM AM/PM"
-        const dateParts = match.date.split(" ");
-        const dateStr = dateParts[0]; // بخش تاریخ (DD/MM/YY)
-        
-        // تبدیل تاریخ
-        const [day, month, year] = dateStr.split("/").map(Number);
-        
-        // ساخت شیء Date (توجه: ماه‌ها از 0 شروع می‌شوند)
-        const fullYear = 2000 + year; // تبدیل 25 به 2025
-        const dateObj = new Date(fullYear, month - 1, day);
-        
-        // گرفتن بخش زمان اگر وجود دارد
-        let timeStr = "";
-        if (dateParts.length > 1) {
-          // بررسی قالب زمان
-          const timeMatch = match.date.match(/(\d+:\d+\s*[AP]M)/i);
-          timeStr = timeMatch ? timeMatch[1] : "";
-        }
-        
-        console.log(`مسابقه ${match.id}: تاریخ=${dateObj.toDateString()}, زمان=${timeStr}`);
-        
-        return {
-          id: match.id.toString(),
-          date: dateObj,
-          ageGroup: match.ageGroup,
-          time: timeStr,
-          teams: match.teams
-        };
-      } catch (error) {
-        console.error(`خطا در پردازش تاریخ برای مسابقه ${match.id}:`, error);
-        return null;
-      }
-    }).filter(Boolean) as CalendarMatch[];
-    
-    console.log("تعداد مسابقات پس از پردازش:", processed.length);
-    setProcessedMatches(processed);
-  }, [selectedAgeGroup, searchQuery]);
+    console.log("Number of matches after filtering:", filtered.length);
+    setProcessedMatches(filtered);
+    setHasFilteredMatches(filtered.length > 0);
+  }, [matchdayData, searchQuery]);
 
-  // ساخت روزهای تقویم
+  // Generate calendar days when month or processed matches change
   useEffect(() => {
-    console.log("ساخت روزهای تقویم...");
+    console.log("Generating calendar days...");
     const days = generateCalendar();
     setCalendarDays(days);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth, processedMatches]);
 
-  // توابع مربوط به ناوبری
+  // Navigation functions
   const goToPreviousMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
+    );
   };
 
   const goToNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
+    );
   };
 
-  // تولید ساختار تقویم
+  // Reset to current month
+  const goToCurrentMonth = () => {
+    setCurrentMonth(new Date());
+  };
+
+  // Check if a match belongs to a specific age group
+  const checkAgeGroup = (ageCategory: string) => {
+    if (!ageCategory)
+      return { isU7to12: false, isU13to14: false, isU15to17: false };
+
+    ageCategory = ageCategory.toUpperCase();
+
+    const isU7to12 =
+      /U(7|8|9|10|11|12)\b/.test(ageCategory) ||
+      ageCategory.includes("U7 - U12") ||
+      ageCategory.includes("U7-U12");
+
+    const isU13to14 =
+      /U(13|14)\b/.test(ageCategory) ||
+      ageCategory.includes("U13 - U14") ||
+      ageCategory.includes("U13-U14");
+
+    const isU15to17 =
+      /U(15|16|17)\b/.test(ageCategory) ||
+      ageCategory.includes("U15 - U17") ||
+      ageCategory.includes("U15-U17");
+
+    return { isU7to12, isU13to14, isU15to17 };
+  };
+
+  // Generate calendar structure
   const generateCalendar = () => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
-    
-    console.log(`ساخت تقویم برای ${month + 1}/${year}`);
-    
-    // روز اول ماه در هفته (0 = یکشنبه، 6 = شنبه)
+
+    console.log(`Building calendar for ${month + 1}/${year}`);
+
+    // First day of month in week (0 = Sunday, 6 = Saturday)
     const firstDay = new Date(year, month, 1).getDay();
-    
-    // آخرین روز ماه
+
+    // Last day of month
     const lastDay = new Date(year, month + 1, 0).getDate();
-    
-    // آخرین روز ماه قبل
+
+    // Last day of previous month
     const prevMonthLastDay = new Date(year, month, 0).getDate();
-    
-    const daysArray: Array<{ day: number; isCurrentMonth: boolean; matches: CalendarMatch[] }> = [];
-    
-    // روزهای ماه قبل که در هفته اول نمایش داده می‌شوند
+
+    const daysArray: Array<{
+      day: number;
+      isCurrentMonth: boolean;
+      hasU7to12: boolean;
+      hasU13to14: boolean;
+      hasU15to17: boolean;
+    }> = [];
+
+    // Previous month days that appear in first week
     for (let i = 0; i < firstDay; i++) {
       const day = prevMonthLastDay - firstDay + i + 1;
-      
-      // فیلتر مسابقات مربوط به این روز
-      const dayMatches = processedMatches.filter(match => 
-        match.date.getDate() === day && 
-        match.date.getMonth() === month - 1 && 
-        match.date.getFullYear() === year
-      );
-      
-      daysArray.push({ day, isCurrentMonth: false, matches: dayMatches });
-    }
-    
-    // روزهای ماه جاری
-    for (let i = 1; i <= lastDay; i++) {
-      // فیلتر مسابقات مربوط به این روز
-      const dayMatches = processedMatches.filter(match => {
-        const matchDate = match.date;
-        const isMatch = 
-          matchDate.getDate() === i && 
-          matchDate.getMonth() === month && 
-          matchDate.getFullYear() === year;
-          
-        if (isMatch) {
-          console.log(`مسابقه برای روز ${i} یافت شد:`, match.teams.join(" vs "));
-        }
-        
-        return isMatch;
-      });
-      
-      if (dayMatches.length > 0) {
-        console.log(`برای روز ${i}، ${dayMatches.length} مسابقه یافت شد`);
+
+      // Check for age group matches on this day
+      let hasU7to12 = false;
+      let hasU13to14 = false;
+      let hasU15to17 = false;
+
+      if (Array.isArray(processedMatches)) {
+        processedMatches.forEach((match) => {
+          if (!match || !match.match_date || !match.age_category) return;
+
+          try {
+            const matchDate = new Date(match.match_date);
+            if (
+              matchDate.getDate() === day &&
+              matchDate.getMonth() === month - 1 &&
+              matchDate.getFullYear() === (month === 0 ? year - 1 : year)
+            ) {
+              const { isU7to12, isU13to14, isU15to17 } = checkAgeGroup(
+                match.age_category
+              );
+              if (isU7to12) hasU7to12 = true;
+              if (isU13to14) hasU13to14 = true;
+              if (isU15to17) hasU15to17 = true;
+            }
+          } catch (e) {
+            console.error("Error parsing date:", e);
+          }
+        });
       }
-      
-      daysArray.push({ day: i, isCurrentMonth: true, matches: dayMatches });
+
+      daysArray.push({
+        day,
+        isCurrentMonth: false,
+        hasU7to12,
+        hasU13to14,
+        hasU15to17,
+      });
     }
-    
-    // روزهای ماه بعد برای تکمیل آخرین هفته
-    const remainingCells = 42 - daysArray.length; // همیشه 6 ردیف نمایش بده (6 * 7 = 42)
+
+    // Current month days
+    for (let i = 1; i <= lastDay; i++) {
+      // Check for age group matches on this day
+      let hasU7to12 = false;
+      let hasU13to14 = false;
+      let hasU15to17 = false;
+
+      if (Array.isArray(processedMatches)) {
+        processedMatches.forEach((match) => {
+          if (!match || !match.match_date || !match.age_category) return;
+
+          try {
+            const matchDate = new Date(match.match_date);
+            if (
+              matchDate.getDate() === i &&
+              matchDate.getMonth() === month &&
+              matchDate.getFullYear() === year
+            ) {
+              const { isU7to12, isU13to14, isU15to17 } = checkAgeGroup(
+                match.age_category
+              );
+              if (isU7to12) hasU7to12 = true;
+              if (isU13to14) hasU13to14 = true;
+              if (isU15to17) hasU15to17 = true;
+            }
+          } catch (e) {
+            console.error("Error parsing date:", e);
+          }
+        });
+      }
+
+      daysArray.push({
+        day: i,
+        isCurrentMonth: true,
+        hasU7to12,
+        hasU13to14,
+        hasU15to17,
+      });
+    }
+
+    // Next month days to complete the last week
+    const remainingCells = 42 - daysArray.length; // Always show 6 rows (6 * 7 = 42)
     for (let i = 1; i <= remainingCells; i++) {
-      // فیلتر مسابقات مربوط به این روز
-      const dayMatches = processedMatches.filter(match => 
-        match.date.getDate() === i && 
-        match.date.getMonth() === month + 1 && 
-        match.date.getFullYear() === year
-      );
-      
-      daysArray.push({ day: i, isCurrentMonth: false, matches: dayMatches });
+      // Check for age group matches on this day
+      let hasU7to12 = false;
+      let hasU13to14 = false;
+      let hasU15to17 = false;
+
+      if (Array.isArray(processedMatches)) {
+        processedMatches.forEach((match) => {
+          if (!match || !match.match_date || !match.age_category) return;
+
+          try {
+            const matchDate = new Date(match.match_date);
+            if (
+              matchDate.getDate() === i &&
+              matchDate.getMonth() === month + 1 &&
+              matchDate.getFullYear() === (month === 11 ? year + 1 : year)
+            ) {
+              const { isU7to12, isU13to14, isU15to17 } = checkAgeGroup(
+                match.age_category
+              );
+              if (isU7to12) hasU7to12 = true;
+              if (isU13to14) hasU13to14 = true;
+              if (isU15to17) hasU15to17 = true;
+            }
+          } catch (e) {
+            console.error("Error parsing date:", e);
+          }
+        });
+      }
+
+      daysArray.push({
+        day: i,
+        isCurrentMonth: false,
+        hasU7to12,
+        hasU13to14,
+        hasU15to17,
+      });
     }
-    
+
     return daysArray;
   };
 
-  // فرمت ماه و سال
+  // Format month and year
   const formatMonthYear = (date: Date) => {
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   };
-  
-  // گروه‌بندی روزها به هفته‌ها
-  const weeks: Array<Array<typeof calendarDays[0]>> = [];
+
+  // Group days into weeks
+  const weeks: Array<Array<(typeof calendarDays)[0]>> = [];
   for (let i = 0; i < calendarDays.length; i += 7) {
     weeks.push(calendarDays.slice(i, i + 7));
   }
 
-  // برای اهداف رفع اشکال
-  console.log("ماه جاری:", currentMonth.toDateString());
-  console.log("تعداد مسابقات پردازش شده:", processedMatches.length);
-  console.log("تعداد کل روزهای تقویم:", calendarDays.length);
+  // Get today's date to highlight current day
+  const today = new Date();
+  const isCurrentMonth =
+    today.getMonth() === currentMonth.getMonth() &&
+    today.getFullYear() === currentMonth.getFullYear();
+  const currentDay = today.getDate();
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -216,15 +300,24 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
       <div className="flex items-center justify-between p-4 border-b">
         <h2 className="text-2xl font-bold">{formatMonthYear(currentMonth)}</h2>
         <div className="flex space-x-2">
-          <Button 
+          <Button
             onClick={goToPreviousMonth}
             className="p-2 rounded-full"
+            aria-label="Previous month"
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
-          <Button 
+          <Button
+            onClick={goToCurrentMonth}
+            className="px-3 py-1 text-sm rounded-lg"
+            aria-label="Current month"
+          >
+            Today
+          </Button>
+          <Button
             onClick={goToNextMonth}
             className="p-2 rounded-full"
+            aria-label="Next month"
           >
             <ChevronRight className="h-6 w-6" />
           </Button>
@@ -233,7 +326,7 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
 
       {/* Weekday headers */}
       <div className="grid grid-cols-7 text-center py-2 border-b">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
           <div key={day} className="font-medium text-gray-700">
             {day}
           </div>
@@ -243,54 +336,93 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
       {/* Calendar grid */}
       <div className="grid grid-cols-1">
         {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} className="grid grid-cols-7 border-b last:border-b-0">
-            {week.map((dayData, dayIndex) => (
-              <div
-                key={`${weekIndex}-${dayIndex}`}
-                className={`relative h-32 p-1 border-r last:border-r-0 ${
-                  dayData.isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'
-                }`}
-              >
-                <div className="text-right p-1">{dayData.day}</div>
-                
-                {/* Match indicators */}
-                <div className="mt-1 space-y-1">
-                  {dayData.matches.map((match) => {
-                    // Determine color based on age group
-                    let bgColor = "bg-gray-500";
-                    const textColor = "text-white";
-                    
-                    if (match.ageGroup.includes("U7 - U12")) {
-                      bgColor = "bg-indigo-900";
-                    } else if (match.ageGroup.includes("U13 - U14")) {
-                      bgColor = "bg-orange-500";
-                    } else if (match.ageGroup.includes("U15 - U17")) {
-                      bgColor = "bg-red-500";
-                    }
-                    
-                    return (
-                      <div
-                        key={match.id}
-                        className={`${bgColor} ${textColor} rounded p-1 text-xs leading-tight overflow-hidden`}
-                      >
-                        <div className="font-medium">
-                          {match.ageGroup.split(' - ')[0]} Match
-                        </div>
-                        <div>{match.time}</div>
-                      </div>
-                    );
-                  })}
+          <div
+            key={weekIndex}
+            className="grid grid-cols-7 border-b last:border-b-0"
+          >
+            {week.map((dayData, dayIndex) => {
+              // Determine if this is today
+              const isToday =
+                isCurrentMonth &&
+                dayData.isCurrentMonth &&
+                dayData.day === currentDay;
+
+              return (
+                <div
+                  key={`${weekIndex}-${dayIndex}`}
+                  className={`relative min-h-[100px] p-1 border-r last:border-r-0 ${
+                    !dayData.isCurrentMonth
+                      ? "bg-gray-50 text-gray-400"
+                      : isToday
+                      ? "bg-white"
+                      : "bg-white"
+                  }`}
+                >
+                  {/* Day number */}
+                  <div className="text-right p-1">
+                    {isToday ? (
+                      <span className="bg-primary font-bold text-white rounded-full w-7 h-7 inline-flex items-center justify-center">
+                        {dayData.day}
+                      </span>
+                    ) : (
+                      dayData.day
+                    )}
+                  </div>
+
+                  {/* Age group indicators */}
+                  <div className="mt-1 space-y-1 text-xs">
+                    {dayData.isCurrentMonth && (
+                      <>
+                        {dayData.hasU7to12 && (
+                          <div
+                            className={`px-1 py-0.5 rounded ${
+                              selectedAgeGroup === "u7-12" ||
+                              selectedAgeGroup === "all"
+                                ? "bg-indigo-100 text-indigo-900 font-medium"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            U7-12
+                          </div>
+                        )}
+                        {dayData.hasU13to14 && (
+                          <div
+                            className={`px-1 py-0.5 rounded ${
+                              selectedAgeGroup === "u13-14" ||
+                              selectedAgeGroup === "all"
+                                ? "bg-orange-100 text-orange-700 font-medium"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            U13-14
+                          </div>
+                        )}
+                        {dayData.hasU15to17 && (
+                          <div
+                            className={`px-1 py-0.5 rounded ${
+                              selectedAgeGroup === "u15-17" ||
+                              selectedAgeGroup === "all"
+                                ? "bg-red-100 text-red-700 font-medium"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            U15-17
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ))}
       </div>
-      
-      {/* Debug info - can be removed in production */}
-      {processedMatches.length === 0 && (
-        <div className="p-4 text-red-500 bg-red-50">
-          هشدار: هیچ مسابقه‌ای برای نمایش یافت نشد. لطفاً داده‌های ورودی را بررسی کنید.
+
+      {/* No matches notice */}
+      {!hasFilteredMatches && (
+        <div className="p-4 text-amber-700 bg-amber-50 border-t text-center">
+          No matches found for the current filters. Try adjusting your filters.
         </div>
       )}
     </div>

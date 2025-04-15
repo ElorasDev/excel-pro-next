@@ -82,8 +82,23 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
   fetchMatches: async () => {
     try {
       set({ loading: true, error: null });
-      const data = await fetchWithErrorHandling<Match[]>(`${API_URL}/matches`);
-      set({ matches: data, loading: false });
+      
+      // اضافه کردن headers برای جلوگیری از کش شدن نتایج
+      const response = await fetch(`${API_URL}/matches`, {
+        method: 'GET',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch matches: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Fetched matches:', data.length);
+      
+      set({ 
+        matches: data, 
+        loading: false 
+      });
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to fetch matches', 
@@ -192,17 +207,41 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
   removeMatch: async (id: number) => {
     try {
       set({ loading: true, error: null });
-      await fetchWithErrorHandling(`${API_URL}/matches/${id}`, {
+      
+      // فراخوانی API برای حذف مسابقه
+      const response = await fetch(`${API_URL}/matches/${id}`, {
         method: 'DELETE',
       });
       
-      // Remove the match from the matches array
+      if (!response.ok) {
+        throw new Error(`Failed to delete match: ${response.status}`);
+      }
+      
+      // بروزرسانی محلی استور
       const currentMatches = get().matches;
       set({ 
         matches: currentMatches.filter(match => match.id !== id),
-        currentMatch: get().currentMatch?.id === id ? null : get().currentMatch,
+        currentMatch: null, // تنظیم صریح currentMatch به null
         loading: false 
       });
+      
+      // بازخوانی صریح داده‌ها از سرور
+      try {
+        const freshResponse = await fetch(`${API_URL}/matches`, {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        if (freshResponse.ok) {
+          const freshData = await freshResponse.json();
+          set({ matches: freshData });
+        }
+      } catch (fetchError) {
+        console.error('Error refreshing data after deletion:', fetchError);
+      }
       
       return true;
     } catch (error) {
@@ -213,4 +252,5 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
       return false;
     }
   },
+
 }));

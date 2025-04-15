@@ -248,12 +248,11 @@ export const useUpdateMatch = (id?: number) => {
 
 // Hook for deleting a match
 export const useDeleteMatch = () => {
-  const { removeMatch, loading, error } = useMatchStore();
+  const { removeMatch, fetchMatches, loading, error } = useMatchStore();
   
   const deleteMatch = async (id: number) => {
     console.log('Deleting match with ID:', id);
     try {
-      // Ensure we're working with a number
       const matchId = typeof id === 'string' ? parseInt(id, 10) : id;
       
       if (isNaN(matchId)) {
@@ -262,6 +261,12 @@ export const useDeleteMatch = () => {
       }
       
       const success = await removeMatch(matchId);
+      
+      if (success) {
+        // اگر حذف موفقیت‌آمیز بود، صریحاً لیست را دوباره بارگیری کنید
+        await fetchMatches();
+      }
+      
       console.log('Delete result:', success);
       return success;
     } catch (err) {

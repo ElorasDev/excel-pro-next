@@ -5,9 +5,17 @@ import "swiper/swiper-bundle.css"; // Make sure the Swiper styles are imported
 import Image from "next/image";
 
 interface TeamImages {
-  id: string;
-  alt: string;
-  src: string;
+    id: string;
+    title: string;
+    file_name: string;
+    storage_filename: string;
+    image_url: string;
+    file_path: string;
+    mime_type: string;
+    file_size: number;
+    caption: string | null;
+    created_at?: string;
+    updated_at?: string;
 }
 
 interface SliderProps {
@@ -37,12 +45,12 @@ const TeamSlider: NextPage<SliderProps> = ({ teamImages }) => {
         speed={800}
         className="team-swiper py-4"
       >
-        {[...teamImages, ...teamImages].slice(0, 12).map((image, index) => (
-          <SwiperSlide key={`team-${index}`}>
+        {teamImages.map((image) => (
+          <SwiperSlide key={`team-${image.id}`}>
             <div className="rounded-lg overflow-hidden shadow-md">
               <Image
-                src={image.src}
-                alt={image.alt}
+                src={image.image_url}
+                alt={image.title ? image.title : image.file_name}
                 width={500}
                 height={300}
                 className="w-full h-auto" // Responsive width, auto height
