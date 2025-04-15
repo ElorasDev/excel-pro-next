@@ -7,7 +7,6 @@ export const sendOtp = async (phoneNumber: string) => {
       body: JSON.stringify({ phone_number: phoneNumber }),
     });
     
-    console.log(process.env.NEXT_PUBLIC_API_URL)
     const data = await res.json();
   
     if (!res.ok) throw new Error(data.message || "Something went wrong");
