@@ -110,7 +110,7 @@ const Acknowledgment: NextPage = () => {
       console.log("Registering user with data:", userData);
 
       // Register the user
-      const response = await fetch("http://localhost:3001/users/register", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
