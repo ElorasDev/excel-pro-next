@@ -2,7 +2,31 @@ import { ProgramType } from "../SummeryPrograms/types";
 
 export const programs: ProgramType[] = [
   {
-    ageGroup: "U7 – U12",
+    ageGroup: "U5 – U8",
+    backgroundClass: "bg-green-50",
+    textColorClass: "text-gray-900",
+    schedule: ["Tuesdays at 5PM", "Saturday at 10AM"],
+    gameInfo: "Games: TBD",
+    tag: {
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+        </svg>
+      ),
+      text: "New",
+      className: "text-green-800",
+    },
+    imageSrc: "/images/programs/u15-17.png",
+    team_image: "/images/person/team/u7.png",
+    description: "Our U5 - U8 program introduces young players to the fundamentals of soccer in a fun, engaging environment. Players learn basic ball control, simple passing, and teamwork through game-based activities designed to build confidence and foster a love for the sport.",
+    programOutline: {
+      description: "Young players train in a nurturing environment with coaches specialized in early childhood development and soccer fundamentals.",
+      additionalDetails: "The U5-U8 Introduction Program focuses on building coordination, basic soccer skills, and social development through play. Sessions are structured with short, engaging activities to maintain attention and maximize enjoyment.",
+    },
+    playerUniformsEquipment: "At Excel Pro Soccer Academy, all players will receive full uniform upon registration. Uniforms consist of a jersey, shorts, and pair of socks. This uniform is to be worn at each session. All players are to bring their own shoes and shin pads. Running shoes are acceptable for this age group. Please note that shin pads are mandatory during all games and training sessions!"
+  },
+  {
+    ageGroup: "U9 – U12",
     backgroundClass: "bg-gray-100",
     textColorClass: "text-gray-900",
     schedule: ["Wednesdays at 5PM", "Sunday at 1PM"],
@@ -16,7 +40,7 @@ export const programs: ProgramType[] = [
       text: "Popular",
       className: "text-gray-800",
     },
-    imageSrc: "/images/programs/u7-12.png",
+    imageSrc: "/images/programs/u15-17.png",
     team_image: "/images/person/team/u7.png",
     description: "The goal of our U7 - U12 program is to give each player a solid foundation of soccer skills and techniques while educating them about the knowledge of the game. At this level, our priority is to create a fun and exciting environment while teaching skills such as dribbling at different speeds, passing, cuts and turns and 1v1 attacking and defending.",
     programOutline: {
@@ -40,7 +64,7 @@ export const programs: ProgramType[] = [
       text: "Off",
       className: "text-gray-800",
     },
-    imageSrc: "/images/programs/u13-14.png",
+    imageSrc: "/images/programs/u15-17.png",
     team_image: "/images/person/team/u7.png",
     description: "The goal of our U7 - U12 program is to give each player a solid foundation of soccer skills and techniques while educating them about the knowledge of the game. At this level, our priority is to create a fun and exciting environment while teaching skills such as dribbling at different speeds, passing, cuts and turns and 1v1 attacking and defending.",
     programOutline: {
@@ -50,7 +74,7 @@ export const programs: ProgramType[] = [
     playerUniformsEquipment: "At Excel Pro Soccer Academy, all players will receive full uniform upon registration. Uniforms consist of a jersey, shorts, and pair of socks. This uniform is to be worn at each session. Game day uniforms are separately given upon being selected for the team which includes players jersey number!All players are to bring their own shoes and shin pads. Running shoes are not acceptable. Please note that shin pads are mandatory during all games and training sessions!"
   },
   {
-    ageGroup: "U15 – U17",
+    ageGroup: "U15 – U18",
     backgroundClass: "bg-black",
     textColorClass: "text-white",
     schedule: ["Wednesdays at 5PM", "Sunday at 1PM"],

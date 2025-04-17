@@ -5,7 +5,6 @@ import RegisterForm from "@/components/organisms/RegisterContent/RegisterForm/Re
 
 const Register = () => {
   const [auth, setAuth] = useState<boolean>(false);
-
   return (
     <section>
       {!auth ? (

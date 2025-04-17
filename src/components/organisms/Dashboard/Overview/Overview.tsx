@@ -378,7 +378,7 @@ const Overview = () => {
         </div>
 
         {/* Action Buttons */}
-        <div
+        {/* <div
           className={`flex flex-col sm:flex-row gap-2 ${
             mobileMenuOpen ? "block" : "hidden sm:flex"
           }`}
@@ -390,7 +390,7 @@ const Overview = () => {
             <span className="mr-2">👤</span>
             <span>Player of the month</span>
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {/* Filters & Search */}

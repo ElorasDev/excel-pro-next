@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { programs } from "@/components/organisms/SummeryPrograms/data";
 import ProgramDetails from "@/components/template/Program/ProgramDetails/ProgramDetails";
 
@@ -17,22 +17,51 @@ const ProgramPage: NextPage<ProgramPageProps> = ({ params }) => {
       .replace(/\s*-\s*/g, '-')
       .replace(/\s+/g, '');
 
-  if (!/^u\d+-u\d+$/i.test(decodedSlug)) {
-    return notFound(); // 404 page
+  // بررسی فرمت URL
+  const validFormat = /^u\d+-u\d+$/i.test(decodedSlug);
+  if (!validFormat) {
+    return notFound();
   }
 
-  // Find the program based on the slug
-  const program = programs.find(p => normalize(p.ageGroup) === normalize(decodedSlug));
-
-  if (!program) {
+  // استفاده از regex برای استخراج اعداد از slug (مثلاً u9-u12)
+  const slugMatches = decodedSlug.match(/^u(\d+)-u(\d+)$/i);
+  if (!slugMatches) {
     return notFound();
+  }
+
+  const requestedStartAge = parseInt(slugMatches[1]);
+  const requestedEndAge = parseInt(slugMatches[2]);
+  
+  // یافتن برنامه متناسب با بررسی محدوده سنی
+  const program = programs.find(p => {
+    // تطبیق دقیق (مثل قبل)
+    if (normalize(p.ageGroup) === normalize(decodedSlug)) {
+      return true;
+    }
+    
+    // تطبیق محدوده سنی
+    const groupMatches = p.ageGroup.match(/u(\d+)\s*[–-]\s*u(\d+)/i);
+    if (groupMatches) {
+      const groupStartAge = parseInt(groupMatches[1]);
+      const groupEndAge = parseInt(groupMatches[2]);
+      
+      // بررسی آیا محدوده درخواستی در محدوده برنامه قرار دارد
+      return requestedStartAge >= groupStartAge && requestedEndAge <= groupEndAge;
+    }
+    
+    return false;
+  });
+
+  // بررسی وجود برنامه
+  if (!program) {
+    return redirect('/programs');
   }
 
   return (
     <main className="min-h-screen bg-gray-50 py-36 lg:py-28 md:py-28 sm:py-36">
         <ProgramDetails 
-        program={program}
-        decodedSlug={decodedSlug}
+          program={program}
+          decodedSlug={decodedSlug}
         />
     </main>
   );

@@ -6,9 +6,11 @@ import { Formik, Field, Form, ErrorMessage, FieldProps } from "formik";
 import * as Yup from "yup";
 import { sendOtp } from "@/services/sendOtpCode";
 import { verifyOtp } from "@/services/verifyOtpCode";
+import { getUserById } from "@/services/getUserById";
 import { CiMobile3 } from "react-icons/ci";
 import FloatingLabelInput from "../FloatingLabelInput/FloatingLabelInput";
 import useUserFormStore from "@/stores/UserFormStore";
+import { useRegisterStepStore } from "@/stores/registerStepStore";
 
 // Form Values
 interface AuthFormValues {
@@ -44,7 +46,8 @@ const AuthForm: NextPage<AuthFormProps> = ({ auth }) => {
   const [verifyCountdown, setVerifyCountdown] = useState<number>(0);
   const [otpSent, setOtpSent] = useState<boolean>(false);
   const [otpExpired, setOtpExpired] = useState<boolean>(false);
-  const { setPhoneNumber } = useUserFormStore();
+  const { setPhoneNumber, setEmail, setFullname } = useUserFormStore();
+  const { setStep } = useRegisterStepStore();
 
   const initialValues: AuthFormValues = {
     phoneNumber: "",
@@ -102,7 +105,29 @@ const AuthForm: NextPage<AuthFormProps> = ({ auth }) => {
       if (res.success) {
         setPhoneNumber(values.phoneNumber);
         alert("OTP Verified Successfully ✅");
-        auth(true);
+
+        // Check if user exists in database
+        try {
+          const userData = await getUserById(values.phoneNumber);
+          if (userData) {
+            alert("Welcome back! Redirecting to your profile.");
+            setEmail(userData.email);
+            setFullname(userData.fullname);
+            setStep(8);
+          } else {
+            // حتی اگر کاربر موجود نباشد هم auth را true کن
+            setStep(1);
+          }
+          // در هر صورت auth را true کن چه کاربر موجود باشد چه نباشد
+          auth(true);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          auth(true);
+          setStep(1);
+        }
+      } else {
+        // اگر OTP تأیید نشود، پیام خطا نمایش داده شود
+        alert("Invalid or expired OTP ❌");
       }
     } catch {
       alert("Invalid or expired OTP ❌");

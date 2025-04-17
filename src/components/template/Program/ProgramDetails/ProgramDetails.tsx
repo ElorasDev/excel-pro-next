@@ -137,7 +137,7 @@ const ProgramDetails: NextPage<ProgramType> = ({ program, decodedSlug }) => {
           {/* Banner image with scale animation */}
           <AnimatedSection className="flex flex-col items-center justify-center h-64 w-full md:w-full relative overflow-hidden rounded-lg" direction="left">
             <motion.div 
-              className="w-full h-full"
+              className="w-full h-full relative"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.5 }}
             >
@@ -147,7 +147,7 @@ const ProgramDetails: NextPage<ProgramType> = ({ program, decodedSlug }) => {
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover object-center" 
-                priority
+                loading="lazy"
                 quality="100"
               />
             </motion.div>

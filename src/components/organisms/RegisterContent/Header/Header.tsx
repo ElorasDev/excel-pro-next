@@ -15,7 +15,7 @@ const Header: NextPage = () => {
             <div
               onClick={() => setStep(step - 1)}
               className={`text-gray-600 hover:text-gray-800 ${
-                step === 1 && "hidden"
+                step === 1 || step === 8 ? "hidden" : ""
               }`}
             >
               <svg

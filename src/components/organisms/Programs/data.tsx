@@ -2,7 +2,7 @@ import { ProgramType } from "../SummeryPrograms/types";
 
 export const programs: ProgramType[] = [
   {
-    ageGroup: "U7 – U12",
+    ageGroup: "U5 – U8",
     backgroundClass: "bg-gray-100",
     textColorClass: "text-gray-900",
     schedule: ["Wednesdays at 5PM", "Sunday at 1PM"],
@@ -26,7 +26,7 @@ export const programs: ProgramType[] = [
     playerUniformsEquipment: "At Excel Pro Soccer Academy, all players will receive full uniform upon registration. Uniforms consist of a jersey, shorts, and pair of socks. This uniform is to be worn at each session. Game day uniforms are separately given upon being selected for the team which includes players jersey number!All players are to bring their own shoes and shin pads. Running shoes are not acceptable. Please note that shin pads are mandatory during all games and training sessions!"
   },
   {
-    ageGroup: "U13 – U14",
+    ageGroup: "U9 – U12",
     backgroundClass: "bg-blue-50",
     textColorClass: "text-gray-900",
     schedule: ["Wednesdays at 5PM", "Sunday at 1PM"],
@@ -50,7 +50,27 @@ export const programs: ProgramType[] = [
     playerUniformsEquipment: "At Excel Pro Soccer Academy, all players will receive full uniform upon registration. Uniforms consist of a jersey, shorts, and pair of socks. This uniform is to be worn at each session. Game day uniforms are separately given upon being selected for the team which includes players jersey number!All players are to bring their own shoes and shin pads. Running shoes are not acceptable. Please note that shin pads are mandatory during all games and training sessions!"
   },
   {
-    ageGroup: "U15 – U17",
+    ageGroup: "U13 – U14",
+    backgroundClass: "bg-black",
+    textColorClass: "text-white",
+    schedule: ["Wednesdays at 5PM", "Sunday at 1PM"],
+    gameInfo: "Games: TBD",
+    tag: {
+      icon: null,
+      text: "",
+      className: "text-white",
+    },
+    imageSrc: "/images/programs/u15-17.png",
+    team_image: "/images/person/team/u7.png",
+    description: "The goal of our U7 - U12 program is to give each player a solid foundation of soccer skills and techniques while educating them about the knowledge of the game. At this level, our priority is to create a fun and exciting environment while teaching skills such as dribbling at different speeds, passing, cuts and turns and 1v1 attacking and defending.",
+    programOutline: {
+      description:  "All players train throughout the year under the supervision of Reza Abedian and other passionate and experienced coaches who are looking to bring the best out of these young soccer players.",
+      additionalDetails: "The U8-U12 Competitive Program at Excel Pro Soccer Academy is an opportunity for players to grow in technique and strive for excellence in the beautiful game. At the end of each practice, coaches pick their player of the day to create a fun competitive environment. Every year during Summer and Fall/Winter season a number of players from the program are selected to play at the North York Association League!",
+    },
+    playerUniformsEquipment: "At Excel Pro Soccer Academy, all players will receive full uniform upon registration. Uniforms consist of a jersey, shorts, and pair of socks. This uniform is to be worn at each session. Game day uniforms are separately given upon being selected for the team which includes players jersey number!All players are to bring their own shoes and shin pads. Running shoes are not acceptable. Please note that shin pads are mandatory during all games and training sessions!"
+  },
+  {
+    ageGroup: "U15 – U18",
     backgroundClass: "bg-black",
     textColorClass: "text-white",
     schedule: ["Wednesdays at 5PM", "Sunday at 1PM"],

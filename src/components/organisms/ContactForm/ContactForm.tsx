@@ -80,9 +80,9 @@ const ContactForm = () => {
       // Call API to send message
       const result = await sendMessage(formData);
 
-      console.log(result)
+      console.log(result);
 
-      console.log(formData)
+      console.log(formData);
 
       if (result.success) {
         // Show success animation
@@ -259,9 +259,10 @@ const ContactForm = () => {
           <Image
             src="/images/person/get_in_touch.png"
             alt="Coaches"
-            layout="fill"
-            objectFit="cover"
-            className="rounded-xl"
+            fill={true}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority={true}
+            className="rounded-xl object-cover"
           />
           {/* Overlay for shadow effect */}
           <motion.div

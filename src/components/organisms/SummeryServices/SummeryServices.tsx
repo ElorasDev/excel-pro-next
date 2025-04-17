@@ -1,9 +1,8 @@
 "use client";
-import { useRef } from 'react';
+import { useRef, Fragment } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import PrimaryIcon from '@/components/atoms/Icons/primaryIcons/PrimaryIcon';
-import { Fragment } from 'react';
 import { services } from './data';
 
 const SummeryServices = () => {

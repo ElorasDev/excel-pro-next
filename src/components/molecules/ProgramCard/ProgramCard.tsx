@@ -32,7 +32,9 @@ const ProgramCard: NextPage<ProgramCardProps> = ({
   imageSrc,
 }) => {
   return (
-    <div className={`relative rounded-3xl overflow-hidden ${backgroundClass} h-96`}>
+    <div
+      className={`relative rounded-3xl overflow-hidden ${backgroundClass} h-96`}
+    >
       {/* Tag section: Display the program's label like 'Popular', 'Off', etc. */}
       {tag.text && (
         <div className="absolute top-4 left-4 flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-[#BDBDBD52]">
@@ -48,7 +50,8 @@ const ProgramCard: NextPage<ProgramCardProps> = ({
               src={imageSrc}
               alt={`${ageGroup} character`}
               fill
-              style={{ objectFit: "contain", objectPosition: "right bottom" }}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-contain object-right-bottom"
               priority
             />
           </div>
@@ -61,13 +64,17 @@ const ProgramCard: NextPage<ProgramCardProps> = ({
 
             {/* Render program schedule dynamically */}
             {schedule.map((line, index) => (
-              <p key={index} className="text-md">{line}</p>
+              <p key={index} className="text-md">
+                {line}
+              </p>
             ))}
 
             <p className="text-lg">{gameInfo}</p>
 
             {/* Link to the program's detailed page */}
-            <Link href={`/program/${ageGroup.toLowerCase().replace(/\s+/g, '')}`}>
+            <Link
+              href={`/program/${ageGroup.toLowerCase().replace(/\s+/g, "")}`}
+            >
               <button className="mt-6 px-8 py-3 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors">
                 Detail
               </button>
@@ -78,6 +85,5 @@ const ProgramCard: NextPage<ProgramCardProps> = ({
     </div>
   );
 };
-
 
 export default ProgramCard;

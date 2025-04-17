@@ -286,7 +286,7 @@ const AboutSection: NextPage<AboutSectionProps> = ({ teamImages }) => {
       >
         <motion.div variants={fadeInUp}>
           <PrimaryIcon
-            number="+10"
+            number="+500"
             text="Student"
             variant="dark"
             icon="/icons/football_player.png"
@@ -294,7 +294,7 @@ const AboutSection: NextPage<AboutSectionProps> = ({ teamImages }) => {
         </motion.div>
         <motion.div variants={fadeInUp}>
           <PrimaryIcon
-            number="+10"
+            number="+18"
             text="Years of experience"
             variant="dark"
             icon="/icons/trophy.png"
@@ -302,7 +302,7 @@ const AboutSection: NextPage<AboutSectionProps> = ({ teamImages }) => {
         </motion.div>
         <motion.div variants={fadeInUp}>
           <PrimaryIcon
-            number="+10"
+            number="+12"
             text="Coaches"
             variant="dark"
             icon="/icons/Coaches.png"

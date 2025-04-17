@@ -64,6 +64,7 @@ const HeroSection: NextPage = () => {
           src="/images/other/training.png"
           width={500}
           height={400}
+          loading="lazy"
           alt="Soccer training"
           className="w-full h-full object-cover rounded-r-lg"
         />
@@ -71,22 +72,39 @@ const HeroSection: NextPage = () => {
       </div>
 
       <motion.div className="relative z-10 flex flex-col gap-4 md:w-3/4">
-        <motion.h1 className="text-3xl md:text-4xl font-bold text-gray-900" variants={itemVariants}>
+        <motion.h1
+          className="text-3xl md:text-4xl font-bold text-gray-900"
+          variants={itemVariants}
+        >
           Excel Pro Academy, Where Champions Are Made!
         </motion.h1>
 
-        <motion.p className="text-gray-600 mt-2 md:max-w-lg" variants={itemVariants}>
-          Train with the best, compete at the highest level, and unlock your full potential with Excel Pro Academy.
+        <motion.p
+          className="text-gray-600 mt-2 md:max-w-lg"
+          variants={itemVariants}
+        >
+          Train with the best, compete at the highest level, and unlock your
+          full potential with Excel Pro Academy.
         </motion.p>
 
-        <motion.div className="flex items-center gap-4 mt-2 flex-wrap" variants={itemVariants}>
-          <Button variant="white" className="rounded-xl">View programs</Button>
-          <Button variant="primary" className="rounded-xl">Join now</Button>
+        <motion.div
+          className="flex items-center gap-4 mt-2 flex-wrap"
+          variants={itemVariants}
+        >
+          <Button variant="white" className="rounded-xl">
+            View programs
+          </Button>
+          <Button variant="primary" className="rounded-xl">
+            Join now
+          </Button>
           <AvatarGroup members={members} extraCount={500} />
         </motion.div>
       </motion.div>
 
-      <motion.div className="mt-6 md:hidden rounded-lg overflow-hidden" variants={itemVariants}>
+      <motion.div
+        className="mt-6 md:hidden rounded-lg overflow-hidden"
+        variants={itemVariants}
+      >
         <Image
           src="/images/other/training.png"
           width={400}

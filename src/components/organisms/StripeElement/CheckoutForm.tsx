@@ -6,15 +6,9 @@ import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useDivisionStore } from "@/stores/divisionStore";
 import useUserFormStore from "@/stores/UserFormStore";
 import type { StripeCardElementChangeEvent } from "@stripe/stripe-js";
+import { useRegisterStepStore } from "@/stores/registerStepStore";
 
-// Map division to backend pricing plan
-const divisionToPlanMapping: Record<string, string> = {
-  U7_U12: "basic",
-  U13_U14: "pro",
-  U15_U17: "premium",
-};
-
-type SubscriptionPlan = "U7_U12" | "U13_U14" | "U15_U17";
+type SubscriptionPlan = "free" | "U5_U8" | "U9_U12" | "U13_U14" | "U15_U18";
 
 interface BillingAddress {
   line1: string;
@@ -33,49 +27,97 @@ interface BillingDetails {
 interface Plan {
   title: string;
   price: string;
+  priceId: string | null;
   features: string[];
 }
 
 const plans: Record<SubscriptionPlan, Plan> = {
-  U7_U12: {
-    title: "U7-U12",
-    price: "$100/month",
+  free: {
+    title: "free",
+    price: "$0/ 2 months",
+    priceId: null,
+    features: ["None Feature"],
+  },
+  U5_U8: {
+    title: "U5-U8",
+    price: "$350/ 2 months",
+    priceId: `${process.env.NEXT_PUBLIC_U5_U8}`,
     features: ["Feature 1", "Feature 2"],
+  },
+  U9_U12: {
+    title: "U9-U12",
+    price: "$350/ 2 months",
+    priceId: `${process.env.NEXT_PUBLIC_U9_U12}`,
+    features: ["All Basic features", "Feature 3", "Feature 4"],
   },
   U13_U14: {
     title: "U13-U14",
-    price: "$100/month",
-    features: ["All Basic features", "Feature 3", "Feature 4"],
+    price: "$350/ 2 months",
+    priceId: `${process.env.NEXT_PUBLIC_U13_U14}`,
+    features: ["All Pro features", "Feature 5", "Feature 6"],
   },
-  U15_U17: {
-    title: "U15-U17",
-    price: "$100/month",
+  U15_U18: {
+    title: "U15-U18",
+    price: "$350/ 2 months",
+    priceId: `${process.env.NEXT_PUBLIC_U15_U18}`,
     features: ["All Pro features", "Feature 5", "Feature 6"],
   },
 };
 
-// Function to normalize division format
+// Enhanced function to normalize division format
 const normalizeDivision = (str: string): SubscriptionPlan => {
+  if (!str || typeof str !== 'string') {
+    console.warn("Invalid division input:", str);
+    return "U13_U14"; // Default to U13_U14 instead of free
+  }
+
   try {
+    
+    // If lower case "free" is specifically requested, return free
+    if (str.toLowerCase() === "free") {
+      return "free";
+    }
+    
     // If division already has the correct format, return it directly
     if (plans[str as SubscriptionPlan]) {
       return str as SubscriptionPlan;
     }
 
-    // Otherwise normalize
-    const normalized = str.toUpperCase().replace(/–|-/g, "_");
+    // Convert to uppercase and replace dashes or en-dashes with underscores
+    const normalized = str.toUpperCase().replace(/–|-|‐|\s+/g, "_");
     
     // Check if the result is valid
     if (plans[normalized as SubscriptionPlan]) {
       return normalized as SubscriptionPlan;
     }
     
-    // Default value if none matched
-    console.warn(`Could not normalize division "${str}", using default value`);
-    return "U7_U12";
+    // Try more aggressively by removing all underscores
+    const withoutUnderscores = normalized.replace(/_+/g, "");
+    
+    // Check for patterns like U5U8, U9U12, etc.
+    for (const validPlan of Object.keys(plans)) {
+      if (validPlan === 'free') continue;
+      
+      const [prefix, suffix] = validPlan.split('_');
+      if (withoutUnderscores === (prefix + suffix)) {
+        return validPlan as SubscriptionPlan;
+      }
+      
+      // Also try matching based on numbers only (for cases like 13-14, etc.)
+      const planNumbers = validPlan.replace(/\D+/g, '');
+      const inputNumbers = withoutUnderscores.replace(/\D+/g, '');
+      
+      if (planNumbers === inputNumbers) {
+        return validPlan as SubscriptionPlan;
+      }
+    }
+    
+    // If nothing else matches, return U13_U14 as the default
+    console.warn(`Could not normalize division "${str}", using U13_U14 as default`);
+    return "U13_U14"; // Default to U13_U14 instead of free
   } catch (error) {
     console.error("Error in normalizeDivision:", error);
-    return "U7_U12"; // Default value in case of error
+    return "U13_U14"; // Default to U13_U14 in case of error
   }
 };
 
@@ -85,12 +127,15 @@ const CheckoutForm: NextPage = () => {
   const elements = useElements();
   const { division } = useDivisionStore();
   const userForm = useUserFormStore();
-
+  const { setStep } = useRegisterStepStore();
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>("U7_U12"); // Default value
+  // منبع خطا: 1. به جای فراخوانی مستقیم normalizeDivision در useState، ابتدا یک مقدار پیش‌فرض قرار می‌دهیم
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>("U13_U14");
   const [initialized, setInitialized] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
+  const [showWarning, setShowWarning] = useState<boolean>(true);
   const [billingDetails, setBillingDetails] = useState<BillingDetails>({
     name: "",
     email: "",
@@ -116,15 +161,17 @@ const CheckoutForm: NextPage = () => {
         setTimeout(() => router.push("/register"), 3000);
         return;
       }
-
+      
       // You could have an API endpoint to update the user's payment status
-      const response = await fetch(`http://localhost:3001/users/${userIdParam}/update-payment-status`, {
-        method: "POST",
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userIdParam}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ 
           paymentStatus: "succeeded",
+          activePlan: selectedPlan, // Send the actual plan name directly
+          planId: selectedPlan, // Also include planId with the same value to match backend
           stripeCustomerId: userForm.stripeCustomerId || ""
         }),
         credentials: "include",
@@ -142,6 +189,9 @@ const CheckoutForm: NextPage = () => {
       // Payment status update successful
       setMessage("Registration and payment successful! Redirecting to homepage...");
       
+      // Set step to 1 consistently
+      setStep(1);
+      
       // Redirect to home page after a short delay
       setTimeout(() => router.push("/"), 2000);
     } catch (error) {
@@ -149,13 +199,41 @@ const CheckoutForm: NextPage = () => {
       setMessage("Error updating payment status. Please contact support.");
       setIsLoading(false);
     }
-  }, [router, userForm.stripeCustomerId]);
+  }, [selectedPlan, userForm.stripeCustomerId, setStep, router]);
 
   // Load user ID from localStorage when component mounts
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
       setUserId(storedUserId);
+      
+      // Check if user has previous subscriptions
+      const checkUserSubscription = async () => {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${storedUserId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            mode: "cors",
+          });
+          
+          if (response.ok) {
+            const userData = await response.json();
+            // If user has a previous subscription, set isFirstTime to false
+            if (userData.subscriptionHistory && userData.subscriptionHistory.length > 0) {
+              setIsFirstTime(false);
+            }
+          }
+        } catch (error) {
+          console.error("Error checking user subscription history:", error);
+          // If there's an error, assume it's a first-time user
+          setIsFirstTime(true);
+        }
+      };
+      
+      checkUserSubscription();
     } else {
       // If no user ID is found, redirect back to registration
       setMessage("Please complete registration before checkout");
@@ -164,33 +242,42 @@ const CheckoutForm: NextPage = () => {
     }
   }, [router]);
 
+  // منبع خطا: 2. جداسازی useEffect برای مقداردهی اولیه selectedPlan با استفاده از normalizeDivision
   useEffect(() => {
-    console.log("Division from store:", division);
 
     try {
+      // First check if division is empty or invalid
       if (!division || division === "undefined" || division === "null") {
-        console.log("Division is invalid or empty, using default");
-        setSelectedPlan("U7_U12");
-        setMessage("Using default program (U7-U12). You can change this later.");
+        setSelectedPlan("U13_U14"); // Set default to U13_U14 instead of free
+        setMessage("Using default program (U13-U14). You can change this later.");
       } else {
         try {
-          const normalizedDivision = normalizeDivision(decodeURIComponent(division));
-          console.log("Normalized division:", normalizedDivision);
-          setSelectedPlan(normalizedDivision);
+          // Decode and normalize division
+          const decodedDivision = decodeURIComponent(division);
+          
+          // Apply normalization
+          const normalizedDivision = normalizeDivision(decodedDivision);
+          
+          // If division is free after normalization but it shouldn't be, use U13_U14 as default
+          if (normalizedDivision === "free" && decodedDivision.toLowerCase() !== "free") {
+            setSelectedPlan("U13_U14");
+          } else {
+            setSelectedPlan(normalizedDivision);
+          }
         } catch (decodeError) {
           console.error("Error decoding division:", decodeError);
-          setSelectedPlan("U7_U12");
-          setMessage("Error processing program selection. Using default program (U7-U12).");
+          setSelectedPlan("U13_U14"); // Default to U13_U14 instead of free on error
+          setMessage("Error processing program selection. Using default program (U13-U14).");
         }
       }
     } catch (error) {
       console.error("Error in division processing:", error);
-      setSelectedPlan("U7_U12");
-      setMessage("An error occurred. Using default program (U7-U12).");
+      setSelectedPlan("U13_U14"); // Default to U13_U14 instead of free on error
+      setMessage("An error occurred. Using default program (U13-U14).");
     } finally {
       setInitialized(true);
     }
-  }, [division]);
+  }, [division]); // فقط زمانی اجرا شود که division تغییر کند
 
   useEffect(() => {
     if (!stripe) return;
@@ -241,16 +328,12 @@ const CheckoutForm: NextPage = () => {
     setMessage(event.error ? event.error.message : null);
   };
 
-  // Define a type for nested object in BillingDetails
-  // type NestedBillingDetailValue = string | BillingAddress | Record<string, string>;
-
   const handleBillingDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
   
     if (name.includes(".")) {
       const [parent, child] = name.split(".");
       
-      // Since we know the structure of BillingDetails, we can handle each possible parent field
       if (parent === "address") {
         setBillingDetails((prev) => ({
           ...prev,
@@ -260,7 +343,6 @@ const CheckoutForm: NextPage = () => {
           },
         }));
       } 
-      // If new nested fields are added in the future, add more conditions here
     } else {
       // Handle top-level fields (name, email)
       setBillingDetails((prev) => ({
@@ -333,18 +415,14 @@ const CheckoutForm: NextPage = () => {
         throw new Error("Failed to create payment method");
       }
 
-      // Send the payment method to your server
-      const stripePriceId = "price_1R0ssRCQIZTVFLLFqYDDGQF4"; // Your actual Stripe price ID
+      // Make sure activePlan is always a valid string
+      const planToSend = typeof selectedPlan === 'string' && selectedPlan 
+        ? selectedPlan 
+        : "U13_U14"; // Default to U13_U14 if selectedPlan is empty or invalid
 
-      console.log("Sending to server:", {
-        priceId: stripePriceId,
-        paymentMethodId: paymentMethod.id,
-        planId: divisionToPlanMapping[selectedPlan],
-        userId: userId,
-        billingDetails: billingDetails,
-      });
+      const stripePriceId = plans[planToSend as SubscriptionPlan]?.priceId;
 
-      const response = await fetch("http://localhost:3001/payments/subscription", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/subscription`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -352,7 +430,9 @@ const CheckoutForm: NextPage = () => {
         body: JSON.stringify({
           priceId: stripePriceId,
           paymentMethodId: paymentMethod.id,
-          planId: divisionToPlanMapping[selectedPlan],
+          planId: planToSend, // Send the actual plan name directly
+          activePlan: planToSend, // Also include activePlan for clarity
+          phone_number: userForm.phone_number,
           userId: userId,
           email: userForm.email || billingDetails.email,
           billingDetails: billingDetails,
@@ -374,8 +454,6 @@ const CheckoutForm: NextPage = () => {
       }
 
       const data = await response.json();
-      console.log("Server response data:", data);
-      router.push("/");
 
       // Save stripeCustomerId if it was provided
       if (data.stripeCustomerId) {
@@ -503,8 +581,21 @@ const CheckoutForm: NextPage = () => {
     );
   }
 
-  const isFirstTime = true;
-  const totalToday = isFirstTime ? 130 : 100;
+  // منبع خطا: 3. اطمینان از بررسی مقادیر قبل از استفاده
+  // Calculate total based on first-time status
+  const isFirstTimeUser = userForm.age ? isFirstTime : false;
+  const planToDisplay = typeof selectedPlan === 'string' && selectedPlan ? selectedPlan : "U13_U14";
+  
+  // استخراج صحیح مقدار عددی از رشته قیمت
+  // از "$350/ 2 months" فقط عدد 350 را استخراج می‌کنیم
+  const priceString = plans[planToDisplay]?.price || "$350/ 2 months";
+  const programPrice = parseInt(priceString.match(/\$(\d+)/)?.[1] || "350");
+  
+  const setupFee = isFirstTimeUser ? 75 : 0;
+  const totalAmount = programPrice + setupFee;
+  
+  // نمایش قیمت به شکل صحیح
+  const totalToday = `$${totalAmount}/ 2 months`;
 
   return (
     <form
@@ -512,6 +603,33 @@ const CheckoutForm: NextPage = () => {
       className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md"
     >
       <h1 className="text-2xl font-bold mb-6">Complete Your Subscription</h1>
+
+      {/* Payment Warning */}
+      {showWarning && (
+        <div id="payment-warning" className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex justify-between items-start">
+          <div className="flex-1">
+            <h3 className="font-bold text-yellow-700">⚠️ Important Payment Notice</h3>
+            <p className="mt-1 text-sm text-yellow-600">
+              To ensure your payment is processed correctly:
+            </p>
+            <ul className="list-disc ml-5 mt-2 text-sm text-yellow-600">
+              <li>Click the &quot;Subscribe Now&quot; button only once.</li>
+              <li>Do not refresh the page during payment processing.</li>
+              <li>If you encounter any issues, please contact customer support.</li>
+            </ul>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowWarning(false)}
+            className="text-yellow-500 hover:text-yellow-700"
+            aria-label="Close warning"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {message && (
         <div
@@ -535,17 +653,17 @@ const CheckoutForm: NextPage = () => {
 
       <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <h2 className="text-xl font-bold mb-2">
-          Selected Program: {plans[selectedPlan].title}
+          Selected Program: {plans[planToDisplay].title}
         </h2>
         <p className="text-lg font-medium text-gray-700 my-2">
-          {plans[selectedPlan].price}
-          {isFirstTime && (
+          {plans[planToDisplay].price}
+          {isFirstTimeUser && (
             <span className="ml-2 text-sm text-blue-600 font-normal">
-              + $30 one-time setup fee
+              + $75 one-time setup fee
             </span>
           )}
         </p>
-        <p className="text-sm text-gray-500">Total today: ${totalToday}</p>
+        <p className="text-sm text-gray-500">Total today: {totalToday}</p>
       </div>
 
       <div className="mb-6">
@@ -587,6 +705,7 @@ const CheckoutForm: NextPage = () => {
           </div>
         </div>
 
+        {/* سایر فیلدها... */}
         <div className="mb-4">
           <label
             htmlFor="address.line1"
@@ -744,29 +863,6 @@ const CheckoutForm: NextPage = () => {
           "Subscribe Now"
         )}
       </button>
-
-      {message && (
-        <div
-          className={`mt-6 p-4 rounded-md ${
-            typeof message === "string" &&
-            (message.toLowerCase().includes("success") ||
-              message.toLowerCase().includes("redirect") ||
-              message.toLowerCase().includes("processing"))
-              ? "bg-green-50 text-green-700"
-              : "bg-yellow-50 text-yellow-700"
-          }`}
-        >
-          {message}
-        </div>
-      )}
-
-      {message &&
-        typeof message === "string" &&
-        message.toLowerCase().includes("error") && (
-          <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md">
-            {message}
-          </div>
-        )}
     </form>
   );
 };

@@ -19,7 +19,7 @@ const Summary = () => {
   const targets = {
     students: 500,
     experience: 18,
-    coaches: 5,
+    coaches: 12,
     awards: 10
   };
 
