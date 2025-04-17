@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/atoms/Button/Button";
+// import { Button } from "@/components/atoms/Button/Button";
 import { useState, useEffect } from "react";
 import {
   FiSliders,
