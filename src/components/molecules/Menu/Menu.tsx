@@ -1,9 +1,10 @@
 "use client";
-import React from "react";
+import { NextPage } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { menuItems } from "./data";
 import clsx from "clsx";
+
 
 interface MenuProps {
   variant?: "default" | "footer";
@@ -11,7 +12,7 @@ interface MenuProps {
   onClicked?: () => void;
 }
 
-const Menu: React.FC<MenuProps> = ({
+const Menu: NextPage<MenuProps> = ({
   variant = "default",
   orientation = "horizontal",
   onClicked,

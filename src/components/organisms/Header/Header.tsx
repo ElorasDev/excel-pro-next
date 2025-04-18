@@ -24,7 +24,6 @@ const Header = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-    router.push("/program");
   };
 
   // Variants for header layout changes
@@ -171,7 +170,10 @@ const Header = () => {
                   >
                     <Button
                       className="rounded-xl w-full mt-5"
-                      onClick={toggleMenu}
+                      onClick={() => {
+                        toggleMenu();
+                        router.push("/program")
+                      }}
                     >
                       Enroll now
                     </Button>
