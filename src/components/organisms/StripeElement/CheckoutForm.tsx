@@ -8,7 +8,12 @@ import useUserFormStore from "@/stores/UserFormStore";
 import type { StripeCardElementChangeEvent } from "@stripe/stripe-js";
 import { useRegisterStepStore } from "@/stores/registerStepStore";
 
-type SubscriptionPlan = "free" | "U5_U8" | "U9_U12" | "U13_U14" | "U15_U18";
+export type SubscriptionPlan =
+  | "free"
+  | "U5_U8"
+  | "U9_U12"
+  | "U13_U14"
+  | "U15_U18";
 
 interface BillingAddress {
   line1: string;
@@ -66,18 +71,17 @@ const plans: Record<SubscriptionPlan, Plan> = {
 
 // Enhanced function to normalize division format
 const normalizeDivision = (str: string): SubscriptionPlan => {
-  if (!str || typeof str !== 'string') {
+  if (!str || typeof str !== "string") {
     console.warn("Invalid division input:", str);
     return "U13_U14"; // Default to U13_U14 instead of free
   }
 
   try {
-    
     // If lower case "free" is specifically requested, return free
     if (str.toLowerCase() === "free") {
       return "free";
     }
-    
+
     // If division already has the correct format, return it directly
     if (plans[str as SubscriptionPlan]) {
       return str as SubscriptionPlan;
@@ -85,35 +89,37 @@ const normalizeDivision = (str: string): SubscriptionPlan => {
 
     // Convert to uppercase and replace dashes or en-dashes with underscores
     const normalized = str.toUpperCase().replace(/–|-|‐|\s+/g, "_");
-    
+
     // Check if the result is valid
     if (plans[normalized as SubscriptionPlan]) {
       return normalized as SubscriptionPlan;
     }
-    
+
     // Try more aggressively by removing all underscores
     const withoutUnderscores = normalized.replace(/_+/g, "");
-    
+
     // Check for patterns like U5U8, U9U12, etc.
     for (const validPlan of Object.keys(plans)) {
-      if (validPlan === 'free') continue;
-      
-      const [prefix, suffix] = validPlan.split('_');
-      if (withoutUnderscores === (prefix + suffix)) {
+      if (validPlan === "free") continue;
+
+      const [prefix, suffix] = validPlan.split("_");
+      if (withoutUnderscores === prefix + suffix) {
         return validPlan as SubscriptionPlan;
       }
-      
+
       // Also try matching based on numbers only (for cases like 13-14, etc.)
-      const planNumbers = validPlan.replace(/\D+/g, '');
-      const inputNumbers = withoutUnderscores.replace(/\D+/g, '');
-      
+      const planNumbers = validPlan.replace(/\D+/g, "");
+      const inputNumbers = withoutUnderscores.replace(/\D+/g, "");
+
       if (planNumbers === inputNumbers) {
         return validPlan as SubscriptionPlan;
       }
     }
-    
+
     // If nothing else matches, return U13_U14 as the default
-    console.warn(`Could not normalize division "${str}", using U13_U14 as default`);
+    console.warn(
+      `Could not normalize division "${str}", using U13_U14 as default`
+    );
     return "U13_U14"; // Default to U13_U14 instead of free
   } catch (error) {
     console.error("Error in normalizeDivision:", error);
@@ -133,7 +139,8 @@ const CheckoutForm: NextPage = () => {
   // منبع خطا: 1. به جای فراخوانی مستقیم normalizeDivision در useState، ابتدا یک مقدار پیش‌فرض قرار می‌دهیم
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>("U13_U14");
   const [initialized, setInitialized] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userPhone, setUserPhone] = useState<string | null>(null);
+  const [userId, setUserId] = useState(null);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
   const [showWarning, setShowWarning] = useState<boolean>(true);
   const [billingDetails, setBillingDetails] = useState<BillingDetails>({
@@ -153,45 +160,52 @@ const CheckoutForm: NextPage = () => {
     try {
       setIsLoading(true);
 
-      // Get stored userId from localStorage
-      const userIdParam = localStorage.getItem("userId");
-      
-      if (!userIdParam) {
+      // Get stored phone number from localStorage
+      const phoneNumber = userForm.phone_number;
+
+      if (!phoneNumber) {
         setMessage("User information not found. Please register again.");
         setTimeout(() => router.push("/register"), 3000);
         return;
       }
-      
+
       // You could have an API endpoint to update the user's payment status
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userIdParam}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          paymentStatus: "succeeded",
-          activePlan: selectedPlan, // Send the actual plan name directly
-          planId: selectedPlan, // Also include planId with the same value to match backend
-          stripeCustomerId: userForm.stripeCustomerId || ""
-        }),
-        credentials: "include",
-        mode: "cors",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/phone/${phoneNumber}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            paymentStatus: "succeeded",
+            activePlan: selectedPlan, // Send the actual plan name directly
+            planId: selectedPlan, // Also include planId with the same value to match backend
+            stripeCustomerId: userForm.stripeCustomerId || "",
+          }),
+          credentials: "include",
+          mode: "cors",
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Failed to update payment status:", errorData);
-        setMessage("Payment recorded but failed to update account. Please contact support.");
+        setMessage(
+          "Payment recorded but failed to update account. Please contact support."
+        );
         setIsLoading(false);
         return;
       }
 
       // Payment status update successful
-      setMessage("Registration and payment successful! Redirecting to homepage...");
-      
+      setMessage(
+        "Registration and payment successful! Redirecting to homepage..."
+      );
+
       // Set step to 1 consistently
       setStep(1);
-      
+
       // Redirect to home page after a short delay
       setTimeout(() => router.push("/"), 2000);
     } catch (error) {
@@ -199,30 +213,45 @@ const CheckoutForm: NextPage = () => {
       setMessage("Error updating payment status. Please contact support.");
       setIsLoading(false);
     }
-  }, [selectedPlan, userForm.stripeCustomerId, setStep, router]);
+  }, [
+    userForm.phone_number,
+    userForm.stripeCustomerId,
+    selectedPlan,
+    setStep,
+    router,
+  ]);
+
+
 
   // Load user ID from localStorage when component mounts
   useEffect(() => {
-    const storedUserId = localStorage.getItem("userId");
-    if (storedUserId) {
-      setUserId(storedUserId);
-      
+    const phoneNumber = userForm.phone_number;
+    if (phoneNumber) {
+      setUserPhone(phoneNumber);
+
       // Check if user has previous subscriptions
       const checkUserSubscription = async () => {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${storedUserId}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            mode: "cors",
-          });
-          
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/users/phone/${phoneNumber}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+              mode: "cors",
+            }
+          );
+
           if (response.ok) {
             const userData = await response.json();
+            setUserId(userData.id)
             // If user has a previous subscription, set isFirstTime to false
-            if (userData.subscriptionHistory && userData.subscriptionHistory.length > 0) {
+            if (
+              userData.subscriptionHistory &&
+              userData.subscriptionHistory.length > 0
+            ) {
               setIsFirstTime(false);
             }
           }
@@ -232,7 +261,7 @@ const CheckoutForm: NextPage = () => {
           setIsFirstTime(true);
         }
       };
-      
+
       checkUserSubscription();
     } else {
       // If no user ID is found, redirect back to registration
@@ -240,26 +269,30 @@ const CheckoutForm: NextPage = () => {
       // Optional: add a redirect after a delay
       setTimeout(() => router.push("/register"), 3000);
     }
-  }, [router]);
+  }, [router, userForm.phone_number]);
 
   // منبع خطا: 2. جداسازی useEffect برای مقداردهی اولیه selectedPlan با استفاده از normalizeDivision
   useEffect(() => {
-
     try {
       // First check if division is empty or invalid
       if (!division || division === "undefined" || division === "null") {
         setSelectedPlan("U13_U14"); // Set default to U13_U14 instead of free
-        setMessage("Using default program (U13-U14). You can change this later.");
+        setMessage(
+          "Using default program (U13-U14). You can change this later."
+        );
       } else {
         try {
           // Decode and normalize division
           const decodedDivision = decodeURIComponent(division);
-          
+
           // Apply normalization
           const normalizedDivision = normalizeDivision(decodedDivision);
-          
+
           // If division is free after normalization but it shouldn't be, use U13_U14 as default
-          if (normalizedDivision === "free" && decodedDivision.toLowerCase() !== "free") {
+          if (
+            normalizedDivision === "free" &&
+            decodedDivision.toLowerCase() !== "free"
+          ) {
             setSelectedPlan("U13_U14");
           } else {
             setSelectedPlan(normalizedDivision);
@@ -267,7 +300,9 @@ const CheckoutForm: NextPage = () => {
         } catch (decodeError) {
           console.error("Error decoding division:", decodeError);
           setSelectedPlan("U13_U14"); // Default to U13_U14 instead of free on error
-          setMessage("Error processing program selection. Using default program (U13-U14).");
+          setMessage(
+            "Error processing program selection. Using default program (U13-U14)."
+          );
         }
       }
     } catch (error) {
@@ -294,7 +329,9 @@ const CheckoutForm: NextPage = () => {
         updatePaymentStatusAndRedirect();
         return;
       } else if (paymentStatus === "processing") {
-        setMessage("Your payment is processing. We'll update you when it's complete.");
+        setMessage(
+          "Your payment is processing. We'll update you when it's complete."
+        );
         return;
       } else if (paymentStatus === "requires_payment_method") {
         setMessage("Your payment was not successful. Please try again.");
@@ -316,10 +353,13 @@ const CheckoutForm: NextPage = () => {
         const statusMessages: Record<string, string> = {
           succeeded: "Payment succeeded!",
           processing: "Your payment is processing.",
-          requires_payment_method: "Your payment was not successful, please try again.",
+          requires_payment_method:
+            "Your payment was not successful, please try again.",
         };
 
-        setMessage(statusMessages[paymentIntent.status] || "Something went wrong.");
+        setMessage(
+          statusMessages[paymentIntent.status] || "Something went wrong."
+        );
       });
     }
   }, [stripe, router, updatePaymentStatusAndRedirect]);
@@ -328,12 +368,14 @@ const CheckoutForm: NextPage = () => {
     setMessage(event.error ? event.error.message : null);
   };
 
-  const handleBillingDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBillingDetailsChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = e.target;
-  
+
     if (name.includes(".")) {
       const [parent, child] = name.split(".");
-      
+
       if (parent === "address") {
         setBillingDetails((prev) => ({
           ...prev,
@@ -342,7 +384,7 @@ const CheckoutForm: NextPage = () => {
             [child]: value,
           },
         }));
-      } 
+      }
     } else {
       // Handle top-level fields (name, email)
       setBillingDetails((prev) => ({
@@ -364,11 +406,15 @@ const CheckoutForm: NextPage = () => {
     message?: string;
   }
 
-  const checkPaymentIntentStatus = async (clientSecret: string): Promise<boolean> => {
+  const checkPaymentIntentStatus = async (
+    clientSecret: string
+  ): Promise<boolean> => {
     if (!stripe) return false;
 
     try {
-      const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
+      const { paymentIntent } = await stripe.retrievePaymentIntent(
+        clientSecret
+      );
       return !!paymentIntent && paymentIntent.status === "succeeded";
     } catch (error) {
       console.error("Error checking payment intent status:", error);
@@ -416,30 +462,34 @@ const CheckoutForm: NextPage = () => {
       }
 
       // Make sure activePlan is always a valid string
-      const planToSend = typeof selectedPlan === 'string' && selectedPlan 
-        ? selectedPlan 
-        : "U13_U14"; // Default to U13_U14 if selectedPlan is empty or invalid
+      const planToSend =
+        typeof selectedPlan === "string" && selectedPlan
+          ? selectedPlan
+          : "U13_U14"; // Default to U13_U14 if selectedPlan is empty or invalid
 
       const stripePriceId = plans[planToSend as SubscriptionPlan]?.priceId;
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/subscription`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          priceId: stripePriceId,
-          paymentMethodId: paymentMethod.id,
-          planId: planToSend, // Send the actual plan name directly
-          activePlan: planToSend, // Also include activePlan for clarity
-          phone_number: userForm.phone_number,
-          userId: userId,
-          email: userForm.email || billingDetails.email,
-          billingDetails: billingDetails,
-        }),
-        credentials: "include",
-        mode: "cors",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/payments/subscription`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            priceId: stripePriceId,
+            paymentMethodId: paymentMethod.id,
+            planId: planToSend, // Send the actual plan name directly
+            activePlan: planToSend, // Also include activePlan for clarity
+            phone_number: userPhone,
+            userId,
+            email: userForm.email || billingDetails.email,
+            billingDetails: billingDetails,
+          }),
+          credentials: "include",
+          mode: "cors",
+        }
+      );
 
       if (!response.ok) {
         let errorMessage = "Server returned an error";
@@ -474,7 +524,9 @@ const CheckoutForm: NextPage = () => {
       // If we need additional authentication or confirmation
       if (data.clientSecret) {
         // Check PaymentIntent status before trying to confirm it
-        const isAlreadySucceeded = await checkPaymentIntentStatus(data.clientSecret);
+        const isAlreadySucceeded = await checkPaymentIntentStatus(
+          data.clientSecret
+        );
 
         if (isAlreadySucceeded) {
           console.log("Payment already succeeded, skipping confirmation");
@@ -496,8 +548,11 @@ const CheckoutForm: NextPage = () => {
           };
 
           try {
-            const { error: confirmError, paymentIntent } = 
-              await stripe.confirmCardPayment(data.clientSecret, confirmOptions);
+            const { error: confirmError, paymentIntent } =
+              await stripe.confirmCardPayment(
+                data.clientSecret,
+                confirmOptions
+              );
 
             if (confirmError) {
               // Check specific conditions - if error "payment_intent_unexpected_state" means the payment was already successful
@@ -512,19 +567,27 @@ const CheckoutForm: NextPage = () => {
               }
 
               console.error("Confirmation error:", confirmError);
-              throw new Error(confirmError.message || "Payment confirmation failed");
+              throw new Error(
+                confirmError.message || "Payment confirmation failed"
+              );
             }
 
             if (paymentIntent) {
               if (paymentIntent.status === "succeeded") {
                 updatePaymentStatusAndRedirect();
               } else if (paymentIntent.status === "processing") {
-                setMessage("Your payment is being processed. We'll notify you when it's complete.");
+                setMessage(
+                  "Your payment is being processed. We'll notify you when it's complete."
+                );
               } else if (paymentIntent.status === "requires_action") {
                 // This will be handled by the redirect flow, no need to do anything here
-                setMessage("Additional authentication required. Please follow the instructions.");
+                setMessage(
+                  "Additional authentication required. Please follow the instructions."
+                );
               } else {
-                throw new Error(`Payment status: ${paymentIntent.status}. Please try again.`);
+                throw new Error(
+                  `Payment status: ${paymentIntent.status}. Please try again.`
+                );
               }
             }
           } catch (confirmErr) {
@@ -534,7 +597,9 @@ const CheckoutForm: NextPage = () => {
               paymentErr.code === "payment_intent_unexpected_state" &&
               paymentErr.payment_intent?.status === "succeeded"
             ) {
-              console.log("Payment was already successful despite error, redirecting");
+              console.log(
+                "Payment was already successful despite error, redirecting"
+              );
               updatePaymentStatusAndRedirect();
               return;
             }
@@ -542,9 +607,13 @@ const CheckoutForm: NextPage = () => {
           }
         }
       } else if (data.error) {
-        throw new Error(data.error || "An error occurred with your subscription");
+        throw new Error(
+          data.error || "An error occurred with your subscription"
+        );
       } else {
-        setMessage("Subscription initiated. Please check your email for confirmation.");
+        setMessage(
+          "Subscription initiated. Please check your email for confirmation."
+        );
       }
     } catch (err) {
       // Check for Stripe error after confirmation
@@ -560,7 +629,10 @@ const CheckoutForm: NextPage = () => {
       }
 
       console.error("Subscription Error:", err);
-      setMessage((err as Error).message || "Failed to create subscription. Please try again.");
+      setMessage(
+        (err as Error).message ||
+          "Failed to create subscription. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -584,16 +656,17 @@ const CheckoutForm: NextPage = () => {
   // منبع خطا: 3. اطمینان از بررسی مقادیر قبل از استفاده
   // Calculate total based on first-time status
   const isFirstTimeUser = userForm.age ? isFirstTime : false;
-  const planToDisplay = typeof selectedPlan === 'string' && selectedPlan ? selectedPlan : "U13_U14";
-  
+  const planToDisplay =
+    typeof selectedPlan === "string" && selectedPlan ? selectedPlan : "U13_U14";
+
   // استخراج صحیح مقدار عددی از رشته قیمت
   // از "$350/ 2 months" فقط عدد 350 را استخراج می‌کنیم
   const priceString = plans[planToDisplay]?.price || "$350/ 2 months";
   const programPrice = parseInt(priceString.match(/\$(\d+)/)?.[1] || "350");
-  
+
   const setupFee = isFirstTimeUser ? 75 : 0;
   const totalAmount = programPrice + setupFee;
-  
+
   // نمایش قیمت به شکل صحیح
   const totalToday = `$${totalAmount}/ 2 months`;
 
@@ -606,16 +679,23 @@ const CheckoutForm: NextPage = () => {
 
       {/* Payment Warning */}
       {showWarning && (
-        <div id="payment-warning" className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex justify-between items-start">
+        <div
+          id="payment-warning"
+          className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex justify-between items-start"
+        >
           <div className="flex-1">
-            <h3 className="font-bold text-yellow-700">⚠️ Important Payment Notice</h3>
+            <h3 className="font-bold text-yellow-700">
+              ⚠️ Important Payment Notice
+            </h3>
             <p className="mt-1 text-sm text-yellow-600">
               To ensure your payment is processed correctly:
             </p>
             <ul className="list-disc ml-5 mt-2 text-sm text-yellow-600">
               <li>Click the &quot;Subscribe Now&quot; button only once.</li>
               <li>Do not refresh the page during payment processing.</li>
-              <li>If you encounter any issues, please contact customer support.</li>
+              <li>
+                If you encounter any issues, please contact customer support.
+              </li>
             </ul>
           </div>
           <button
@@ -624,8 +704,17 @@ const CheckoutForm: NextPage = () => {
             className="text-yellow-500 hover:text-yellow-700"
             aria-label="Close warning"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
             </svg>
           </button>
         </div>
@@ -647,7 +736,8 @@ const CheckoutForm: NextPage = () => {
 
       {!userId && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-700">
-          Please complete registration before checkout. Redirecting to registration page...
+          Please complete registration before checkout. Redirecting to
+          registration page...
         </div>
       )}
 

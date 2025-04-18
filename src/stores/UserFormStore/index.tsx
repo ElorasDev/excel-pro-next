@@ -3,6 +3,7 @@ import { Gender, SkillLevel, PlayerPosition, AvailableDays, PreferredTime } from
 
 
 interface UserFormState {
+  id?: number;
   fullname: string;
   age: number | null;
   gender: Gender;

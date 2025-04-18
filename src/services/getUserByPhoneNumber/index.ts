@@ -1,6 +1,6 @@
 
 
-export const getUserById = async (phone_number: string) => {
+export const getUserByPhoneNumber = async (phone_number: string) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/phone/${phone_number}`, {
       method: "GET",
       headers: {

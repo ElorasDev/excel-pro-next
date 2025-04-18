@@ -6,7 +6,7 @@ import { Formik, Field, Form, ErrorMessage, FieldProps } from "formik";
 import * as Yup from "yup";
 import { sendOtp } from "@/services/sendOtpCode";
 import { verifyOtp } from "@/services/verifyOtpCode";
-import { getUserById } from "@/services/getUserById";
+import { getUserByPhoneNumber } from "@/services/getUserByPhoneNumber";
 import { CiMobile3 } from "react-icons/ci";
 import FloatingLabelInput from "../FloatingLabelInput/FloatingLabelInput";
 import useUserFormStore from "@/stores/UserFormStore";
@@ -108,7 +108,7 @@ const AuthForm: NextPage<AuthFormProps> = ({ auth }) => {
 
         // Check if user exists in database
         try {
-          const userData = await getUserById(values.phoneNumber);
+          const userData = await getUserByPhoneNumber(values.phoneNumber);
           if (userData) {
             alert("Welcome back! Redirecting to your profile.");
             setEmail(userData.email);
