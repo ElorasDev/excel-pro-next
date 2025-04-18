@@ -3,7 +3,7 @@ import AboutSection from "@/components/organisms/AboutSection/AboutSection";
 
 
 
-const TeamGallery = async() => {
+const TeamGallery = async () => {
 
   const teamImages = await fetchAllImages();
 
