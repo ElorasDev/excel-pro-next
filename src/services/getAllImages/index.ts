@@ -8,9 +8,6 @@ export const fetchAllImages = async () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            next: {
-                revalidate: 10,
-            }
         }
         );
 
