@@ -27,7 +27,7 @@ type FAQItem = {
 };
 
 const ContactUs = () => {
-  const position: [number, number] = [43.7, -79.42];
+  const position: [number, number] = [43.90065543881494, -79.39804313547427];
 
   const faqData: FAQItem[] = [
     {
