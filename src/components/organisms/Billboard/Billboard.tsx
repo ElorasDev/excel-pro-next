@@ -3,11 +3,12 @@ import { useState } from "react";
 import Slider from "../Slider/Slider";
 import RezaCard from "../../molecules/RezaCard/RezaCard";
 import IndicatorDots from "../../molecules/IndicatorDots/IndicatorDots";
-import { motion } from "framer-motion"; // import framer-motion
+import { motion } from "framer-motion";
+import { sliderData } from "../Slider/data";
 
 const Billboard = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slideCount = 3;
+  const slideCount = sliderData.length;
 
   return (
     <motion.div

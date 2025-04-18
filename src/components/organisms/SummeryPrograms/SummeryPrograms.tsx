@@ -1,7 +1,7 @@
 "use client";
 import { NextPage } from "next";
 import { useRouter } from "next/navigation";
-import { motion, useInView  } from "framer-motion"; // اضافه کردن framer-motion برای انیمیشن‌ها
+import { motion, useInView } from "framer-motion"; // اضافه کردن framer-motion برای انیمیشن‌ها
 import ProgramCard from "@/components/molecules/ProgramCard/ProgramCard";
 import { Button } from "@/components/atoms/Button/Button";
 import { programs } from "./data";
@@ -17,18 +17,25 @@ const SummeryPrograms: NextPage = () => {
 
   const cardVariants = {
     hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut", delay: 0.2 } },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.8, ease: "easeOut", delay: 0.2 },
+    },
   };
 
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
+
+  // Only get the first three programs
+  const displayedPrograms = programs.slice(0, 3);
 
   return (
     <motion.section
       className="py-12 px-4 max-w-7xl mx-auto"
       ref={ref}
       initial="hidden"
-      animate={inView ? "visible" : "hidden"} 
+      animate={inView ? "visible" : "hidden"}
       variants={sectionVariants}
     >
       <div className="flex justify-between items-center mb-10">
@@ -60,14 +67,14 @@ const SummeryPrograms: NextPage = () => {
         </Button>
       </div>
 
-      {/* Grid layout for displaying multiple program cards */}
+      {/* Grid layout for displaying the first three program cards */}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         initial="hidden"
         animate={inView ? "visible" : "hidden"}
         variants={sectionVariants}
       >
-        {programs.map((program, index) => (
+        {displayedPrograms.map((program, index) => (
           <motion.div key={index} variants={cardVariants}>
             <ProgramCard
               ageGroup={program.ageGroup}

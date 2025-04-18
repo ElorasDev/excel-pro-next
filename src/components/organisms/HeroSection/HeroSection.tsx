@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { NextPage } from "next";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "framer-motion";
 import { Button } from "../../atoms/Button/Button";
 import AvatarGroup from "../../molecules/AvatarGroup/AvatarGroup";
+
 
 // Animation Variants
 const containerVariants = {
@@ -40,6 +42,7 @@ const HeroSection: NextPage = () => {
     { src: "/images/person/avatars/Avatar5.png", alt: "Member 5" },
   ];
 
+  const router = useRouter();
   const controls = useAnimation();
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
@@ -91,10 +94,10 @@ const HeroSection: NextPage = () => {
           className="flex items-center gap-4 mt-2 flex-wrap"
           variants={itemVariants}
         >
-          <Button variant="white" className="rounded-xl">
+          <Button variant="white" className="rounded-xl" onClick={() => router.push("/program")}>
             View programs
           </Button>
-          <Button variant="primary" className="rounded-xl">
+          <Button variant="primary" className="rounded-xl" onClick={() => router.push("/program")}>
             Join now
           </Button>
           <AvatarGroup members={members} extraCount={500} />

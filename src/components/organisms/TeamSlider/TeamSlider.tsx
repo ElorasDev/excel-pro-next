@@ -5,17 +5,17 @@ import "swiper/swiper-bundle.css"; // Make sure the Swiper styles are imported
 import Image from "next/image";
 
 interface TeamImages {
-    id: string;
-    title: string;
-    file_name: string;
-    storage_filename: string;
-    image_url: string;
-    file_path: string;
-    mime_type: string;
-    file_size: number;
-    caption: string | null;
-    created_at?: string;
-    updated_at?: string;
+  id: string;
+  title: string;
+  file_name: string;
+  storage_filename: string;
+  image_url: string;
+  file_path: string;
+  mime_type: string;
+  file_size: number;
+  caption: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface SliderProps {
@@ -45,7 +45,7 @@ const TeamSlider: NextPage<SliderProps> = ({ teamImages }) => {
         speed={800}
         className="team-swiper py-4"
       >
-        {teamImages.map((image) => (
+        {teamImages.map((image, index) => (
           <SwiperSlide key={`team-${image.id}`}>
             <div className="rounded-lg overflow-hidden shadow-md">
               <Image
@@ -53,8 +53,10 @@ const TeamSlider: NextPage<SliderProps> = ({ teamImages }) => {
                 alt={image.title ? image.title : image.file_name}
                 width={500}
                 height={300}
-                className="w-full h-auto" // Responsive width, auto height
+                className="w-full h-auto"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+                loading={index === 0 ? "eager" : "lazy"} // 🔥 این خط اضافه شده
+                priority={index === 0} // برای اطمینان بیشتر که عکس اول زودتر لود شه
               />
             </div>
           </SwiperSlide>

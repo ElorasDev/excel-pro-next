@@ -16,7 +16,7 @@ export const programs: ProgramType[] = [
       text: "New",
       className: "text-green-800",
     },
-    imageSrc: "/images/programs/u15-17.png",
+    imageSrc: "/images/programs/u7-12.png",
     team_image: "/images/person/team/u7.png",
     description: "Our U5 - U8 program introduces young players to the fundamentals of soccer in a fun, engaging environment. Players learn basic ball control, simple passing, and teamwork through game-based activities designed to build confidence and foster a love for the sport.",
     programOutline: {
@@ -40,7 +40,7 @@ export const programs: ProgramType[] = [
       text: "Popular",
       className: "text-gray-800",
     },
-    imageSrc: "/images/programs/u15-17.png",
+    imageSrc: "/images/programs/u13-14.png",
     team_image: "/images/person/team/u7.png",
     description: "The goal of our U7 - U12 program is to give each player a solid foundation of soccer skills and techniques while educating them about the knowledge of the game. At this level, our priority is to create a fun and exciting environment while teaching skills such as dribbling at different speeds, passing, cuts and turns and 1v1 attacking and defending.",
     programOutline: {

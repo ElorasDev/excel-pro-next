@@ -257,7 +257,7 @@ const ContactForm = () => {
         </motion.div>
         <div className="w-full h-full relative">
           <Image
-            src="/images/person/get_in_touch.png"
+            src="/images/person/get_in_touch.webp"
             alt="Coaches"
             fill={true}
             sizes="(max-width: 768px) 100vw, 50vw"

@@ -3,9 +3,6 @@ import { Dispatch, SetStateAction, useEffect } from "react";
 import { NextPage } from "next";
 import Slide from "../../molecules/Slide/Slide";
 import ArrowButton from "../../atoms/ArrowButton/ArrowButton";
-
-
-// types
 import { sliderData } from "./data";
 
 

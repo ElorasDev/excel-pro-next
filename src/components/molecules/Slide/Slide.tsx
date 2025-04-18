@@ -14,6 +14,7 @@ const Slide: NextPage<SlideProps> = ({ imageSrc, playerName }) => {
         alt={`${playerName} player image`}
         quality="100"
         fill={true}
+        priority={true}
       />
     </div>
   );

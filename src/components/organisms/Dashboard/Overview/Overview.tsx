@@ -2,13 +2,14 @@
 
 // import { Button } from "@/components/atoms/Button/Button";
 import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import {
   FiSliders,
   FiX,
   FiSearch,
   FiMenu,
   FiFileText,
-  FiFile
+  FiFile,
 } from "react-icons/fi";
 import FilterModal from "@/components/molecules/FilterModal/FilterModal";
 import { getAllUsers } from "@/services/getAllUsers";
@@ -18,18 +19,25 @@ interface User {
   id: number;
   fullname: string;
   age: number;
-  gender: 'Male' | 'Female' | 'Prefer not to say';
+  gender: "Male" | "Female" | "Prefer not to say";
   isTemporary?: boolean;
   parent_name: string;
   phone_number: string;
   email: string;
   program: string;
-  current_skill_level: 'Beginner' | 'intermediate' | 'Advanced';
-  player_positions?: 'Goalkeeper' | 'Defender' | 'Midfielder' | 'Striker';
+  current_skill_level: "Beginner" | "intermediate" | "Advanced";
+  player_positions?: "Goalkeeper" | "Defender" | "Midfielder" | "Striker";
   custom_position?: string;
   session_goals: string;
-  available_days: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
-  preferred_time: 'Morning' | 'Afternoon' | 'Evening';
+  available_days:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
+  preferred_time: "Morning" | "Afternoon" | "Evening";
   medical_conditions: string;
   comments: string;
   liability_waiver: boolean;
@@ -42,7 +50,10 @@ interface User {
 }
 
 // Simplified interface for the table display
-type Player = Pick<User, 'id' | 'fullname' | 'phone_number' | 'gender' | 'age' | 'activePlan'>;
+type Player = Pick<
+  User,
+  "id" | "fullname" | "phone_number" | "gender" | "age" | "activePlan"
+>;
 
 const Overview = () => {
   // State for filters
@@ -53,24 +64,27 @@ const Overview = () => {
 
   // State for all users from database (complete user data)
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  
+
   // State for original player data (simplified view for the table)
   const [originalPlayers, setOriginalPlayers] = useState<Player[]>([]);
-  
+
   // State for filtered players (what we'll actually display)
   const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
-  
+
   // State for loading indicator
   const [isLoading, setIsLoading] = useState(true);
+
+  // variable for set cookie
+  const savedToken = Cookies.get("auth_token")!;
 
   // Fetch users from database on component mount
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setIsLoading(true);
-        const users = await getAllUsers();
+        const users = await getAllUsers(savedToken);
         setAllUsers(users);
-        
+
         // Create simplified player objects for the table view
         const simplifiedPlayers = users.map((user: User) => ({
           id: user.id,
@@ -78,9 +92,9 @@ const Overview = () => {
           phone_number: user.phone_number,
           gender: user.gender,
           age: user.age,
-          activePlan: user.activePlan || 'No Plan'
+          activePlan: user.activePlan || "No Plan",
         }));
-        
+
         setOriginalPlayers(simplifiedPlayers);
         setFilteredPlayers(simplifiedPlayers);
       } catch (error) {
@@ -91,7 +105,7 @@ const Overview = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [savedToken]);
 
   // State for mobile menu and mobile filters
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -112,8 +126,8 @@ const Overview = () => {
 
   // Function to convert date object to string
   const formatDate = (date: Date | undefined | null): string => {
-    if (!date) return '';
-    if (typeof date === 'string') {
+    if (!date) return "";
+    if (typeof date === "string") {
       return new Date(date).toLocaleDateString();
     }
     return date.toLocaleDateString();
@@ -121,28 +135,47 @@ const Overview = () => {
 
   // Function to convert boolean to "Yes"/"No"
   const formatBoolean = (value: boolean | undefined): string => {
-    if (value === undefined) return '';
-    return value ? 'Yes' : 'No';
+    if (value === undefined) return "";
+    return value ? "Yes" : "No";
   };
 
   // Function to properly export to CSV
   const exportToCSV = () => {
     if (allUsers.length === 0) {
-      alert('No data to export');
+      alert("No data to export");
       return;
     }
-    
+
     // CSV header with all user fields
     const headers = [
-      'ID', 'Full Name', 'Age', 'Gender', 'Temporary', 'Parent Name',
-      'Phone Number', 'Email', 'Program', 'Skill Level', 'Player Position',
-      'Custom Position', 'Session Goals', 'Available Days', 'Preferred Time',
-      'Medical Conditions', 'Comments', 'Liability Waiver', 'Cancellation Policy',
-      'Stripe Customer ID', 'Active Plan', 'Subscription End Date', 'Created At', 'Updated At'
+      "ID",
+      "Full Name",
+      "Age",
+      "Gender",
+      "Temporary",
+      "Parent Name",
+      "Phone Number",
+      "Email",
+      "Program",
+      "Skill Level",
+      "Player Position",
+      "Custom Position",
+      "Session Goals",
+      "Available Days",
+      "Preferred Time",
+      "Medical Conditions",
+      "Comments",
+      "Liability Waiver",
+      "Cancellation Policy",
+      "Stripe Customer ID",
+      "Active Plan",
+      "Subscription End Date",
+      "Created At",
+      "Updated At",
     ];
-    
+
     // Process each user to create CSV rows
-    const csvRows = allUsers.map(user => {
+    const csvRows = allUsers.map((user) => {
       return [
         user.id,
         `"${user.fullname.replace(/"/g, '""')}"`, // Escape quotes
@@ -154,8 +187,10 @@ const Overview = () => {
         `"${user.email.replace(/"/g, '""')}"`,
         `"${user.program.replace(/"/g, '""')}"`,
         user.current_skill_level,
-        user.player_positions || '',
-        user.custom_position ? `"${user.custom_position.replace(/"/g, '""')}"` : '',
+        user.player_positions || "",
+        user.custom_position
+          ? `"${user.custom_position.replace(/"/g, '""')}"`
+          : "",
         `"${user.session_goals.replace(/"/g, '""')}"`,
         user.available_days,
         user.preferred_time,
@@ -163,31 +198,28 @@ const Overview = () => {
         `"${user.comments.replace(/"/g, '""')}"`,
         formatBoolean(user.liability_waiver),
         formatBoolean(user.cancellation_policy),
-        user.stripeCustomerId || '',
-        user.activePlan || '',
+        user.stripeCustomerId || "",
+        user.activePlan || "",
         formatDate(user.currentSubscriptionEndDate),
         formatDate(user.createdAt),
-        formatDate(user.updatedAt)
-      ].join(',');
+        formatDate(user.updatedAt),
+      ].join(",");
     });
-    
+
     // Combine header and rows
-    const csvContent = [
-      headers.join(','),
-      ...csvRows
-    ].join('\n');
-    
+    const csvContent = [headers.join(","), ...csvRows].join("\n");
+
     // Create blob and download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    
+    const link = document.createElement("a");
+
     // Set up download
     link.href = url;
-    link.setAttribute('download', 'players_data.csv');
+    link.setAttribute("download", "players_data.csv");
     document.body.appendChild(link);
     link.click();
-    
+
     // Cleanup
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
@@ -196,34 +228,55 @@ const Overview = () => {
   // Function to properly export to Excel
   const exportToExcel = () => {
     if (allUsers.length === 0) {
-      alert('No data to export');
+      alert("No data to export");
       return;
     }
-    
+
     // Create Excel XML content
-    let excelContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
-    excelContent += '<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Players Data</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>';
-    excelContent += '<body><table>';
-    
+    let excelContent =
+      '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+    excelContent +=
+      "<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Players Data</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>";
+    excelContent += "<body><table>";
+
     // Add headers
-    excelContent += '<tr>';
+    excelContent += "<tr>";
     const headers = [
-      'ID', 'Full Name', 'Age', 'Gender', 'Temporary', 'Parent Name',
-      'Phone Number', 'Email', 'Program', 'Skill Level', 'Player Position',
-      'Custom Position', 'Session Goals', 'Available Days', 'Preferred Time',
-      'Medical Conditions', 'Comments', 'Liability Waiver', 'Cancellation Policy',
-      'Stripe Customer ID', 'Active Plan', 'Subscription End Date', 'Created At', 'Updated At'
+      "ID",
+      "Full Name",
+      "Age",
+      "Gender",
+      "Temporary",
+      "Parent Name",
+      "Phone Number",
+      "Email",
+      "Program",
+      "Skill Level",
+      "Player Position",
+      "Custom Position",
+      "Session Goals",
+      "Available Days",
+      "Preferred Time",
+      "Medical Conditions",
+      "Comments",
+      "Liability Waiver",
+      "Cancellation Policy",
+      "Stripe Customer ID",
+      "Active Plan",
+      "Subscription End Date",
+      "Created At",
+      "Updated At",
     ];
-    
-    headers.forEach(header => {
+
+    headers.forEach((header) => {
       excelContent += `<th>${header}</th>`;
     });
-    excelContent += '</tr>';
-    
+    excelContent += "</tr>";
+
     // Add data rows
-    allUsers.forEach(user => {
-      excelContent += '<tr>';
-      
+    allUsers.forEach((user) => {
+      excelContent += "<tr>";
+
       // Add each user field as a cell
       excelContent += `<td>${user.id}</td>`;
       excelContent += `<td>${user.fullname}</td>`;
@@ -235,8 +288,8 @@ const Overview = () => {
       excelContent += `<td>${user.email}</td>`;
       excelContent += `<td>${user.program}</td>`;
       excelContent += `<td>${user.current_skill_level}</td>`;
-      excelContent += `<td>${user.player_positions || ''}</td>`;
-      excelContent += `<td>${user.custom_position || ''}</td>`;
+      excelContent += `<td>${user.player_positions || ""}</td>`;
+      excelContent += `<td>${user.custom_position || ""}</td>`;
       excelContent += `<td>${user.session_goals}</td>`;
       excelContent += `<td>${user.available_days}</td>`;
       excelContent += `<td>${user.preferred_time}</td>`;
@@ -244,29 +297,29 @@ const Overview = () => {
       excelContent += `<td>${user.comments}</td>`;
       excelContent += `<td>${formatBoolean(user.liability_waiver)}</td>`;
       excelContent += `<td>${formatBoolean(user.cancellation_policy)}</td>`;
-      excelContent += `<td>${user.stripeCustomerId || ''}</td>`;
-      excelContent += `<td>${user.activePlan || ''}</td>`;
+      excelContent += `<td>${user.stripeCustomerId || ""}</td>`;
+      excelContent += `<td>${user.activePlan || ""}</td>`;
       excelContent += `<td>${formatDate(user.currentSubscriptionEndDate)}</td>`;
       excelContent += `<td>${formatDate(user.createdAt)}</td>`;
       excelContent += `<td>${formatDate(user.updatedAt)}</td>`;
-      
-      excelContent += '</tr>';
+
+      excelContent += "</tr>";
     });
-    
+
     // Close table and document
-    excelContent += '</table></body></html>';
-    
+    excelContent += "</table></body></html>";
+
     // Create blob with proper Excel MIME type
-    const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
+    const blob = new Blob([excelContent], { type: "application/vnd.ms-excel" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    
+    const link = document.createElement("a");
+
     // Set up download
     link.href = url;
-    link.setAttribute('download', 'players_data.xls');
+    link.setAttribute("download", "players_data.xls");
     document.body.appendChild(link);
     link.click();
-    
+
     // Cleanup
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
@@ -276,7 +329,7 @@ const Overview = () => {
   // This is where the main fix happens
   useEffect(() => {
     if (originalPlayers.length === 0) return;
-    
+
     // Always start with the original player list
     let newFilteredPlayers = [...originalPlayers];
 
@@ -306,7 +359,9 @@ const Overview = () => {
           (player) => player.age >= 16 && player.age <= 18
         );
       } else if (activeFilters.includes("18+")) {
-        newFilteredPlayers = newFilteredPlayers.filter((player) => player.age > 18);
+        newFilteredPlayers = newFilteredPlayers.filter(
+          (player) => player.age > 18
+        );
       }
 
       // Gender filters
@@ -453,7 +508,7 @@ const Overview = () => {
               size={18}
             />
           </div>
-          
+
           {/* Export Buttons */}
           <div className="flex gap-2">
             <button
@@ -544,7 +599,10 @@ const Overview = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="py-8 text-center text-gray-500">
+                      <td
+                        colSpan={5}
+                        className="py-8 text-center text-gray-500"
+                      >
                         No players found matching the selected filters or search
                       </td>
                     </tr>
@@ -552,7 +610,7 @@ const Overview = () => {
                 </tbody>
               </table>
             </div>
-            
+
             {/* Table Footer */}
             <div className="p-3 md:p-4 border-t border-gray-200 text-gray-500 text-xs md:text-sm">
               Showing {filteredPlayers.length} results

@@ -52,7 +52,7 @@ const ProgramCard: NextPage<ProgramCardProps> = ({
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-contain object-right-bottom"
-              priority
+              loading="lazy"
             />
           </div>
         </div>

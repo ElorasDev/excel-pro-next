@@ -202,11 +202,12 @@ const AboutSection: NextPage<AboutSectionProps> = ({ teamImages }) => {
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
                 <Image
-                  src="/images/person/team/u7.png"
+                  src="/images/person/team/u7.webp"
                   alt="Excel Pro Soccer Team"
                   width={629}
                   height={445}
                   className="rounded-r-3xl w-full h-auto"
+                  priority={true}
                 />
               </motion.div>
             </div>
