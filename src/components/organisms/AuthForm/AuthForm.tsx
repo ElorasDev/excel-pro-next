@@ -11,6 +11,7 @@ import { CiMobile3 } from "react-icons/ci";
 import FloatingLabelInput from "../FloatingLabelInput/FloatingLabelInput";
 import useUserFormStore from "@/stores/UserFormStore";
 import { useRegisterStepStore } from "@/stores/registerStepStore";
+import { useIsFirstRegister } from "@/stores/firstTimeRegister";
 
 // Form Values
 interface AuthFormValues {
@@ -48,6 +49,7 @@ const AuthForm: NextPage<AuthFormProps> = ({ auth }) => {
   const [otpExpired, setOtpExpired] = useState<boolean>(false);
   const { setPhoneNumber, setEmail, setFullname } = useUserFormStore();
   const { setStep } = useRegisterStepStore();
+  const { setIsFirstTime } = useIsFirstRegister();
 
   const initialValues: AuthFormValues = {
     phoneNumber: "",
@@ -111,6 +113,7 @@ const AuthForm: NextPage<AuthFormProps> = ({ auth }) => {
           const userData = await getUserByPhoneNumber(values.phoneNumber);
           if (userData) {
             alert("Welcome back! Redirecting to your profile.");
+            setIsFirstTime(false);
             setEmail(userData.email);
             setFullname(userData.fullname);
             setStep(8);

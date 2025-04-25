@@ -2,6 +2,7 @@ import { fetchAllImages } from "@/services/getAllImages";
 import AboutSection from "@/components/organisms/AboutSection/AboutSection";
 
 
+export const revalidate = 30;
 
 const TeamGallery = async () => {
 

@@ -16,7 +16,8 @@ const FilterModal = ({ isOpen, onClose, activeFilters, onApplyFilters }: FilterM
   const filterOptions = {
     sortBy: ["Newest", "Oldest", "A-Z", "Z-A"],
     gender: ["Male", "Female", "All"],
-    activePlan: ["U7-U12", "U13-U14", "U15-U17", "All"]
+    status: ["verified", "pending", "rejected", "expired", "confirmed"],
+    activePlan: ["U5-U8", "U9-U12", "U13-U14", "U15-U18", "All"]
   };
 
   // Selected filters in the modal (a copy of activeFilters)
@@ -60,7 +61,7 @@ const FilterModal = ({ isOpen, onClose, activeFilters, onApplyFilters }: FilterM
           setSelectedFilters([...newFilters, filter]);
         }
       } else {
-        // For age groups, we allow multiple selections
+        // For status, allow multiple selections
         setSelectedFilters([...selectedFilters, filter]);
       }
     }
@@ -99,10 +100,10 @@ const FilterModal = ({ isOpen, onClose, activeFilters, onApplyFilters }: FilterM
           </div>
         </div>
         
-        {/* <div>
-          <h3 className="font-medium mb-2">Age Group</h3>
+        <div>
+          <h3 className="font-medium mb-2">Gender</h3>
           <div className="flex flex-wrap gap-2">
-            {filterOptions.ageGroups.map((option) => (
+            {filterOptions.gender.map((option) => (
               <button
                 key={option}
                 onClick={() => toggleFilter(option)}
@@ -116,12 +117,12 @@ const FilterModal = ({ isOpen, onClose, activeFilters, onApplyFilters }: FilterM
               </button>
             ))}
           </div>
-        </div> */}
+        </div>
         
         <div>
-          <h3 className="font-medium mb-2">Gender</h3>
+          <h3 className="font-medium mb-2">Status</h3>
           <div className="flex flex-wrap gap-2">
-            {filterOptions.gender.map((option) => (
+            {filterOptions.status.map((option) => (
               <button
                 key={option}
                 onClick={() => toggleFilter(option)}
@@ -159,13 +160,13 @@ const FilterModal = ({ isOpen, onClose, activeFilters, onApplyFilters }: FilterM
         <div className="flex justify-between pt-4 border-t mt-4">
           <Button 
             onClick={handleResetFilters}
-            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg"
           >
             Reset
           </Button>
           <Button 
             onClick={handleApplyFilters}
-            className="bg-blue-500 text-white hover:bg-blue-600"
+            className=" text-white rounded-lg"
           >
             Apply Filters
           </Button>

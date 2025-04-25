@@ -1,6 +1,7 @@
 "use client";
 import { NextPage } from "next";
 import { useState } from "react";
+import Cookies from "js-cookie";
 import { FaFilter, FaTrash, FaSearch, FaEye } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import Modal from "@/components/atoms/Modal/Modal";
@@ -12,6 +13,10 @@ import {
 import { Message } from "@/stores/messageStore";
 
 const Messages: NextPage = () => {
+
+
+  const savedToken = Cookies.get("auth_token")!;
+
   // Use custom hooks for state management
   const {
     filteredMessages,
@@ -49,7 +54,7 @@ const Messages: NextPage = () => {
   const onDeleteMessage = async () => {
     if (!currentMessage) return;
 
-    const success = await deleteMessage(currentMessage.id);
+    const success = await deleteMessage(currentMessage.id, savedToken);
     if (success) {
       setIsDeleteModalOpen(false);
       refresh();

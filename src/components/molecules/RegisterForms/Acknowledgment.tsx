@@ -1,10 +1,10 @@
+import { useState } from "react";
 import { NextPage } from "next";
 import { Button } from "@/components/atoms/Button/Button";
 import { useRegisterStepStore } from "@/stores/registerStepStore";
 import useUserFormStore from "@/stores/UserFormStore";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useState } from "react";
 import { useDivisionStore } from "@/stores/divisionStore";
 
 const validationSchema = Yup.object({

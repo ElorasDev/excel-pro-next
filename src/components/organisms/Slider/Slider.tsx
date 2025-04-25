@@ -3,58 +3,54 @@ import { Dispatch, SetStateAction, useEffect } from "react";
 import { NextPage } from "next";
 import Slide from "../../molecules/Slide/Slide";
 import ArrowButton from "../../atoms/ArrowButton/ArrowButton";
-import { sliderData } from "./data";
+import { usePlayers } from "@/context/PlayerContext/PlayerContext";
 
-
-// Defining types for props received by the Slider component
 interface SliderProps {
-  currentSlide: number; // The index of the current active slide
-  setCurrentSlide: Dispatch<SetStateAction<number>>; // Function to update the current slide index
+  currentSlide: number;
+  setCurrentSlide: Dispatch<SetStateAction<number>>;
 }
 
 const Slider: NextPage<SliderProps> = ({ currentSlide, setCurrentSlide }) => {
-  useEffect(() => {
-    // Auto-slide functionality with interval
-    const interval = setInterval(() => {
-      // Move to the next slide, and loop back to the first one when the end is reached
-      setCurrentSlide((prev) => (prev + 1) % sliderData.length);
-    }, 7000); // Change slide every 7 seconds
+  const players = usePlayers();
 
-    // Clean up the interval on component unmount
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % players.length);
+    }, 7000);
+
     return () => clearInterval(interval);
-  }, [setCurrentSlide]); // Depend on setCurrentSlide to trigger effect on updates
+  }, [setCurrentSlide, players.length]);
+
+  // If players are empty, show a default slide
+  const hasPlayers = players.length > 0;
 
   return (
     <div className="relative w-min-full md:w-3/4 h-full min-h-[250px] sm:min-h-[250px] md:min-h-[500px] bg-gray-900 rounded-lg shadow-xl overflow-hidden">
       <div
         className="flex h-full transition-transform duration-500 ease-in-out"
-        // Dynamic transform property to slide between slides based on currentSlide index
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
-        {/* Mapping over sliderData and rendering Slide components for each item */}
-        {sliderData.map((slide) => (
-          <Slide key={slide.id} {...slide} />
-        ))}
+        {hasPlayers
+          ? players.map((player) => <Slide key={player.id} {...player} />)
+          : <Slide key="default" player_name="Default Player" image_url="/images/billboard/Banner1.webp" />}
       </div>
 
-      <div className="absolute top-1/2 left-0 right-0 flex justify-between px-4 transform -translate-y-1/2">
-        {/* Left arrow button to go to the previous slide */}
-        <ArrowButton
-          direction="left"
-          onClick={() =>
-            // Move to the previous slide and loop back to the last one
-            setCurrentSlide((prev: number) => (prev - 1 + sliderData.length) % sliderData.length)
-          }
-        />
-        {/* Right arrow button to go to the next slide */}
-        <ArrowButton
-          direction="right"
-          onClick={() =>
-            // Move to the next slide and loop back to the first one
-            setCurrentSlide((prev) => (prev + 1) % sliderData.length)
-          }
-        />
-      </div>
+      {players.length > 1 && (
+        <div className="absolute top-1/2 left-0 right-0 flex justify-between px-4 transform -translate-y-1/2">
+          <ArrowButton
+            direction="left"
+            onClick={() =>
+              setCurrentSlide((prev: number) => (prev - 1 + players.length) % players.length)
+            }
+          />
+          <ArrowButton
+            direction="right"
+            onClick={() =>
+              setCurrentSlide((prev) => (prev + 1) % players.length)
+            }
+          />
+        </div>
+      )}
     </div>
   );
 };

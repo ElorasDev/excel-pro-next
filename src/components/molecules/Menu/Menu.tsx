@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { menuItems } from "./data";
 import clsx from "clsx";
 
-
 interface MenuProps {
   variant?: "default" | "footer";
   orientation?: "horizontal" | "vertical";

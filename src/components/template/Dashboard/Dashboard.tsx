@@ -9,6 +9,7 @@ import Messages from "@/components/organisms/Dashboard/Messages/Messages";
 import Gallery from "@/components/organisms/Dashboard/Gallery/Gallery";
 import { useRouter } from "next/navigation";
 import Payment from "@/components/organisms/Dashboard/Payment/Payment";
+import PlayerMonthGallery from "@/components/organisms/Dashboard/PlayerMonthGallery/PlayerMonthGallery";
 
 const Dashboard = () => {
   const { activeMenuId } = useMenuStore();
@@ -33,6 +34,8 @@ const Dashboard = () => {
         <Gallery />
       ) : activeMenuId === 5 ? (
         <Payment />
+      ) : activeMenuId === 6 ? (
+        <PlayerMonthGallery />
       ) : (
         ""
       )}

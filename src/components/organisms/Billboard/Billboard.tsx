@@ -4,11 +4,13 @@ import Slider from "../Slider/Slider";
 import RezaCard from "../../molecules/RezaCard/RezaCard";
 import IndicatorDots from "../../molecules/IndicatorDots/IndicatorDots";
 import { motion } from "framer-motion";
-import { sliderData } from "../Slider/data";
+import { usePlayers } from "@/context/PlayerContext/PlayerContext";
+// import { sliderData } from "../Slider/data";
 
 const Billboard = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slideCount = sliderData.length;
+  const players = usePlayers();
+  const slideCount = players.length;
 
   return (
     <motion.div

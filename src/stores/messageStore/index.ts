@@ -16,10 +16,10 @@ interface MessageState {
   error: string | null;
 
   // Fetch messages
-  fetchMessages: () => Promise<void>;
+  fetchMessages: (token: string) => Promise<void>;
 
   // Delete a message
-  deleteMessage: (id: string) => Promise<boolean>;
+  deleteMessage: (id: string, token: string) => Promise<boolean>;
 
   // Filter state
   searchQuery: string;
@@ -43,11 +43,16 @@ export const useMessageStore = create<MessageState>((set) => ({
   sortBy: null,
 
   // Fetch all messages
-  fetchMessages: async () => {
+  fetchMessages: async (token: string) => {
     set({ loading: true, error: null });
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/messages`
+        `${process.env.NEXT_PUBLIC_API_URL}/messages`,
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        }
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -64,7 +69,7 @@ export const useMessageStore = create<MessageState>((set) => ({
   },
 
   // Delete a message
-  deleteMessage: async (id: string) => {
+  deleteMessage: async (id: string, token: string) => {
     set({ loading: true, error: null });
     try {
       const response = await fetch(
@@ -73,6 +78,7 @@ export const useMessageStore = create<MessageState>((set) => ({
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
         }
       );
