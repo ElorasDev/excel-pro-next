@@ -27,12 +27,19 @@ const Slider: NextPage<SliderProps> = ({ currentSlide, setCurrentSlide }) => {
   return (
     <div className="relative w-min-full md:w-3/4 h-full min-h-[250px] sm:min-h-[250px] md:min-h-[500px] bg-gray-900 rounded-lg shadow-xl overflow-hidden">
       <div
-        className="flex h-full transition-transform duration-500 ease-in-out"
-        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+        className={`flex h-full transition-transform duration-500 ease-in-out -translate-x-[ ${
+          currentSlide * 100
+        }%]`}
       >
-        {hasPlayers
-          ? players.map((player) => <Slide key={player.id} {...player} />)
-          : <Slide key="default" player_name="Default Player" image_url="/images/billboard/Banner1.webp" />}
+        {hasPlayers ? (
+          players.map((player) => <Slide key={player.id} {...player} />)
+        ) : (
+          <Slide
+            key="default"
+            player_name="Default Player"
+            image_url="/images/billboard/Banner1.webp"
+          />
+        )}
       </div>
 
       {players.length > 1 && (
@@ -40,7 +47,9 @@ const Slider: NextPage<SliderProps> = ({ currentSlide, setCurrentSlide }) => {
           <ArrowButton
             direction="left"
             onClick={() =>
-              setCurrentSlide((prev: number) => (prev - 1 + players.length) % players.length)
+              setCurrentSlide(
+                (prev: number) => (prev - 1 + players.length) % players.length
+              )
             }
           />
           <ArrowButton
