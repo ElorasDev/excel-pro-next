@@ -3,9 +3,9 @@ import Landing from "@/components/template/Landing/Landing";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://excel-pro-next.vercel.app"),
-  title: "Excel Pro Football Academy | Premier Youth Soccer Training Toronto",
+  title: "Excel Pro Football Academy | Premier Youth Soccer Training",
   description:
-    "Founded by former Persepolis FC player Reza Abedian, Excel Pro offers elite soccer training for youth in Toronto. Our experienced coaches provide personalized development programs focused on technical skills, teamwork, and competitive excellence. Join Toronto's largest Iranian-based soccer academy.",
+    "Excel Pro, founded by former Persepolis FC player Reza Abedian, offers Toronto youth personalized soccer training, focusing on skills, teamwork, and success.",
   keywords: [
     "football academy",
     "soccer training",
