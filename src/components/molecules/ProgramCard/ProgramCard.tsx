@@ -74,6 +74,8 @@ const ProgramCard: NextPage<ProgramCardProps> = ({
             {/* Link to the program's detailed page */}
             <Link
               href={`/program/${ageGroup.toLowerCase().replace(/\s+/g, "")}`}
+              aria-label={`Details about ${ageGroup} soccer program`}
+              title={`Soccer training program for ${ageGroup}`}
             >
               <button className="mt-6 px-8 py-3 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors">
                 Detail

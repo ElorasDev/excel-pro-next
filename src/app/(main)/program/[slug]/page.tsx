@@ -17,13 +17,12 @@ const ProgramPage: NextPage<ProgramPageProps> = ({ params }) => {
       .replace(/\s*-\s*/g, '-')
       .replace(/\s+/g, '');
 
-  // بررسی فرمت URL
+
   const validFormat = /^u\d+-u\d+$/i.test(decodedSlug);
   if (!validFormat) {
     return notFound();
   }
 
-  // استفاده از regex برای استخراج اعداد از slug (مثلاً u9-u12)
   const slugMatches = decodedSlug.match(/^u(\d+)-u(\d+)$/i);
   if (!slugMatches) {
     return notFound();
@@ -32,20 +31,19 @@ const ProgramPage: NextPage<ProgramPageProps> = ({ params }) => {
   const requestedStartAge = parseInt(slugMatches[1]);
   const requestedEndAge = parseInt(slugMatches[2]);
   
-  // یافتن برنامه متناسب با بررسی محدوده سنی
+
   const program = programs.find(p => {
-    // تطبیق دقیق (مثل قبل)
+
     if (normalize(p.ageGroup) === normalize(decodedSlug)) {
       return true;
     }
     
-    // تطبیق محدوده سنی
+
     const groupMatches = p.ageGroup.match(/u(\d+)\s*[–-]\s*u(\d+)/i);
     if (groupMatches) {
       const groupStartAge = parseInt(groupMatches[1]);
       const groupEndAge = parseInt(groupMatches[2]);
       
-      // بررسی آیا محدوده درخواستی در محدوده برنامه قرار دارد
       return requestedStartAge >= groupStartAge && requestedEndAge <= groupEndAge;
     }
     

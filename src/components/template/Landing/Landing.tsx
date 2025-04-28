@@ -9,11 +9,9 @@ import ContactForm from "@/components/organisms/ContactForm/ContactForm";
 import { PlayerProvider } from "@/context/PlayerContext/PlayerContext";
 import { fetchAllPlayerMonth } from "@/services/getPlayerMonth";
 
-
 export const revalidate = 30;
 
-const Landing = async() => {
-
+const Landing = async () => {
   const players = await fetchAllPlayerMonth();
 
   console.log(players);
@@ -25,18 +23,10 @@ const Landing = async() => {
           <BannerSlider />
         </section>
       </PlayerProvider>
-      <section className="my-24">
-        <HeroSection />
-      </section>
-      <section className="mt-9">
-        <Summary />
-      </section>
-      <section>
-        <SummeryServices />
-      </section>
-      <section>
-        <SummeryPrograms />
-      </section>
+      <HeroSection />
+      <Summary />
+      <SummeryServices />
+      <SummeryPrograms />
       <section className="mx-4">
         <WhyCooseUs />
       </section>

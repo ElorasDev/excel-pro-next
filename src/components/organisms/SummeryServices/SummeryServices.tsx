@@ -1,67 +1,148 @@
 "use client";
-import { useRef, Fragment } from 'react';
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import PrimaryIcon from '@/components/atoms/Icons/primaryIcons/PrimaryIcon';
-import { services } from './data';
+
+import { useRef, Fragment } from "react";
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
+import PrimaryIcon from "@/components/atoms/Icons/primaryIcons/PrimaryIcon";
+import { services } from "./data";
+import Script from "next/script";
+import Link from "next/link";
 
 const SummeryServices = () => {
   const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true });
+  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
 
+  // Animation variants
   const titleVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeOut" } },
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
   };
 
   const iconVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut", delay: 0.2 } },
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.7, ease: "easeOut", delay: 0.1 },
+    },
+  };
+
+  // JSON-LD schema for services
+  const servicesSchema = {
+    "@context": "https://schema.org",
+    "@type": "SportsOrganization",
+    "name": "Excel Pro Academy",
+    "offers": services.map((service) => ({
+      "@type": "Service",
+      "name": service.title,
+      "provider": {
+        "@type": "SportsOrganization",
+        "name": "Excel Pro Academy",
+      },
+      "description": `Professional ${service.title} services offered by Excel Pro Academy.`,
+      "areaServed": {
+        "@type": "Place",
+        "name": "Toronto",
+      },
+    })),
   };
 
   return (
-    <motion.div
-      ref={sectionRef}
-      className="bg-secondary p-4 text-center"
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={titleVariants}
-    >
-      <motion.h2
-        className="text-md font-semibold text-primary my-3"
-        variants={titleVariants}
-      >
-        Our Services
-      </motion.h2>
-      <motion.h2
-        className="text-2xl font-bold text-white my-5"
-        variants={titleVariants}
-      >
-        Excel Pro Academy Services
-      </motion.h2>
+    <>
+      {/* JSON-LD Structured Data */}
+      <Script
+        id="services-schema-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesSchema) }}
+      />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-x-8 justify-items-center mt-4 lg:mt-10 md:mt-8">
-        {services.map((service, index) => (
-          <Fragment key={index}>
-            <motion.div
-              variants={iconVariants}
-              initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
-            >
-              <PrimaryIcon 
-                icon={`/icons/${service.title}.png`}
-                text={service.title}
-                variant="light"
-                className="w-[64px] h-[64px]"
-                fontWeight="bold"
-                width={35}
-                height={35}
-              />
-            </motion.div>
-          </Fragment>
-        ))}
-      </div>
-    </motion.div>
+      <motion.section
+        ref={sectionRef}
+        className="bg-secondary p-4 text-center"
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+        variants={titleVariants}
+        aria-labelledby="services-heading"
+        lang="en"
+        itemScope
+        itemType="https://schema.org/Service"
+      >
+        <motion.p
+          className="text-md font-semibold text-primary my-3"
+          variants={titleVariants}
+        >
+          Our Services
+        </motion.p>
+
+        <motion.h2
+          id="services-heading"
+          className="text-2xl font-bold text-white my-5"
+          variants={titleVariants}
+          itemProp="name"
+        >
+          Excel Pro Academy Services
+        </motion.h2>
+
+        <div
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-x-8 justify-items-center mt-4 lg:mt-10 md:mt-8"
+          itemProp="hasOfferCatalog"
+          itemScope
+          itemType="https://schema.org/OfferCatalog"
+        >
+          {services.map((service, index) => (
+            <Fragment key={index}>
+              <motion.div
+                variants={iconVariants}
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                itemProp="itemListElement"
+                itemScope
+                itemType="https://schema.org/Offer"
+              >
+                <Link
+                  href={`/services/${service.title
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`}
+                  aria-label={`Learn more about ${service.title} service`}
+                  title={`Excel Pro Academy ${service.title} Service`}
+                >
+                  <PrimaryIcon
+                    icon={`/icons/${service.title}.png`}
+                    text={service.title}
+                    variant="light"
+                    className="w-[64px] h-[64px]"
+                    fontWeight="bold"
+                    width={35}
+                    height={35}
+                  />
+                </Link>
+                <meta
+                  itemProp="description"
+                  content={`Professional ${service.title} services offered by Excel Pro Academy.`}
+                />
+              </motion.div>
+            </Fragment>
+          ))}
+        </div>
+
+        {/* Hidden content for SEO boost */}
+        <div className="sr-only">
+          {services.map((service, index) => (
+            <div key={`meta-${index}`}>
+              <h3>{service.title}</h3>
+              <p>
+                Excel Pro Academy offers professional {service.title} services
+                for youth soccer players in Toronto.
+              </p>
+            </div>
+          ))}
+        </div>
+      </motion.section>
+    </>
   );
 };
 
