@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Landing from "@/components/template/Landing/Landing";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://your-domain.com"), // ضروری برای URLs کامل
+  metadataBase: new URL("https://excel-pro-next.vercel.app"), // ضروری برای URLs کامل
   title: "Excel Pro Football Academy | Professional Soccer Training in Toronto",
   description:
     "Excel Pro Academy offers professional soccer training and development programs for youth aged 6-18 in Toronto. Join us to develop skills, teamwork, and excellence.",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     description:
       "Join Toronto's premier soccer academy for youth development. Professional coaches, personalized training, and competitive programs.",
     type: "website",
-    url: "https://your-domain.com",
+    url: "https://excel-pro-next.vercel.app",
     siteName: "Excel Pro Football Academy",
     locale: "en_US",
     images: [
@@ -63,27 +63,26 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://your-domain.com",
+    canonical: "https://excel-pro-next.vercel.app",
     languages: {
-      "en-US": "https://your-domain.com",
-      // اگر نسخه‌های زبانی دیگری دارید، اینجا اضافه کنید
+      "en": "https://excel-pro-next.vercel.app/",
+      "en-US": "https://excel-pro-next.vercel.app/",
     },
   },
 };
 
 export default async function Home() {
-  // ترکیب همه Schema.org در یک آرایه
   const schemaData = [
     // Schema برای سازمان
     {
       "@context": "https://schema.org",
       "@type": "SportsOrganization",
-      "@id": "https://your-domain.com/#organization",
+      "@id": "https://excel-pro-next.vercel.app/#organization",
       name: "Excel Pro Football Academy",
-      url: "https://your-domain.com",
+      url: "https://excel-pro-next.vercel.app",
       logo: {
         "@type": "ImageObject",
-        url: "https://your-domain.com/images/logo.png",
+        url: "https://excel-pro-next.vercel.app/images/logo.png",
         width: 180,
         height: 60,
       },
@@ -97,41 +96,39 @@ export default async function Home() {
       },
       contactPoint: {
         "@type": "ContactPoint",
-        telephone: "+1-416-123-4567", // شماره واقعی خود را قرار دهید
+        telephone: "+1-416-123-4567",
         contactType: "customer service",
-        email: "info@excelproacademy.com", // ایمیل واقعی خود را قرار دهید
+        email: "info@excelproacademy.com",
       },
       sameAs: [
         "https://www.instagram.com/yourpage",
         "https://www.facebook.com/yourpage",
-        // سایر لینک‌های شبکه‌های اجتماعی
       ],
     },
-    // Schema برای وب‌سایت
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "@id": "https://your-domain.com/#website",
-      url: "https://your-domain.com",
+      "@id": "https://excel-pro-next.vercel.app/#website",
+      url: "https://excel-pro-next.vercel.app",
       name: "Excel Pro Football Academy",
       description:
         "Professional soccer training and development for youth players in Toronto",
       publisher: {
-        "@id": "https://your-domain.com/#organization",
+        "@id": "https://excel-pro-next.vercel.app/#organization",
       },
     },
     // Schema برای صفحه وب
     {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "@id": "https://your-domain.com/#webpage",
-      url: "https://your-domain.com/",
+      "@id": "https://excel-pro-next.vercel.app/#webpage",
+      url: "https://excel-pro-next.vercel.app",
       name: "Excel Pro Football Academy | Professional Soccer Training in Toronto",
       isPartOf: {
-        "@id": "https://your-domain.com/#website",
+        "@id": "https://excel-pro-next.vercel.app/#website",
       },
       about: {
-        "@id": "https://your-domain.com/#organization",
+        "@id": "https://excel-pro-next.vercel.app/#organization",
       },
       description:
         "Excel Pro Academy offers professional soccer training and development programs for youth aged 6-18 in Toronto. Join us to develop skills, teamwork, and excellence.",
@@ -140,13 +137,13 @@ export default async function Home() {
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
-      "@id": "https://your-domain.com/#localbusiness",
+      "@id": "https://excel-pro-next.vercel.app/#localbusiness",
       name: "Excel Pro Football Academy",
-      image: "https://your-domain.com/images/academy-photo.jpg",
+      image: "https://excel-pro-next.vercel.app/images/academy-photo.jpg",
       priceRange: "$$", // تقریب قیمت‌گذاری خدمات
       telephone: "+1-416-123-4567",
       email: "info@excelproacademy.com",
-      url: "https://your-domain.com",
+      url: "https://excel-pro-next.vercel.app",
       address: {
         "@type": "PostalAddress",
         streetAddress: "123 Soccer Street",
@@ -194,9 +191,9 @@ export default async function Home() {
         <Landing />
 
         <section className="sr-only">
-          <h1>
+          <h2>
             Excel Pro Football Academy - Toronto&apos;s Premier Soccer Training
-          </h1>
+          </h2>
           <p>
             Welcome to Excel Pro Football Academy, the largest Iranian-based
             soccer academy in Toronto. Founded by former Persepolis FC player
@@ -214,6 +211,5 @@ export default async function Home() {
     </>
   );
 }
-
 
 export const revalidate = 3600;
