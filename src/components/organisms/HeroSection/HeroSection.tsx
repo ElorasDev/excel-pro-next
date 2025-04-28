@@ -35,11 +35,26 @@ const itemVariants = {
 
 const HeroSection: NextPage = () => {
   const members = [
-    { src: "/images/person/avatars/Avatar1.png", alt: "Football Academy Member 1" },
-    { src: "/images/person/avatars/Avatar2.png", alt: "Football Academy Member 2" },
-    { src: "/images/person/avatars/Avatar3.png", alt: "Football Academy Member 3" },
-    { src: "/images/person/avatars/Avatar4.png", alt: "Football Academy Member 4" },
-    { src: "/images/person/avatars/Avatar5.png", alt: "Football Academy Member 5" },
+    {
+      src: "/images/person/avatars/Avatar1.png",
+      alt: "Football Academy Member 1",
+    },
+    {
+      src: "/images/person/avatars/Avatar2.png",
+      alt: "Football Academy Member 2",
+    },
+    {
+      src: "/images/person/avatars/Avatar3.png",
+      alt: "Football Academy Member 3",
+    },
+    {
+      src: "/images/person/avatars/Avatar4.png",
+      alt: "Football Academy Member 4",
+    },
+    {
+      src: "/images/person/avatars/Avatar5.png",
+      alt: "Football Academy Member 5",
+    },
   ];
 
   const router = useRouter();
@@ -54,7 +69,10 @@ const HeroSection: NextPage = () => {
   }, [isInView, controls]);
 
   return (
-    <section aria-label="Excel Pro Football Academy Hero Section" className="my-24">
+    <section
+      aria-label="Excel Pro Football Academy Hero Section"
+      className="my-24"
+    >
       <motion.div
         ref={ref}
         className="relative bg-white p-6 rounded-lg shadow-sm w-full max-w-6xl mx-auto overflow-hidden"
@@ -82,32 +100,34 @@ const HeroSection: NextPage = () => {
             className="text-3xl md:text-4xl font-bold text-gray-900"
             variants={itemVariants}
           >
-            Excel Pro Football Academy, Where Champions Are Made!
+            Excel Pro Football Academy | Professional Soccer Training for Youth
+            in Toronto
           </motion.h1>
 
           <motion.p
             className="text-gray-600 mt-2 md:max-w-lg"
             variants={itemVariants}
           >
-            Train with the best football coaches, compete at the highest level, and unlock your
-            full potential with Excel Pro Football Academy&apos;s professional training programs.
+            Train with the best football coaches, compete at the highest level,
+            and unlock your full potential with Excel Pro Football
+            Academy&apos;s professional training programs.
           </motion.p>
 
           <motion.div
             className="flex items-center gap-4 mt-2 flex-wrap"
             variants={itemVariants}
           >
-            <Button 
-              variant="white" 
-              className="rounded-xl" 
+            <Button
+              variant="white"
+              className="rounded-xl"
               onClick={() => router.push("/program")}
               aria-label="View Excel Pro Football Academy programs"
             >
               View programs
             </Button>
-            <Button 
-              variant="primary" 
-              className="rounded-xl" 
+            <Button
+              variant="primary"
+              className="rounded-xl"
               onClick={() => router.push("/program")}
               aria-label="Join Excel Pro Football Academy now"
             >

@@ -30,9 +30,7 @@ const Landing = async () => {
       <section className="mx-4">
         <WhyCooseUs />
       </section>
-      <section>
         <Testimonial />
-      </section>
       <section>
         <ContactForm />
       </section>
