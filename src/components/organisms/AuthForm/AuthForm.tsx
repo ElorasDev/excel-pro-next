@@ -113,7 +113,7 @@ const AuthForm: NextPage<AuthFormProps> = ({ auth }) => {
           const userData = await getUserByPhoneNumber(values.phoneNumber);
           if (userData) {
             alert("Welcome back! Redirecting to your profile.");
-            setIsFirstTime(false);
+            setIsFirstTime(userData.subscriptionCounter === 0);
             setEmail(userData.email);
             setFullname(userData.fullname);
             setStep(8);
