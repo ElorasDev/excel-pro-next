@@ -118,10 +118,8 @@ const AuthForm: NextPage<AuthFormProps> = ({ auth }) => {
             setFullname(userData.fullname);
             setStep(8);
           } else {
-            // حتی اگر کاربر موجود نباشد هم auth را true کن
             setStep(1);
           }
-          // در هر صورت auth را true کن چه کاربر موجود باشد چه نباشد
           auth(true);
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -129,7 +127,6 @@ const AuthForm: NextPage<AuthFormProps> = ({ auth }) => {
           setStep(1);
         }
       } else {
-        // اگر OTP تأیید نشود، پیام خطا نمایش داده شود
         alert("Invalid or expired OTP ❌");
       }
     } catch {
