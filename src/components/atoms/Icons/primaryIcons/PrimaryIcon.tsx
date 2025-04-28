@@ -51,7 +51,7 @@ const PrimaryIcon: NextPage<PrimaryIconProps> = forwardRef(
         {/* Text Section */}
         <div className="text-center h-20 my-2">
           {number && (
-            <h3 className="text-2xl font-bold text-red-500">{number}</h3>
+            <span className="text-2xl font-bold text-red-500">{number}</span>
           )}
           {text && <p className={`my-2 ${font} ${textColor}`}>{text}</p>}
         </div>

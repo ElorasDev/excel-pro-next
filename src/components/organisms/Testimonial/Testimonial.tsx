@@ -196,7 +196,7 @@ const Testimonial: NextPage = () => {
                   />
                 </motion.div>
                 <div>
-                  <h3 className="font-bold text-base text-[#121212]">{currentTestimonial.name}</h3>
+                  <p className="font-bold text-base text-[#121212]">{currentTestimonial.name}</p>
                   <p className="text-xs text-gray-500">{currentTestimonial.location}</p>
                 </div>
               </motion.div>
@@ -302,7 +302,7 @@ const Testimonial: NextPage = () => {
                     />
                   </motion.div>
                   <div>
-                    <h3 className="font-bold text-lg text-[#121212]">{currentTestimonial.name}</h3>
+                    <p className="font-bold text-lg text-[#121212]">{currentTestimonial.name}</p>
                     <p className="text-sm text-gray-500">{currentTestimonial.location}</p>
                   </div>
                 </motion.div>
