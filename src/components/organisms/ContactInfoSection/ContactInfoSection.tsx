@@ -34,12 +34,12 @@ const ContactInfoSection = () => {
         <ContactCard
           iconSrc="/icons/phone.png"
           title="Telephone"
-          content="(416) 770-8181"
+          content="+1 647-703-7821"
         />
         <ContactCard
           iconSrc="/icons/location-marker.png"
           title="Email"
-          content="Excelproacademy@gmail.com"
+          content="excelprosocceracademy@gmail.com"
         />
       </motion.div>
     );

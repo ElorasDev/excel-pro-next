@@ -27,14 +27,14 @@ type FAQItem = {
 };
 
 const ContactUs = () => {
-  const position: [number, number] = [43.90065543881494, -79.39804313547427];
+  const position: [number, number] = [43.87302038763351, -79.36276925767224];
 
   const faqData: FAQItem[] = [
     {
       id: 1,
       question: "What age groups do you accept at Excel Pro Academy?",
       answer:
-        "We welcome players from ages 6 to 18. Our programs are tailored to suit each age group's skills and development needs.",
+        "We welcome players from ages 5 to 18. Our programs are tailored to suit each age group's skills and development needs.",
     },
     {
       id: 2,

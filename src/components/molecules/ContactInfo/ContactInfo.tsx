@@ -12,17 +12,17 @@ const ContactInfoCard = () => {
     >
       <div className="flex items-center text-white">
         <Location size={20}/>
-        <span className="text-sm ml-2">123 Excel Street, Ontario</span>
+        <span className="text-sm ml-2">Canada, Ontario</span>
       </div>
 
       <div className="text-white flex items-center">
         <PhoneIcon size={20} />
-        <span className="text-sm ml-2">+1 (234) 567-8900</span>
+        <span className="text-sm ml-2">+1 647-703-7821</span>
       </div>
 
       <div className="text-white flex items-center">
         <EmailIcon size={20}/>
-        <span className="text-sm ml-2">info@excelpro.com</span>
+        <span className="text-sm ml-2">excelprosocceracademy@gmail.com</span>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 import { NextPage } from "next";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
@@ -81,6 +82,7 @@ const AboutSection: NextPage<AboutSectionProps> = ({ teamImages }) => {
   const statsRef = useRef(null);
   const servicesRef = useRef(null);
   const teamSectionRef = useRef(null);
+  const router = useRouter();
 
   // Check if sections are in view
   const isAboutInView = useInView(aboutSectionRef, { once: true, amount: 0.3 });
@@ -247,18 +249,18 @@ const AboutSection: NextPage<AboutSectionProps> = ({ teamImages }) => {
               transition={{ duration: 0.7, delay: 0.4 }}
             >
               <p className="break-words max-w-full">
-                Excel Pro is the largest Iranian-Based soccer academy in
-                Toronto, managed by former Persepolis FC player, Reza Abedian.
-                At Excel Pro Soccer Academy, we have been training youths from
-                age +5 all the way to 18 years old.
+                At Excel Pro Soccer Academy, we are committed to building the
+                next generation of soccer players through structured training,
+                competitive opportunities, and a positive team culture. Based in
+                Toronto and active throughout the Greater Toronto Area (GTA),
+                our academy welcomes players aged 5 to 17, from beginners to
+                high-level athletes.
               </p>
               <p className="break-words max-w-full">
-                Excel Pro Soccer Academy is a soccer school based in Toronto.
-                Reza Abedian is the founder and Head Coach at the Excel Pro
-                Soccer Academy with a long and recognized professional soccer
-                experience. Founded in 2010, it is now considered to be one of
-                the best in Canada and offers personalised training which is
-                tailored to each of its players individual needs.
+                With a team of certified, passionate coaches, we combine
+                European-style training with Canadian grassroots development
+                models to give every player the tools they need to grow — both
+                on and off the field.
               </p>
             </motion.div>
 
@@ -269,7 +271,10 @@ const AboutSection: NextPage<AboutSectionProps> = ({ teamImages }) => {
               }
               transition={{ duration: 0.5, delay: 0.7 }}
             >
-              <Button className="mt-8 text-white font-medium py-3 px-6 rounded-lg transition duration-300">
+              <Button
+                className="mt-8 text-white font-medium py-3 px-6 rounded-lg transition duration-300"
+                onClick={() => router.push("program")}
+              >
                 ENTER A SOCCER WORLD
               </Button>
             </motion.div>

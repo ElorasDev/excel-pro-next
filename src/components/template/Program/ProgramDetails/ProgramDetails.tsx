@@ -11,6 +11,7 @@ interface ProgramType {
   decodedSlug: string;
   program: {
     ageGroup: string;
+    title: string;
     team_image: string;
     schedule: string[];
     gameInfo: string;
@@ -74,7 +75,7 @@ const ProgramDetails: NextPage<ProgramType> = ({ program, decodedSlug }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.8 }}
         >
-          <h1 className="text-4xl font-bold text-gray-900">{program.ageGroup}</h1>
+          <h1 className="text-4xl font-bold text-gray-900">{program.title}</h1>
         </motion.div>
       </motion.div>
 

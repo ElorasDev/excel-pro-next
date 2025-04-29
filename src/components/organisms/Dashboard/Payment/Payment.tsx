@@ -581,7 +581,7 @@ const Payment: NextPage = () => {
         {viewMode === "pending" ? (
           isPendingLoading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <span className="ml-2">Loading pending transfers...</span>
             </div>
           ) : (
@@ -725,7 +725,7 @@ const Payment: NextPage = () => {
           )
         ) : isLoading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <span className="ml-2">Loading transfers...</span>
           </div>
         ) : (

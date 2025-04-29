@@ -105,12 +105,13 @@ const HeroSection: NextPage = () => {
           </motion.h1>
 
           <motion.p
-            className="text-gray-600 mt-2 md:max-w-lg"
+            className="text-gray-600 mt-2"
             variants={itemVariants}
           >
-            Train with the best football coaches, compete at the highest level,
-            and unlock your full potential with Excel Pro Football
-            Academy&apos;s professional training programs.
+            We believe that every player deserves a chance to succeed. Whether
+            your child is just starting or already playing at a competitive
+            level, Excel Pro Soccer Academy provides the training, support, and
+            opportunities they need to reach their full potential.
           </motion.p>
 
           <motion.div

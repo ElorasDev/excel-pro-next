@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef, useState, useEffect } from 'react';
-import Link from 'next/link';
-import { motion, useInView } from 'framer-motion';
-import PrimaryIcon from '@/components/atoms/Icons/primaryIcons/PrimaryIcon';
-import Script from 'next/script';
+import { useRef, useState, useEffect } from "react";
+import Link from "next/link";
+import { motion, useInView } from "framer-motion";
+import PrimaryIcon from "@/components/atoms/Icons/primaryIcons/PrimaryIcon";
+import Script from "next/script";
 
 const Summary = () => {
   const sectionRef = useRef(null);
@@ -32,10 +32,16 @@ const Summary = () => {
       const awardsStep = targets.awards / (duration / interval);
 
       const timer = setInterval(() => {
-        setStudentCount(prev => Math.min(prev + studentsStep, targets.students));
-        setExperienceCount(prev => Math.min(prev + experienceStep, targets.experience));
-        setCoachesCount(prev => Math.min(prev + coachesStep, targets.coaches));
-        setAwardsCount(prev => Math.min(prev + awardsStep, targets.awards));
+        setStudentCount((prev) =>
+          Math.min(prev + studentsStep, targets.students)
+        );
+        setExperienceCount((prev) =>
+          Math.min(prev + experienceStep, targets.experience)
+        );
+        setCoachesCount((prev) =>
+          Math.min(prev + coachesStep, targets.coaches)
+        );
+        setAwardsCount((prev) => Math.min(prev + awardsStep, targets.awards));
       }, interval);
 
       const cleanup = setTimeout(() => {
@@ -51,19 +57,25 @@ const Summary = () => {
         clearTimeout(cleanup);
       };
     }
-  }, [isInView, targets.awards, targets.coaches, targets.experience, targets.students]);
+  }, [
+    isInView,
+    targets.awards,
+    targets.coaches,
+    targets.experience,
+    targets.students,
+  ]);
 
   // Optimizing animations to reduce Web Vitals impact
   const containerVariants = {
     hidden: { opacity: 0, y: 20 }, // reduced y value for better performance
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { 
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
         duration: 0.8, // reduced duration
         ease: "easeOut",
-        staggerChildren: 0.15 // reduced for better performance
-      } 
+        staggerChildren: 0.15, // reduced for better performance
+      },
     },
   };
 
@@ -94,36 +106,37 @@ const Summary = () => {
   const academySchema = {
     "@context": "https://schema.org",
     "@type": "SportsTeam",
-    "name": "Excel Pro Soccer Academy",
-    "description": "Excel Pro Soccer Academy is the largest Iranian-based soccer academy in Toronto, founded and led by former Persepolis FC player, Reza Abedian.",
-    "sport": "Soccer",
-    "memberOf": {
+    name: "Excel Pro Soccer Academy",
+    description:
+      "Excel Pro Soccer Academy is the largest Iranian-based soccer academy in Toronto, founded and led by former Persepolis FC player, Reza Abedian.",
+    sport: "Soccer",
+    memberOf: {
       "@type": "Organization",
-      "name": "Toronto Soccer Association"
+      name: "Toronto Soccer Association",
     },
-    "coach": {
+    coach: {
       "@type": "Person",
-      "name": "Reza Abedian",
-      "jobTitle": "Head Coach",
-      "alumniOf": {
+      name: "Reza Abedian",
+      jobTitle: "Head Coach",
+      alumniOf: {
         "@type": "SportsTeam",
-        "name": "Persepolis FC"
-      }
+        name: "Persepolis FC",
+      },
     },
-    "numberOfEmployees": targets.coaches,
-    "award": `${targets.awards} soccer awards`,
-    "foundingDate": `${new Date().getFullYear() - targets.experience}`
+    numberOfEmployees: targets.coaches,
+    award: `${targets.awards} soccer awards`,
+    foundingDate: `${new Date().getFullYear() - targets.experience}`,
   };
 
   return (
     <>
       {/* Adding structured data using JSON-LD */}
-      <Script 
-        id="academy-schema" 
+      <Script
+        id="academy-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(academySchema) }}
       />
-      
+
       <motion.section
         ref={sectionRef}
         className="lg:p-28 py-8 px-4 w-full bg-[#F9F9F9] mt-9"
@@ -142,7 +155,7 @@ const Summary = () => {
             variants={itemVariants}
             itemProp="name"
           >
-            About Excel Pro Academy
+            Welcome to Excel Pro Soccer Academy — Developing Future Stars
           </motion.h2>
 
           <motion.p
@@ -150,27 +163,35 @@ const Summary = () => {
             variants={itemVariants}
             itemProp="description"
           >
-            Excel Pro Soccer Academy is the largest Iranian-based soccer academy in Toronto, founded and led by former Persepolis FC player, Reza Abedian. We provide professional soccer training for youth aged 6 to 18, focusing on developing skills, teamwork, and excellence on and off the field.
+            At Excel Pro Soccer Academy we provide elite soccer training for
+            boys and girls aged 5 to 17. Based in Toronto and serving the entire
+            GTA, our academy focuses on developing technical skills, game
+            intelligence, and a lifelong passion for soccer.
           </motion.p>
 
           <motion.div variants={itemVariants}>
             <Link
-              href="/about"
+              href="/about-us"
               aria-label="Learn more about Excel Pro Soccer Academy"
               title="Learn more about Excel Pro Soccer Academy"
               className="inline-flex items-center text-gray-700 hover:text-primary text-lg font-semibold transition-all duration-300 justify-center group"
               rel="canonical" // Add canonical relation for SEO
             >
               Learn More
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 ml-3 transition-transform duration-300 group-hover:translate-x-1" 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 ml-3 transition-transform duration-300 group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
                 aria-hidden="true" // Hide from screen readers as it's decorative
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7-7 7M5 12h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 5l7 7-7 7M5 12h16"
+                />
               </svg>
             </Link>
           </motion.div>
@@ -181,9 +202,9 @@ const Summary = () => {
           variants={containerVariants}
         >
           <motion.div variants={iconVariants}>
-            <PrimaryIcon 
-              number={formatCount(studentCount)} 
-              text="Students" 
+            <PrimaryIcon
+              number={formatCount(studentCount)}
+              text="Students"
               variant="dark"
               icon="/icons/football_player.png"
               width={150}
@@ -192,9 +213,9 @@ const Summary = () => {
           </motion.div>
 
           <motion.div variants={iconVariants}>
-            <PrimaryIcon 
-              number={formatCount(experienceCount)} 
-              text="Years of Experience" 
+            <PrimaryIcon
+              number={formatCount(experienceCount)}
+              text="Years of Experience"
               variant="dark"
               width={150}
               height={150}
@@ -203,9 +224,9 @@ const Summary = () => {
           </motion.div>
 
           <motion.div variants={iconVariants}>
-            <PrimaryIcon 
-              number={formatCount(coachesCount)} 
-              text="Professional Coaches" 
+            <PrimaryIcon
+              number={formatCount(coachesCount)}
+              text="Professional Coaches"
               variant="dark"
               icon="/icons/Coaches.png"
               width={150}
@@ -214,9 +235,9 @@ const Summary = () => {
           </motion.div>
 
           <motion.div variants={iconVariants}>
-            <PrimaryIcon 
-              number={formatCount(awardsCount)} 
-              text="Awards Won" 
+            <PrimaryIcon
+              number={formatCount(awardsCount)}
+              text="Awards Won"
               variant="dark"
               icon="/icons/cup.png"
               width={150}
