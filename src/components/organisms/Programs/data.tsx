@@ -80,7 +80,7 @@ export const programs: ProgramType[] = [
       "At Excel Pro Soccer Academy, all players will receive full uniform upon registration. Uniforms consist of a jersey, shorts, and pair of socks. This uniform is to be worn at each session. Game day uniforms are separately given upon being selected for the team which includes players jersey number!All players are to bring their own shoes and shin pads. Running shoes are not acceptable. Please note that shin pads are mandatory during all games and training sessions!",
   },
   {
-    ageGroup: "U13 – U17",
+    ageGroup: "U13 – U14",
     title: "Competitive Phase (Ages 13-17)",
     backgroundClass: "bg-black",
     textColorClass: "text-white",
