@@ -28,7 +28,7 @@ export const programs: ProgramType[] = [
       className: "text-green-800",
     },
     imageSrc: "/images/programs/u7-12.png",
-    team_image: "/images/person/team/u7.png",
+    team_image: "/images/person/team/u7.webp",
     description:
       "Our youngest athletes are introduced to the beautiful game in a fun and energetic environment. Sessions focus on basic ball control, coordination, teamwork, and building confidence through play-based learning. Training frequency: 2 x per week",
     programOutline: {
@@ -67,7 +67,7 @@ export const programs: ProgramType[] = [
       className: "text-gray-800",
     },
     imageSrc: "/images/programs/u13-14.png",
-    team_image: "/images/person/team/u7.png",
+    team_image: "/images/person/team/u7.webp",
     description:
       "As players grow, we emphasize technical skill development, tactical understanding, and physical fitness. This stage builds the foundation for more competitive play, with a focus on ball mastery, passing, and movement. Training frequency: 2–3x per week, optional weekend games",
     programOutline: {
@@ -106,7 +106,7 @@ export const programs: ProgramType[] = [
       className: "text-gray-800",
     },
     imageSrc: "/images/programs/u15-17.png",
-    team_image: "/images/person/team/u7.png",
+    team_image: "/images/person/team/u7.webp",
     description:
       "Our competitive teams train with high intensity and are introduced to position-specific tactics, match strategies, and mental strength training. Players compete in regional leagues and tournaments across Toronto and the GTA. Training frequency: 2-3x per week + regular matches",
     programOutline: {
@@ -131,7 +131,7 @@ export const programs: ProgramType[] = [
       className: "text-white",
     },
     imageSrc: "/images/programs/u15-17.png",
-    team_image: "/images/person/team/u7.png",
+    team_image: "/images/person/team/u7.webp",
     description:
       "This program is designed for serious players aiming to play at a high level, including university, college, and semi-professional opportunities. We focus on advanced tactical systems, strength & conditioning, video analysis, and exposure to top-level competitions. Training frequency: 3x per week + league play + showcases",
     programOutline: {
