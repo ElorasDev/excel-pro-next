@@ -1,6 +1,5 @@
 "use client";
 
-// import { Button } from "@/components/atoms/Button/Button";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import {
@@ -10,8 +9,10 @@ import {
   FiMenu,
   FiFileText,
   FiFile,
+  FiEye
 } from "react-icons/fi";
 import FilterModal from "@/components/molecules/FilterModal/FilterModal";
+import Modal from "@/components/atoms/Modal/Modal"; // Update path as needed
 import { getAllUsers } from "@/services/getAllUsers";
 
 // Complete User interface based on your database schema
@@ -61,6 +62,10 @@ const Overview = () => {
 
   // State for filter modal
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  
+  // State for player detail modal
+  const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<User | null>(null);
 
   // State for all users from database (complete user data)
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -123,10 +128,19 @@ const Overview = () => {
   const applyFilters = (filters: string[]) => {
     setActiveFilters(filters);
   };
+  
+  // Function to open player details modal
+  const openPlayerModal = (playerId: number) => {
+    const player = allUsers.find(user => user.id === playerId);
+    if (player) {
+      setSelectedPlayer(player);
+      setIsPlayerModalOpen(true);
+    }
+  };
 
   // Function to convert date object to string
   const formatDate = (date: Date | undefined | null): string => {
-    if (!date) return "";
+    if (!date) return "N/A";
     if (typeof date === "string") {
       return new Date(date).toLocaleDateString();
     }
@@ -135,7 +149,7 @@ const Overview = () => {
 
   // Function to convert boolean to "Yes"/"No"
   const formatBoolean = (value: boolean | undefined): string => {
-    if (value === undefined) return "";
+    if (value === undefined) return "N/A";
     return value ? "Yes" : "No";
   };
 
@@ -326,7 +340,6 @@ const Overview = () => {
   };
 
   // Effect to filter players when activeFilters or searchQuery changes
-  // This is where the main fix happens
   useEffect(() => {
     if (originalPlayers.length === 0) return;
 
@@ -554,7 +567,9 @@ const Overview = () => {
                     <th className="text-left py-4 px-6 font-medium text-gray-600 whitespace-nowrap w-1/6">
                       Active Plan
                     </th>
-                    <th className="py-4 px-6 whitespace-nowrap w-1/6"></th>
+                    <th className="py-4 px-6 font-medium text-gray-600 text-center whitespace-nowrap w-1/6">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -595,6 +610,15 @@ const Overview = () => {
                             {player.activePlan}
                           </span>
                         </td>
+                        <td className="py-4 px-6 whitespace-nowrap w-1/6 text-center">
+                          <button
+                            onClick={() => openPlayerModal(player.id)}
+                            className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                            title="View player details"
+                          >
+                            <FiEye size={18} />
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (
@@ -626,6 +650,171 @@ const Overview = () => {
         activeFilters={activeFilters}
         onApplyFilters={applyFilters}
       />
+
+      {/* Player Details Modal */}
+      {selectedPlayer && (
+        <Modal
+          isOpen={isPlayerModalOpen}
+          onClose={() => setIsPlayerModalOpen(false)}
+          title="Player Details"
+        >
+          <div className="space-y-6">
+            {/* Basic Info Section */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Full Name</p>
+                  <p className="font-medium">{selectedPlayer.fullname}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Age</p>
+                  <p className="font-medium">{selectedPlayer.age}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Gender</p>
+                  <p className="font-medium">{selectedPlayer.gender}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Temporary Player</p>
+                  <p className="font-medium">{formatBoolean(selectedPlayer.isTemporary)}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Info Section */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Contact Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Parent Name</p>
+                  <p className="font-medium">{selectedPlayer.parent_name || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Phone Number</p>
+                  <p className="font-medium">{selectedPlayer.phone_number}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="font-medium">{selectedPlayer.email}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Training Info Section */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Training Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Program</p>
+                  <p className="font-medium">{selectedPlayer.program}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Skill Level</p>
+                  <p className="font-medium">{selectedPlayer.current_skill_level}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Position</p>
+                  <p className="font-medium">{selectedPlayer.player_positions || selectedPlayer.custom_position || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Session Goals</p>
+                  <p className="font-medium">{selectedPlayer.session_goals}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Schedule Info */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Schedule</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Available Days</p>
+                  <p className="font-medium">{selectedPlayer.available_days}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Preferred Time</p>
+                  <p className="font-medium">{selectedPlayer.preferred_time}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Subscription Info */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Subscription</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Active Plan</p>
+                  <p className="font-medium">
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      selectedPlayer.activePlan === "Premium" 
+                        ? "bg-purple-100 text-purple-800" 
+                        : selectedPlayer.activePlan === "Standard" 
+                        ? "bg-blue-100 text-blue-800" 
+                        : "bg-green-100 text-green-800"
+                    }`}>
+                      {selectedPlayer.activePlan || "No Plan"}
+                    </span>
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Subscription End Date</p>
+                  <p className="font-medium">{formatDate(selectedPlayer.currentSubscriptionEndDate)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Stripe Customer ID</p>
+                  <p className="font-medium">{selectedPlayer.stripeCustomerId || "N/A"}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Medical & Comments */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Additional Information</h3>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-500">Medical Conditions</p>
+                  <p className="font-medium">{selectedPlayer.medical_conditions || "None"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Comments</p>
+                  <p className="font-medium">{selectedPlayer.comments || "None"}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Legal</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Liability Waiver</p>
+                  <p className="font-medium">{formatBoolean(selectedPlayer.liability_waiver)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Cancellation Policy</p>
+                  <p className="font-medium">{formatBoolean(selectedPlayer.cancellation_policy)}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Registration Dates */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Registration Info</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Created At</p>
+                  <p className="font-medium">{formatDate(selectedPlayer.createdAt)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Last Updated</p>
+                  <p className="font-medium">{formatDate(selectedPlayer.updatedAt)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

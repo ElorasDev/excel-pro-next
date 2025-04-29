@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
 
 // Type definition for a team member
 type TeamMember = {
@@ -11,13 +12,14 @@ type TeamMember = {
   position: string;
   imageSrc: string;
   imageAlt: string;
+  socialMedia?: string;
 };
 
 interface TeamSectionProps {
   teamMembers?: TeamMember[];
 }
 
-const TeamSection: React.FC<TeamSectionProps> = ({ teamMembers }) => {
+const TeamSection: NextPage<TeamSectionProps> = ({ teamMembers }) => {
   // Default team members if none are provided
   const defaultTeamMembers: TeamMember[] = [
     {
@@ -25,37 +27,44 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamMembers }) => {
       name: "Reza Abedian",
       position: "Owner & coach of Excel Pro Academy",
       imageSrc: "/images/person/avatars/abedian_avatar.png",
-      imageAlt: "Reza Abedian"
+      imageAlt: "Reza Abedian",
+      socialMedia: "https://www.instagram.com/reza.abedian21?igsh=MWZtN3htb3dvZGdp",
     },
     {
       id: "2",
-      name: "John Doe",
+      name: "Reza Charim",
       position: "Head coach of Excel Pro Academy",
-      imageSrc: "/images/person/avatars/abedian_avatar.png",
-      imageAlt: "John Doe"
+      imageSrc: "/images/person/reza-charim.jpg",
+      imageAlt: "John Doe",
+      socialMedia:
+        "https://www.instagram.com/reza.charim?igsh=MXdrMmV6cDhnYmRkOQ==",
     },
-    {
-      id: "3",
-      name: "Jeff Rayan",
-      position: "Assistant Coach of Excel Pro Academy",
-      imageSrc: "/images/person/avatars/abedian_avatar.png",
-      imageAlt: "Jeff Rayan"
-    }
+    // {
+    //   id: "3",
+    //   name: "Jeff Rayan",
+    //   position: "Assistant Coach of Excel Pro Academy",
+    //   imageSrc: "/images/person/avatars/abedian_avatar.png",
+    //   imageAlt: "Jeff Rayan",
+    // },
   ];
 
   // Use provided team members or fall back to default ones
   const displayTeamMembers = teamMembers || defaultTeamMembers;
 
-  return (
-    <div className="w-full bg-white py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
+  // Render differently based on number of members
+  const renderTeamMembers = () => {
+    // For 1 or 2 members, center them
+    if (displayTeamMembers.length <= 2) {
+      return (
+        <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-8 max-w-3xl mx-auto">
           {displayTeamMembers.map((member) => (
-            <div key={member.id} className="bg-gray-50 p-8 rounded-3xl text-center">
+            <div
+              key={member.id}
+              className="bg-gray-50 p-8 rounded-3xl text-center w-full max-w-sm"
+            >
               <div className="flex justify-center mb-4">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden bg-purple-100">
-                  <Image 
+                  <Image
                     src={member.imageSrc}
                     alt={member.imageAlt}
                     fill
@@ -63,7 +72,9 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamMembers }) => {
                   />
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-1">{member.name}</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-1">
+                {member.name}
+              </h3>
               <p className="text-red-500 mb-6">{member.position}</p>
               <div className="mb-6">
                 <button className="border border-gray-300 rounded-md py-2 px-6 text-gray-700 hover:bg-gray-100 transition duration-200">
@@ -71,28 +82,112 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamMembers }) => {
                 </button>
               </div>
               <div className="flex justify-center space-x-4">
-                <Link href="#" className="text-gray-400 hover:text-gray-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                <Link
+                  href={member.socialMedia ? member.socialMedia : "#"}
+                  className="text-gray-400 hover:text-gray-600"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-5 h-5"
+                  >
+                    <rect
+                      x="2"
+                      y="2"
+                      width="20"
+                      height="20"
+                      rx="5"
+                      ry="5"
+                    ></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                   </svg>
                 </Link>
-                <Link href="#" className="text-gray-400 hover:text-gray-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-                  </svg>
-                </Link>
-                <a href="#" className="text-gray-400 hover:text-gray-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                  </svg>
-                </a>
               </div>
             </div>
           ))}
-          
         </div>
+      );
+    } 
+    
+    // For 3 or more members, use grid layout
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {displayTeamMembers.map((member) => (
+          <div
+            key={member.id}
+            className="bg-gray-50 p-8 rounded-3xl text-center"
+          >
+            <div className="flex justify-center mb-4">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden bg-purple-100">
+                <Image
+                  src={member.imageSrc}
+                  alt={member.imageAlt}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-1">
+              {member.name}
+            </h3>
+            <p className="text-red-500 mb-6">{member.position}</p>
+            <div className="mb-6">
+              <button className="border border-gray-300 rounded-md py-2 px-6 text-gray-700 hover:bg-gray-100 transition duration-200">
+                About {member.name}
+              </button>
+            </div>
+            <div className="flex justify-center space-x-4">
+              <Link
+                href={member.socialMedia ? member.socialMedia : "#"}
+                className="text-gray-400 hover:text-gray-600"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-5 h-5"
+                >
+                  <rect
+                    x="2"
+                    y="2"
+                    width="20"
+                    height="20"
+                    rx="5"
+                    ry="5"
+                  ></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div className="w-full bg-white py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {renderTeamMembers()}
       </div>
     </div>
   );

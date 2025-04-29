@@ -10,6 +10,7 @@ import Link from "next/link";
  */
 interface ProgramCardProps {
   ageGroup: string;
+  title: string;
   backgroundClass: string;
   textColorClass: string;
   schedule: string[];

@@ -34,6 +34,7 @@ const Programs = () => {
           <motion.div key={index} variants={cardVariants}>
             <ProgramCard
               ageGroup={program.ageGroup}
+              title={program.title}
               backgroundClass={program.backgroundClass}
               textColorClass={program.textColorClass}
               schedule={program.schedule}

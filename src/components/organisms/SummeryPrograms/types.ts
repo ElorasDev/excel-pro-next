@@ -8,6 +8,7 @@ export interface ProgramTag {
 
 export interface ProgramType {
     ageGroup: string;
+    title: string;
     backgroundClass: string;
     textColorClass: string;
     schedule: string[];
