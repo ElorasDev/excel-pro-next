@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { NextPage } from "next";
 import {
   FiUser,
   FiMail,
@@ -17,8 +18,6 @@ interface Admin {
   id: number;
   username: string;
   email: string;
-  first_name: string;
-  last_name: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,8 +27,6 @@ interface UpdateAuthDto {
   username?: string;
   email?: string;
   password?: string;
-  first_name?: string;
-  last_name?: string;
   currentPassword?: string;
 }
 
@@ -62,12 +59,13 @@ const formatDate = (date: Date | string | undefined | null): string => {
   }
 };
 
-const AdminProfileUpdate: React.FC = () => {
+const AdminProfileUpdate: NextPage = () => {
   // Auth token from cookies
   const authToken = Cookies.get("auth_token");
 
-  // Current admin ID (in a real app, this would come from context or state management)
-  const adminId = 1; // This should be dynamic in a real application
+  // Get current admin ID from cookies or state management
+  // For testing, we can use a default value
+  const [adminId, setAdminId] = useState<number | null>(null);
 
   // States
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -86,8 +84,6 @@ const AdminProfileUpdate: React.FC = () => {
   const [formData, setFormData] = useState<UpdateAuthDto>({
     username: "",
     email: "",
-    first_name: "",
-    last_name: "",
     password: "",
     currentPassword: "",
   });
@@ -96,8 +92,17 @@ const AdminProfileUpdate: React.FC = () => {
   const [sensitiveFieldsChanged, setSensitiveFieldsChanged] =
     useState<boolean>(false);
 
-  // Fetch admin data on component mount
+  // Get admin ID on component mount
   useEffect(() => {
+    // In a real app, you would get this from your auth context or user info
+    // For now, we'll set it to 1 for testing
+    setAdminId(2);
+  }, []);
+
+  // Fetch admin data when adminId is available
+  useEffect(() => {
+    if (!adminId) return;
+
     const fetchAdminData = async () => {
       if (!authToken) {
         setNotification({
@@ -125,6 +130,7 @@ const AdminProfileUpdate: React.FC = () => {
 
         if (!response.ok) {
           const errorData = (await response.json()) as ApiErrorResponse;
+          console.error("API Error Response:", errorData);
           throw new Error(errorData.message || "Failed to fetch admin data");
         }
 
@@ -147,12 +153,11 @@ const AdminProfileUpdate: React.FC = () => {
         setFormData({
           username: data.username,
           email: data.email,
-          first_name: data.first_name,
-          last_name: data.last_name,
           password: "",
           currentPassword: "",
         });
       } catch (error) {
+        console.error("Error fetching admin data:", error);
         setNotification({
           show: true,
           type: "error",
@@ -204,8 +209,6 @@ const AdminProfileUpdate: React.FC = () => {
       setFormData({
         username: adminData.username,
         email: adminData.email,
-        first_name: adminData.first_name,
-        last_name: adminData.last_name,
         password: "",
         currentPassword: "",
       });
@@ -220,7 +223,7 @@ const AdminProfileUpdate: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!authToken || !adminData) {
+    if (!authToken || !adminData || !adminId) {
       setNotification({
         show: true,
         type: "error",
@@ -246,10 +249,6 @@ const AdminProfileUpdate: React.FC = () => {
     if (formData.username !== adminData.username)
       updateData.username = formData.username;
     if (formData.email !== adminData.email) updateData.email = formData.email;
-    if (formData.first_name !== adminData.first_name)
-      updateData.first_name = formData.first_name;
-    if (formData.last_name !== adminData.last_name)
-      updateData.last_name = formData.last_name;
     if (formData.password && formData.password.length > 0)
       updateData.password = formData.password;
 
@@ -268,68 +267,135 @@ const AdminProfileUpdate: React.FC = () => {
       updateData.currentPassword = formData.currentPassword;
     }
 
+    // API URL for update
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/admin/${adminId}`;
+
     try {
       setIsLoading(true);
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/${adminId}`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updateData),
+      // Using XMLHttpRequest instead of fetch
+      const xhr = new XMLHttpRequest();
+      xhr.open("PATCH", apiUrl, true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
+
+      // Add timer for debugging
+      console.time("XHR Request");
+
+      // Set timeout
+      xhr.timeout = 30000; // 30 seconds
+
+      // Handle timeout
+      xhr.ontimeout = function () {
+        console.timeEnd("XHR Request");
+        console.error("XHR request timed out");
+        setNotification({
+          show: true,
+          type: "error",
+          message: "Request timed out. Please try again.",
+        });
+        setIsLoading(false);
+      };
+
+      // Handle error
+      xhr.onerror = function () {
+        console.timeEnd("XHR Request");
+        console.error("XHR request failed");
+        setNotification({
+          show: true,
+          type: "error",
+          message: "Network error occurred. Please try again.",
+        });
+        setIsLoading(false);
+      };
+
+      // Handle response
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          // Request is complete
+          console.timeEnd("XHR Request");
+
+          try {
+            // Process successful response
+            if (xhr.status >= 200 && xhr.status < 300) {
+              const responseData = JSON.parse(xhr.responseText) as Admin;
+
+              // Convert dates
+              try {
+                if (typeof responseData.createdAt === "string") {
+                  responseData.createdAt = new Date(responseData.createdAt);
+                }
+                if (typeof responseData.updatedAt === "string") {
+                  responseData.updatedAt = new Date(responseData.updatedAt);
+                }
+              } catch (error) {
+                console.error("Error processing dates:", error);
+              }
+
+              // Update admin data
+              setAdminData(responseData);
+
+              // Update form data and clear password fields
+              setFormData({
+                username: responseData.username,
+                email: responseData.email,
+                password: "",
+                currentPassword: "",
+              });
+
+              // Show success message
+              setNotification({
+                show: true,
+                type: "success",
+                message: "Profile updated successfully",
+              });
+
+              // Exit edit mode
+              setIsEditing(false);
+              setSensitiveFieldsChanged(false);
+            } else {
+              // Process error
+              let errorMessage = "Failed to update admin profile";
+              try {
+                const errorData = JSON.parse(xhr.responseText);
+                errorMessage = errorData.message || errorMessage;
+              } catch (e) {
+                console.error("Error parsing error response:", e);
+              }
+
+              throw new Error(errorMessage);
+            }
+          } catch (error) {
+            console.error("Error in XHR response handling:", error);
+
+            // Show error message
+            setNotification({
+              show: true,
+              type: "error",
+              message:
+                error instanceof Error
+                  ? error.message
+                  : "Failed to update profile",
+            });
+          } finally {
+            setIsLoading(false);
+          }
         }
-      );
+      };
 
-      if (!response.ok) {
-        const errorData = (await response.json()) as ApiErrorResponse;
-        throw new Error(errorData.message || "Failed to update admin profile");
-      }
+      const requestBody = JSON.stringify(updateData);
 
-      const updatedAdmin = (await response.json()) as Admin;
-
-      // Convert date strings to Date objects if needed
-      if (typeof updatedAdmin.createdAt === "string") {
-        updatedAdmin.createdAt = new Date(updatedAdmin.createdAt);
-      }
-      if (typeof updatedAdmin.updatedAt === "string") {
-        updatedAdmin.updatedAt = new Date(updatedAdmin.updatedAt);
-      }
-
-      // Update admin data with the response
-      setAdminData(updatedAdmin);
-
-      // Update form data and reset password fields
-      setFormData({
-        username: updatedAdmin.username,
-        email: updatedAdmin.email,
-        first_name: updatedAdmin.first_name,
-        last_name: updatedAdmin.last_name,
-        password: "",
-        currentPassword: "",
-      });
-
-      // Show success message
-      setNotification({
-        show: true,
-        type: "success",
-        message: "Profile updated successfully",
-      });
-
-      // Exit edit mode
-      setIsEditing(false);
-      setSensitiveFieldsChanged(false);
+      xhr.send(requestBody);
     } catch (error) {
-      // Show error message
+      console.error("Error setting up XHR request:", error);
+
       setNotification({
         show: true,
         type: "error",
         message:
           error instanceof Error ? error.message : "Failed to update profile",
       });
-    } finally {
+
       setIsLoading(false);
     }
   };
@@ -407,122 +473,60 @@ const AdminProfileUpdate: React.FC = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Basic Information Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-800 mb-2">
-              Basic Information
-            </h3>
+        <div className="space-y-4 mb-8">
+          <h3 className="text-lg font-medium text-gray-800 mb-2">
+            Account Information
+          </h3>
 
-            {/* First Name */}
-            <div>
-              <label
-                htmlFor="first_name"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                First Name
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="text"
-                  id="first_name"
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                  className={`pl-10 w-full py-2 px-3 border ${
-                    isEditing ? "border-gray-300" : "border-gray-200 bg-gray-50"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
-                />
+          {/* Username */}
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Username
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiUser className="text-gray-400" size={18} />
               </div>
-            </div>
-
-            {/* Last Name */}
-            <div>
-              <label
-                htmlFor="last_name"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Last Name
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="text"
-                  id="last_name"
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                  className={`pl-10 w-full py-2 px-3 border ${
-                    isEditing ? "border-gray-300" : "border-gray-200 bg-gray-50"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
-                />
-              </div>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className={`pl-10 w-full py-2 px-3 border ${
+                  isEditing ? "border-gray-300" : "border-gray-200 bg-gray-50"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+              />
             </div>
           </div>
 
-          {/* Account Information Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-800 mb-2">
-              Account Information
-            </h3>
-
-            {/* Username */}
-            <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Username
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                  className={`pl-10 w-full py-2 px-3 border ${
-                    isEditing ? "border-gray-300" : "border-gray-200 bg-gray-50"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
-                />
+          {/* Email */}
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Email
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiMail className="text-gray-400" size={18} />
               </div>
-            </div>
-
-            {/* Email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiMail className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                  className={`pl-10 w-full py-2 px-3 border ${
-                    isEditing ? "border-gray-300" : "border-gray-200 bg-gray-50"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
-                />
-              </div>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className={`pl-10 w-full py-2 px-3 border ${
+                  isEditing ? "border-gray-300" : "border-gray-200 bg-gray-50"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+              />
             </div>
           </div>
         </div>
