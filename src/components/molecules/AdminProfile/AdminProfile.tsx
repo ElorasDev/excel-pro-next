@@ -45,19 +45,19 @@ interface ApiErrorResponse {
 }
 
 // Helper function for date formatting that handles undefined/invalid dates
-const formatDate = (date: Date | string | undefined | null): string => {
-  if (!date) return "N/A";
+// const formatDate = (date: Date | string | undefined | null): string => {
+//   if (!date) return "N/A";
 
-  try {
-    if (typeof date === "string") {
-      return new Date(date).toLocaleDateString();
-    }
-    return date.toLocaleDateString();
-  } catch (error) {
-    console.error("Error formatting date:", error);
-    return "Invalid date";
-  }
-};
+//   try {
+//     if (typeof date === "string") {
+//       return new Date(date).toLocaleDateString();
+//     }
+//     return date.toLocaleDateString();
+//   } catch (error) {
+//     console.error("Error formatting date:", error);
+//     return "Invalid date";
+//   }
+// };
 
 const AdminProfileUpdate: NextPage = () => {
   // Auth token from cookies
@@ -637,7 +637,7 @@ const AdminProfileUpdate: NextPage = () => {
         )}
 
         {/* Meta Information */}
-        {adminData && (
+        {/* {adminData && (
           <div className="mt-8 pt-6 border-t border-gray-200">
             <div className="flex flex-col gap-2 text-sm text-gray-500">
               <div>
@@ -654,7 +654,7 @@ const AdminProfileUpdate: NextPage = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </form>
     </div>
   );
