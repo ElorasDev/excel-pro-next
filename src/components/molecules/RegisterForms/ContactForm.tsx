@@ -8,28 +8,61 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 
 const validationSchema = Yup.object({
-  parent_name: Yup.string().required("Fullname is required"),
-  email: Yup.string().required("email is required"),
+  address: Yup.string()
+    .required("Address is required")
+    .max(500, "Address cannot exceed 500 characters"),
+  postalCode: Yup.string()
+    .required("Postal code is required")
+    .max(20, "Postal code cannot exceed 20 characters"),
+  city: Yup.string()
+    .required("City is required")
+    .max(100, "City cannot exceed 100 characters"),
+  emergencyContactName: Yup.string()
+    .required("Emergency contact name is required")
+    .max(200, "Emergency contact name cannot exceed 200 characters"),
+  emergencyPhone: Yup.string()
+    .required("Emergency phone is required")
+    .max(20, "Emergency phone cannot exceed 20 characters"),
 });
 
-const PlayerInformationForm: NextPage = () => {
+const AddressAndEmergencyForm: NextPage = () => {
   const { setStep, step } = useRegisterStepStore();
-  const { parent_name, email, setParentName, setEmail } = useUserFormStore();
+  const { 
+    address, 
+    postalCode, 
+    city, 
+    emergencyContactName, 
+    emergencyPhone,
+    setAddress,
+    setPostalCode,
+    setCity,
+    setEmergencyContactName,
+    setEmergencyPhone
+  } = useUserFormStore();
 
   const [focused, setFocused] = useState({
-    parent_name: Boolean(parent_name),
-    email: Boolean(email),
+    address: Boolean(address),
+    postalCode: Boolean(postalCode),
+    city: Boolean(city),
+    emergencyContactName: Boolean(emergencyContactName),
+    emergencyPhone: Boolean(emergencyPhone),
   });
 
   const formik = useFormik({
     initialValues: {
-      parent_name: parent_name || "",
-      email: email || "",
+      address: address || "",
+      postalCode: postalCode || "",
+      city: city || "",
+      emergencyContactName: emergencyContactName || "",
+      emergencyPhone: emergencyPhone || "",
     },
     validationSchema,
     onSubmit: (values) => {
-      setParentName(values.parent_name);
-      setEmail(values.email);
+      setAddress(values.address);
+      setPostalCode(values.postalCode);
+      setCity(values.city);
+      setEmergencyContactName(values.emergencyContactName);
+      setEmergencyPhone(values.emergencyPhone);
       const nextStep = step + 1;
       setStep(nextStep);
     },
@@ -55,49 +88,117 @@ const PlayerInformationForm: NextPage = () => {
       {/* Form Content */}
       <div className="mb-8">
         <h1 className="text-xl sm:text-2xl font-bold mb-4">
-          Welcome! Please fill out this form to register for private soccer
-          sessions. These sessions are tailored to help players improve their
-          skills and achieve their goals.
+          Location and Emergency Contact Information
         </h1>
+        <p className="mb-4">
+          Please provide your address details and emergency contact information. This information will be used in case of emergency during training sessions or matches.
+        </p>
 
         <form onSubmit={formik.handleSubmit}>
-          <div className="grid grid-cols-2 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 mt-6">
+            {/* Address */}
             <div>
               <FloatingLabelInput
-                id="parent_name"
-                name="parent_name"
-                label="Parent/Guardian Name"
+                id="address"
+                name="address"
+                label="Full Address"
                 type="text"
-                value={formik.values.parent_name}
+                value={formik.values.address}
                 onChange={formik.handleChange}
-                onFocus={() => handleFocus("parent_name")}
-                onBlur={() => handleBlur("parent_name")}
-                placeholder="Example : Alex Smith"
-                isFocused={focused.parent_name}
+                onFocus={() => handleFocus("address")}
+                onBlur={() => handleBlur("address")}
+                placeholder="Example: 123 Main Street, Apartment 4B"
+                isFocused={focused.address}
               />
-              {formik.touched.parent_name && formik.errors.parent_name && (
+              {formik.touched.address && formik.errors.address && (
                 <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.parent_name}
+                  {formik.errors.address}
+                </div>
+              )}
+            </div>
+
+            {/* City and Postal Code */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <FloatingLabelInput
+                  id="city"
+                  name="city"
+                  label="City"
+                  type="text"
+                  value={formik.values.city}
+                  onChange={formik.handleChange}
+                  onFocus={() => handleFocus("city")}
+                  onBlur={() => handleBlur("city")}
+                  placeholder="Example: New York"
+                  isFocused={focused.city}
+                />
+                {formik.touched.city && formik.errors.city && (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.city}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <FloatingLabelInput
+                  id="postalCode"
+                  name="postalCode"
+                  label="Postal Code"
+                  type="text"
+                  value={formik.values.postalCode}
+                  onChange={formik.handleChange}
+                  onFocus={() => handleFocus("postalCode")}
+                  onBlur={() => handleBlur("postalCode")}
+                  placeholder="Example: 10001"
+                  isFocused={focused.postalCode}
+                />
+                {formik.touched.postalCode && formik.errors.postalCode && (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.postalCode}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Emergency Contact Information */}
+            <h2 className="text-lg font-semibold mt-4">Emergency Contact</h2>
+            
+            <div>
+              <FloatingLabelInput
+                id="emergencyContactName"
+                name="emergencyContactName"
+                label="Emergency Contact Name"
+                type="text"
+                value={formik.values.emergencyContactName}
+                onChange={formik.handleChange}
+                onFocus={() => handleFocus("emergencyContactName")}
+                onBlur={() => handleBlur("emergencyContactName")}
+                placeholder="Example: John Doe"
+                isFocused={focused.emergencyContactName}
+              />
+              {formik.touched.emergencyContactName && formik.errors.emergencyContactName && (
+                <div className="text-red-500 text-sm mt-1">
+                  {formik.errors.emergencyContactName}
                 </div>
               )}
             </div>
 
             <div>
               <FloatingLabelInput
-                id="email"
-                name="email"
-                label="email"
-                type="text"
-                value={formik.values.email}
+                id="emergencyPhone"
+                name="emergencyPhone"
+                label="Emergency Phone Number"
+                type="tel"
+                value={formik.values.emergencyPhone}
                 onChange={formik.handleChange}
-                onFocus={() => handleFocus("email")}
-                onBlur={() => handleBlur("email")}
-                placeholder="Example : Teams"
-                isFocused={focused.email}
+                onFocus={() => handleFocus("emergencyPhone")}
+                onBlur={() => handleBlur("emergencyPhone")}
+                placeholder="Example: +1-555-123-4567"
+                isFocused={focused.emergencyPhone}
               />
-              {formik.touched.email && formik.errors.email && (
+              {formik.touched.emergencyPhone && formik.errors.emergencyPhone && (
                 <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.email}
+                  {formik.errors.emergencyPhone}
                 </div>
               )}
             </div>
@@ -108,11 +209,11 @@ const PlayerInformationForm: NextPage = () => {
             <Button
               type="submit"
               className={`font-medium w-full py-3 rounded-md ${
-                !formik.values.parent_name || !formik.values.email
+                !formik.isValid || formik.isSubmitting
                   ? "bg-red-400 cursor-not-allowed"
                   : "bg-red-600 hover:bg-red-700 text-white"
               }`}
-              disabled={!formik.values.parent_name || !formik.values.email}
+              disabled={!formik.isValid || formik.isSubmitting}
             >
               Next step
             </Button>
@@ -123,4 +224,4 @@ const PlayerInformationForm: NextPage = () => {
   );
 };
 
-export default PlayerInformationForm;
+export default AddressAndEmergencyForm;

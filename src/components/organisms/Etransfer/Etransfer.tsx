@@ -145,7 +145,7 @@ const Etransfer = () => {
   const userForm = useUserFormStore();
   const { division } = useDivisionStore();
   const { isFirstTime } = useIsFirstRegister();
-  
+
   // State management
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1); // 1: initial, 2: instructions, 3: confirmation
@@ -154,7 +154,7 @@ const Etransfer = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>("U13_U14");
   const [error, setError] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
-  
+
   const bankAccount = {
     name: "Soccer Training Academy",
     accountNumber: "12345678",
@@ -165,7 +165,9 @@ const Etransfer = () => {
   // Calculate final price
   const price = plans[selectedPlan]?.price?.split("/")[0] || "350";
   const firstTimeRegistrationFee = 75; // First-time registration fee
-  const finalPrice = isFirstTime ? (parseInt(price) + firstTimeRegistrationFee).toString() : price;
+  const finalPrice = isFirstTime
+    ? (parseInt(price) + firstTimeRegistrationFee).toString()
+    : price;
 
   // Initialize selected plan from the division store
   useEffect(() => {
@@ -174,11 +176,11 @@ const Etransfer = () => {
         setSelectedPlan("U13_U14");
         return;
       }
-      
+
       try {
         const decodedDivision = decodeURIComponent(division);
         const normalizedDivision = normalizeDivision(decodedDivision);
-        
+
         // If division is free after normalization but it shouldn't be, use U13_U14 as default
         if (
           normalizedDivision === "free" &&
@@ -282,7 +284,7 @@ const Etransfer = () => {
       if (!transferToken) {
         throw new Error("Invalid transfer token");
       }
-      
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/transfer/token/${transferToken}/confirm`,
         {
@@ -337,7 +339,8 @@ const Etransfer = () => {
       {step === 1 && (
         <div>
           <p className="mb-4">
-            With e-transfer, you can directly transfer the amount to our account.
+            With e-transfer, you can directly transfer the amount to our
+            account.
           </p>
           <div className="bg-gray-100 p-4 rounded mb-6">
             <h2 className="font-bold mb-2">Your Registration Information:</h2>
@@ -353,11 +356,18 @@ const Etransfer = () => {
                 ? `It appears this is your first time registering. ($${firstTimeRegistrationFee} first-time registration fee added)`
                 : "Welcome back! You've registered with us before."}
             </p>
+            <p className="text-sm text-red-600 mt-2">
+              ⚠️ Please make sure to include the{" "}
+              <strong>player&apos;s full name</strong> and{" "}
+              <strong>phone number</strong> in the message or note section when
+              sending the e-Transfer. This is required to identify your payment.
+            </p>
           </div>
           <p className="mb-4">
             After clicking the button below, you will see transfer instructions.
             <br />
-            Note: After completing your payment, you must return to this page and confirm your payment.
+            Note: After completing your payment, you must return to this page
+            and confirm your payment.
           </p>
           <button
             onClick={createTransfer}
@@ -377,7 +387,8 @@ const Etransfer = () => {
           >
             <p className="font-bold">Important:</p>
             <p>
-              After completing the transfer, please return to this page and confirm your payment.
+              After completing the transfer, please return to this page and
+              confirm your payment.
             </p>
             <p>Your reference number: {transferId}</p>
           </div>
@@ -395,7 +406,8 @@ const Etransfer = () => {
             <p className="text-sm text-gray-600">{bankAccount.notes}</p>
             <p className="font-bold mt-4">Amount to pay: ${finalPrice}</p>
             <p className="mt-2">
-              Please mention reference number {transferId} in your transfer notes.
+              Please mention reference number {transferId} in your transfer
+              notes.
             </p>
           </div>
 
@@ -422,7 +434,8 @@ const Etransfer = () => {
             <p className="font-bold">Thank You!</p>
             <p>Your payment confirmation has been recorded.</p>
             <p>
-              Our team will verify your payment and update your subscription status.
+              Our team will verify your payment and update your subscription
+              status.
             </p>
             <p>This usually takes 1-2 business days.</p>
           </div>

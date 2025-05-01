@@ -20,27 +20,36 @@ const RegisterForm = () => {
   // If you only want to log the data fields without the setter functions
   const userDataOnly = {
     fullname: userFormData.fullname,
-    age: userFormData.age,
+    dateOfBirth: userFormData.dateOfBirth,
     gender: userFormData.gender,
+    height: userFormData.height,
+    weight: userFormData.weight,
+    tShirtSize: userFormData.tShirtSize,
+    shortSize: userFormData.shortSize,
+    jacketSize: userFormData.jacketSize,
+    pantsSize: userFormData.pantsSize,
+    address: userFormData.address,
+    postalCode: userFormData.postalCode,
+    nationalIdCard: userFormData.nationalIdCard,
+    city: userFormData.city,
+    emergencyContactName: userFormData.emergencyContactName,
+    emergencyPhone: userFormData.emergencyPhone,
+    experienceLevel: userFormData.experienceLevel,
+    photoUrl: userFormData.photoUrl,
     parent_name: userFormData.parent_name,
     phone_number: userFormData.phone_number,
     email: userFormData.email,
     current_skill_level: userFormData.current_skill_level,
     player_positions: userFormData.player_positions,
     custom_position: userFormData.custom_position,
-    session_goals: userFormData.session_goals,
-    available_days: userFormData.available_days,
-    preferred_time: userFormData.preferred_time,
-    medical_conditions: userFormData.medical_conditions,
-    comments: userFormData.comments,
-    liability_waiver: userFormData.liability_waiver,
-    cancellation_policy: userFormData.cancellation_policy,
-    stripeCustomerId: userFormData.stripeCustomerId
+    stripeCustomerId: userFormData.stripeCustomerId,
+    policy: userFormData.policy,
+    activePlan: userFormData.activePlan
   };
   
   console.log("User Form Data (data only):", userDataOnly);
 
-  if (step > 7) {
+  if (step > 5) {
     return (
       <div className="my-12 flex items-center justify-center">
         <Etransfer />
