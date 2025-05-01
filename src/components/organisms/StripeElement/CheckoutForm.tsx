@@ -141,7 +141,7 @@ const CheckoutForm: NextPage = () => {
   const [initialized, setInitialized] = useState(false);
   const [userPhone, setUserPhone] = useState<string | null>(null);
   const [userId, setUserId] = useState(null);
-  const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
+  // const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
   const [showWarning, setShowWarning] = useState<boolean>(true);
   const [billingDetails, setBillingDetails] = useState<BillingDetails>({
     name: "",
@@ -252,13 +252,13 @@ const CheckoutForm: NextPage = () => {
               userData.subscriptionHistory &&
               userData.subscriptionHistory.length > 0
             ) {
-              setIsFirstTime(false);
+              // setIsFirstTime(false);
             }
           }
         } catch (error) {
           console.error("Error checking user subscription history:", error);
           // If there's an error, assume it's a first-time user
-          setIsFirstTime(true);
+          // setIsFirstTime(true);
         }
       };
 
@@ -655,20 +655,19 @@ const CheckoutForm: NextPage = () => {
 
   // منبع خطا: 3. اطمینان از بررسی مقادیر قبل از استفاده
   // Calculate total based on first-time status
-  const isFirstTimeUser = userForm.age ? isFirstTime : false;
+  // const isFirstTimeUser = userForm.age ? isFirstTime : false;
   const planToDisplay =
     typeof selectedPlan === "string" && selectedPlan ? selectedPlan : "U13_U14";
 
   // استخراج صحیح مقدار عددی از رشته قیمت
   // از "$350/ 2 months" فقط عدد 350 را استخراج می‌کنیم
-  const priceString = plans[planToDisplay]?.price || "$350/ 2 months";
-  const programPrice = parseInt(priceString.match(/\$(\d+)/)?.[1] || "350");
+  // const priceString = plans[planToDisplay]?.price || "$350/ 2 months";
+  // const programPrice = parseInt(priceString.match(/\$(\d+)/)?.[1] || "350");
 
-  const setupFee = isFirstTimeUser ? 75 : 0;
-  const totalAmount = programPrice + setupFee;
+  // const setupFee = isFirstTimeUser ? 75 : 0;
+  // const totalAmount = programPrice + setupFee;
 
-  // نمایش قیمت به شکل صحیح
-  const totalToday = `$${totalAmount}/ 2 months`;
+  // const totalToday = `$${totalAmount}/ 2 months`;
 
   return (
     <form
@@ -746,14 +745,14 @@ const CheckoutForm: NextPage = () => {
           Selected Program: {plans[planToDisplay].title}
         </h2>
         <p className="text-lg font-medium text-gray-700 my-2">
-          {plans[planToDisplay].price}
+          {/* {plans[planToDisplay].price}
           {isFirstTimeUser && (
             <span className="ml-2 text-sm text-blue-600 font-normal">
               + $75 one-time setup fee
             </span>
-          )}
+          )} */}
         </p>
-        <p className="text-sm text-gray-500">Total today: {totalToday}</p>
+        {/* <p className="text-sm text-gray-500">Total today: {totalToday}</p> */}
       </div>
 
       <div className="mb-6">
