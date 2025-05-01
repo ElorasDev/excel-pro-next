@@ -9,51 +9,59 @@ import {
   FiMenu,
   FiFileText,
   FiFile,
-  FiEye
+  FiEye,
 } from "react-icons/fi";
 import FilterModal from "@/components/molecules/FilterModal/FilterModal";
 import Modal from "@/components/atoms/Modal/Modal"; // Update path as needed
 import { getAllUsers } from "@/services/getAllUsers";
+import Image from "next/image";
 
 // Complete User interface based on your database schema
 interface User {
   id: number;
   fullname: string;
-  age: number;
-  gender: "Male" | "Female" | "Prefer not to say";
+  dateOfBirth: string;
+  height: number;
+  weight: number;
+  tShirtSize: string;
+  shortSize: string;
+  jacketSize: string;
+  pantsSize: string;
+  address: string;
+  postalCode: string;
+  city: string;
+  emergencyContactName: string;
+  emergencyPhone: string;
+  experienceLevel: string;
+  photoUrl: string;
+  NationalIdCard: string;
+  gender: "Male" | "Female";
   isTemporary?: boolean;
   parent_name: string;
   phone_number: string;
   email: string;
-  program: string;
-  current_skill_level: "Beginner" | "intermediate" | "Advanced";
+  current_skill_level: "Beginner" | "Intermediate" | "Advanced";
   player_positions?: "Goalkeeper" | "Defender" | "Midfielder" | "Striker";
   custom_position?: string;
-  session_goals: string;
-  available_days:
-    | "Monday"
-    | "Tuesday"
-    | "Wednesday"
-    | "Thursday"
-    | "Friday"
-    | "Saturday"
-    | "Sunday";
-  preferred_time: "Morning" | "Afternoon" | "Evening";
-  medical_conditions: string;
-  comments: string;
-  liability_waiver: boolean;
-  cancellation_policy: boolean;
+  policy: boolean;
   stripeCustomerId?: string;
   activePlan?: string;
   currentSubscriptionEndDate?: Date;
   createdAt: Date;
   updatedAt: Date;
+  subscriptionCounter: number;
 }
 
 // Simplified interface for the table display
 type Player = Pick<
   User,
-  "id" | "fullname" | "phone_number" | "gender" | "age" | "activePlan"
+  | "id"
+  | "fullname"
+  | "phone_number"
+  | "gender"
+  | "dateOfBirth"
+  | "activePlan"
+  | "photoUrl"
 >;
 
 const Overview = () => {
@@ -62,7 +70,7 @@ const Overview = () => {
 
   // State for filter modal
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  
+
   // State for player detail modal
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<User | null>(null);
@@ -82,6 +90,18 @@ const Overview = () => {
   // variable for set cookie
   const savedToken = Cookies.get("auth_token")!;
 
+  // Helper function to calculate age from date of birth
+  const calculateAge = (dateOfBirth: string): number => {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   // Fetch users from database on component mount
   useEffect(() => {
     const fetchUsers = async () => {
@@ -96,8 +116,9 @@ const Overview = () => {
           fullname: user.fullname,
           phone_number: user.phone_number,
           gender: user.gender,
-          age: user.age,
+          dateOfBirth: user.dateOfBirth,
           activePlan: user.activePlan || "No Plan",
+          photoUrl: user.photoUrl,
         }));
 
         setOriginalPlayers(simplifiedPlayers);
@@ -128,10 +149,10 @@ const Overview = () => {
   const applyFilters = (filters: string[]) => {
     setActiveFilters(filters);
   };
-  
+
   // Function to open player details modal
   const openPlayerModal = (playerId: number) => {
-    const player = allUsers.find(user => user.id === playerId);
+    const player = allUsers.find((user) => user.id === playerId);
     if (player) {
       setSelectedPlayer(player);
       setIsPlayerModalOpen(true);
@@ -164,57 +185,74 @@ const Overview = () => {
     const headers = [
       "ID",
       "Full Name",
+      "Date of Birth",
       "Age",
+      "Height",
+      "Weight",
+      "T-Shirt Size",
+      "Short Size",
+      "Jacket Size",
+      "Pants Size",
+      "Address",
+      "Postal Code",
+      "City",
+      "Emergency Contact Name",
+      "Emergency Phone",
+      "Experience Level",
       "Gender",
       "Temporary",
       "Parent Name",
       "Phone Number",
       "Email",
-      "Program",
-      "Skill Level",
+      "Current Skill Level",
       "Player Position",
       "Custom Position",
-      "Session Goals",
-      "Available Days",
-      "Preferred Time",
-      "Medical Conditions",
-      "Comments",
-      "Liability Waiver",
-      "Cancellation Policy",
+      "Policy Agreement",
       "Stripe Customer ID",
       "Active Plan",
       "Subscription End Date",
+      "Subscription Counter",
       "Created At",
       "Updated At",
     ];
 
     // Process each user to create CSV rows
     const csvRows = allUsers.map((user) => {
+      // Calculate age from date of birth
+      const age = calculateAge(user.dateOfBirth);
+
       return [
         user.id,
         `"${user.fullname.replace(/"/g, '""')}"`, // Escape quotes
-        user.age,
+        `"${user.dateOfBirth}"`,
+        age,
+        user.height,
+        user.weight,
+        user.tShirtSize,
+        user.shortSize,
+        user.jacketSize,
+        user.pantsSize,
+        `"${user.address.replace(/"/g, '""')}"`,
+        `"${user.postalCode.replace(/"/g, '""')}"`,
+        `"${user.city.replace(/"/g, '""')}"`,
+        `"${user.emergencyContactName.replace(/"/g, '""')}"`,
+        `"${user.emergencyPhone.replace(/"/g, '""')}"`,
+        user.experienceLevel,
         user.gender,
         formatBoolean(user.isTemporary),
         `"${user.parent_name.replace(/"/g, '""')}"`,
         `"${user.phone_number.replace(/"/g, '""')}"`,
         `"${user.email.replace(/"/g, '""')}"`,
-        `"${user.program.replace(/"/g, '""')}"`,
         user.current_skill_level,
         user.player_positions || "",
         user.custom_position
           ? `"${user.custom_position.replace(/"/g, '""')}"`
           : "",
-        `"${user.session_goals.replace(/"/g, '""')}"`,
-        user.available_days,
-        user.preferred_time,
-        `"${user.medical_conditions.replace(/"/g, '""')}"`,
-        `"${user.comments.replace(/"/g, '""')}"`,
-        formatBoolean(user.liability_waiver),
-        formatBoolean(user.cancellation_policy),
+        formatBoolean(user.policy),
         user.stripeCustomerId || "",
         user.activePlan || "",
         formatDate(user.currentSubscriptionEndDate),
+        user.subscriptionCounter,
         formatDate(user.createdAt),
         formatDate(user.updatedAt),
       ].join(",");
@@ -258,26 +296,33 @@ const Overview = () => {
     const headers = [
       "ID",
       "Full Name",
+      "Date of Birth",
       "Age",
+      "Height",
+      "Weight",
+      "T-Shirt Size",
+      "Short Size",
+      "Jacket Size",
+      "Pants Size",
+      "Address",
+      "Postal Code",
+      "City",
+      "Emergency Contact Name",
+      "Emergency Phone",
+      "Experience Level",
       "Gender",
       "Temporary",
       "Parent Name",
       "Phone Number",
       "Email",
-      "Program",
-      "Skill Level",
+      "Current Skill Level",
       "Player Position",
       "Custom Position",
-      "Session Goals",
-      "Available Days",
-      "Preferred Time",
-      "Medical Conditions",
-      "Comments",
-      "Liability Waiver",
-      "Cancellation Policy",
+      "Policy Agreement",
       "Stripe Customer ID",
       "Active Plan",
       "Subscription End Date",
+      "Subscription Counter",
       "Created At",
       "Updated At",
     ];
@@ -289,31 +334,41 @@ const Overview = () => {
 
     // Add data rows
     allUsers.forEach((user) => {
+      // Calculate age from date of birth
+      const age = calculateAge(user.dateOfBirth);
+
       excelContent += "<tr>";
 
       // Add each user field as a cell
       excelContent += `<td>${user.id}</td>`;
       excelContent += `<td>${user.fullname}</td>`;
-      excelContent += `<td>${user.age}</td>`;
+      excelContent += `<td>${user.dateOfBirth}</td>`;
+      excelContent += `<td>${age}</td>`;
+      excelContent += `<td>${user.height}</td>`;
+      excelContent += `<td>${user.weight}</td>`;
+      excelContent += `<td>${user.tShirtSize}</td>`;
+      excelContent += `<td>${user.shortSize}</td>`;
+      excelContent += `<td>${user.jacketSize}</td>`;
+      excelContent += `<td>${user.pantsSize}</td>`;
+      excelContent += `<td>${user.address}</td>`;
+      excelContent += `<td>${user.postalCode}</td>`;
+      excelContent += `<td>${user.city}</td>`;
+      excelContent += `<td>${user.emergencyContactName}</td>`;
+      excelContent += `<td>${user.emergencyPhone}</td>`;
+      excelContent += `<td>${user.experienceLevel}</td>`;
       excelContent += `<td>${user.gender}</td>`;
       excelContent += `<td>${formatBoolean(user.isTemporary)}</td>`;
       excelContent += `<td>${user.parent_name}</td>`;
       excelContent += `<td>${user.phone_number}</td>`;
       excelContent += `<td>${user.email}</td>`;
-      excelContent += `<td>${user.program}</td>`;
       excelContent += `<td>${user.current_skill_level}</td>`;
       excelContent += `<td>${user.player_positions || ""}</td>`;
       excelContent += `<td>${user.custom_position || ""}</td>`;
-      excelContent += `<td>${user.session_goals}</td>`;
-      excelContent += `<td>${user.available_days}</td>`;
-      excelContent += `<td>${user.preferred_time}</td>`;
-      excelContent += `<td>${user.medical_conditions}</td>`;
-      excelContent += `<td>${user.comments}</td>`;
-      excelContent += `<td>${formatBoolean(user.liability_waiver)}</td>`;
-      excelContent += `<td>${formatBoolean(user.cancellation_policy)}</td>`;
+      excelContent += `<td>${formatBoolean(user.policy)}</td>`;
       excelContent += `<td>${user.stripeCustomerId || ""}</td>`;
       excelContent += `<td>${user.activePlan || ""}</td>`;
       excelContent += `<td>${formatDate(user.currentSubscriptionEndDate)}</td>`;
+      excelContent += `<td>${user.subscriptionCounter}</td>`;
       excelContent += `<td>${formatDate(user.createdAt)}</td>`;
       excelContent += `<td>${formatDate(user.updatedAt)}</td>`;
 
@@ -358,23 +413,27 @@ const Overview = () => {
 
     // Apply active filters
     if (activeFilters.length > 0) {
-      // Age group filters
+      // Age group filters - calculate age from dateOfBirth
       if (activeFilters.includes("U7-U12")) {
-        newFilteredPlayers = newFilteredPlayers.filter(
-          (player) => player.age >= 7 && player.age <= 12
-        );
+        newFilteredPlayers = newFilteredPlayers.filter((player) => {
+          const age = calculateAge(player.dateOfBirth);
+          return age >= 7 && age <= 12;
+        });
       } else if (activeFilters.includes("U13-U15")) {
-        newFilteredPlayers = newFilteredPlayers.filter(
-          (player) => player.age >= 13 && player.age <= 15
-        );
+        newFilteredPlayers = newFilteredPlayers.filter((player) => {
+          const age = calculateAge(player.dateOfBirth);
+          return age >= 13 && age <= 15;
+        });
       } else if (activeFilters.includes("U16-U18")) {
-        newFilteredPlayers = newFilteredPlayers.filter(
-          (player) => player.age >= 16 && player.age <= 18
-        );
+        newFilteredPlayers = newFilteredPlayers.filter((player) => {
+          const age = calculateAge(player.dateOfBirth);
+          return age >= 16 && age <= 18;
+        });
       } else if (activeFilters.includes("18+")) {
-        newFilteredPlayers = newFilteredPlayers.filter(
-          (player) => player.age > 18
-        );
+        newFilteredPlayers = newFilteredPlayers.filter((player) => {
+          const age = calculateAge(player.dateOfBirth);
+          return age > 18;
+        });
       }
 
       // Gender filters
@@ -428,7 +487,7 @@ const Overview = () => {
       {/* Header Section */}
       <div className="mb-6 flex flex-col sm:flex-row sm:justify-between">
         <div className="flex flex-col mb-4 sm:mb-0">
-          <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome, Reza</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome To Excel Pro Dashboard</h1>
           <p className="text-gray-500 text-sm md:text-base">
             Track, and manage your players
           </p>
@@ -574,53 +633,71 @@ const Overview = () => {
                 </thead>
                 <tbody>
                   {filteredPlayers.length > 0 ? (
-                    filteredPlayers.map((player) => (
-                      <tr key={player.id} className="border-b border-gray-200">
-                        <td className="py-4 px-6 whitespace-nowrap w-2/5">
-                          <div className="flex items-center">
-                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500 mr-2 md:mr-3 flex items-center justify-center text-white">
-                              {player.fullname.charAt(0)}
-                            </div>
-                            <div>
-                              <div className="font-medium text-sm md:text-base">
-                                {player.fullname}
+                    filteredPlayers.map((player) => {
+                      // Calculate age from date of birth
+                      const age = calculateAge(player.dateOfBirth);
+
+                      return (
+                        <tr
+                          key={player.id}
+                          className="border-b border-gray-200"
+                        >
+                          <td className="py-4 px-6 whitespace-nowrap w-2/5">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500 mr-2 md:mr-3 flex items-center justify-center text-white overflow-hidden">
+                                {player.photoUrl ? (
+                                  <Image
+                                    src={player.photoUrl}
+                                    alt={player.fullname}
+                                    width={80}
+                                    height={80}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  player.fullname.charAt(0)
+                                )}
                               </div>
-                              <div className="text-gray-500 text-xs md:text-sm">
-                                {player.phone_number}
+                              <div>
+                                <div className="font-medium text-sm md:text-base">
+                                  {player.fullname}
+                                </div>
+                                <div className="text-gray-500 text-xs md:text-sm">
+                                  {player.phone_number}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 whitespace-nowrap text-sm md:text-base w-1/6">
-                          {player.gender}
-                        </td>
-                        <td className="py-4 px-6 whitespace-nowrap text-sm md:text-base w-1/6">
-                          {player.age}
-                        </td>
-                        <td className="py-4 px-6 whitespace-nowrap w-1/6">
-                          <span
-                            className={`px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm ${
-                              player.activePlan === "Premium"
-                                ? "bg-purple-100 text-purple-800"
-                                : player.activePlan === "Standard"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-green-100 text-green-800"
-                            }`}
-                          >
-                            {player.activePlan}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 whitespace-nowrap w-1/6 text-center">
-                          <button
-                            onClick={() => openPlayerModal(player.id)}
-                            className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
-                            title="View player details"
-                          >
-                            <FiEye size={18} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+                          <td className="py-4 px-6 whitespace-nowrap text-sm md:text-base w-1/6">
+                            {player.gender}
+                          </td>
+                          <td className="py-4 px-6 whitespace-nowrap text-sm md:text-base w-1/6">
+                            {age}
+                          </td>
+                          <td className="py-4 px-6 whitespace-nowrap w-1/6">
+                            <span
+                              className={`px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm ${
+                                player.activePlan === "Premium"
+                                  ? "bg-purple-100 text-purple-800"
+                                  : player.activePlan === "Standard"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-green-100 text-green-800"
+                              }`}
+                            >
+                              {player.activePlan}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 whitespace-nowrap w-1/6 text-center">
+                            <button
+                              onClick={() => openPlayerModal(player.id)}
+                              className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                              title="View player details"
+                            >
+                              <FiEye size={18} />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
                       <td
@@ -659,17 +736,45 @@ const Overview = () => {
           title="Player Details"
         >
           <div className="space-y-6">
+            {/* Player Photo */}
+            <div className="flex justify-center">
+              {selectedPlayer.photoUrl ? (
+                <div className="w-24 h-24 rounded-full overflow-hidden">
+                  <Image
+                    src={selectedPlayer.photoUrl}
+                    alt={selectedPlayer.fullname}
+                    loading="lazy"
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-red-500 flex items-center justify-center text-white text-2xl">
+                  {selectedPlayer.fullname.charAt(0)}
+                </div>
+              )}
+            </div>
+
             {/* Basic Info Section */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                Basic Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Full Name</p>
                   <p className="font-medium">{selectedPlayer.fullname}</p>
                 </div>
                 <div>
+                  <p className="text-sm text-gray-500">Date of Birth</p>
+                  <p className="font-medium">{selectedPlayer.dateOfBirth}</p>
+                </div>
+                <div>
                   <p className="text-sm text-gray-500">Age</p>
-                  <p className="font-medium">{selectedPlayer.age}</p>
+                  <p className="font-medium">
+                    {calculateAge(selectedPlayer.dateOfBirth)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Gender</p>
@@ -677,18 +782,57 @@ const Overview = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Temporary Player</p>
-                  <p className="font-medium">{formatBoolean(selectedPlayer.isTemporary)}</p>
+                  <p className="font-medium">
+                    {formatBoolean(selectedPlayer.isTemporary)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Physical Characteristics */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                Physical Characteristics
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Height</p>
+                  <p className="font-medium">{selectedPlayer.height} cm</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Weight</p>
+                  <p className="font-medium">{selectedPlayer.weight} kg</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">T-Shirt Size</p>
+                  <p className="font-medium">{selectedPlayer.tShirtSize}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Short Size</p>
+                  <p className="font-medium">{selectedPlayer.shortSize}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Jacket Size</p>
+                  <p className="font-medium">{selectedPlayer.jacketSize}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Pants Size</p>
+                  <p className="font-medium">{selectedPlayer.pantsSize}</p>
                 </div>
               </div>
             </div>
 
             {/* Contact Info Section */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Contact Information</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                Contact Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Parent Name</p>
-                  <p className="font-medium">{selectedPlayer.parent_name || "N/A"}</p>
+                  <p className="font-medium">
+                    {selectedPlayer.parent_name || "N/A"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Phone Number</p>
@@ -698,88 +842,132 @@ const Overview = () => {
                   <p className="text-sm text-gray-500">Email</p>
                   <p className="font-medium">{selectedPlayer.email}</p>
                 </div>
+                <div>
+                  <p className="text-sm text-gray-500">Address</p>
+                  <p className="font-medium">{selectedPlayer.address}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Postal Code</p>
+                  <p className="font-medium">{selectedPlayer.postalCode}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">City</p>
+                  <p className="font-medium">{selectedPlayer.city}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Emergency Contact */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                Emergency Contact
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Name</p>
+                  <p className="font-medium">
+                    {selectedPlayer.emergencyContactName}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Phone</p>
+                  <p className="font-medium">{selectedPlayer.emergencyPhone}</p>
+                </div>
               </div>
             </div>
 
             {/* Training Info Section */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Training Information</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                Training Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Program</p>
-                  <p className="font-medium">{selectedPlayer.program}</p>
+                  <p className="text-sm text-gray-500">Experience Level</p>
+                  <p className="font-medium">
+                    {selectedPlayer.experienceLevel}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Skill Level</p>
-                  <p className="font-medium">{selectedPlayer.current_skill_level}</p>
+                  <p className="font-medium">
+                    {selectedPlayer.current_skill_level}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Position</p>
-                  <p className="font-medium">{selectedPlayer.player_positions || selectedPlayer.custom_position || "N/A"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Session Goals</p>
-                  <p className="font-medium">{selectedPlayer.session_goals}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Schedule Info */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Schedule</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Available Days</p>
-                  <p className="font-medium">{selectedPlayer.available_days}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Preferred Time</p>
-                  <p className="font-medium">{selectedPlayer.preferred_time}</p>
+                  <p className="font-medium">
+                    {selectedPlayer.player_positions ||
+                      selectedPlayer.custom_position ||
+                      "N/A"}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Subscription Info */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Subscription</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                Subscription
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Active Plan</p>
                   <p className="font-medium">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      selectedPlayer.activePlan === "Premium" 
-                        ? "bg-purple-100 text-purple-800" 
-                        : selectedPlayer.activePlan === "Standard" 
-                        ? "bg-blue-100 text-blue-800" 
-                        : "bg-green-100 text-green-800"
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        selectedPlayer.activePlan === "Premium"
+                          ? "bg-purple-100 text-purple-800"
+                          : selectedPlayer.activePlan === "Standard"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
                       {selectedPlayer.activePlan || "No Plan"}
                     </span>
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Subscription End Date</p>
-                  <p className="font-medium">{formatDate(selectedPlayer.currentSubscriptionEndDate)}</p>
+                  <p className="font-medium">
+                    {formatDate(selectedPlayer.currentSubscriptionEndDate)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Stripe Customer ID</p>
-                  <p className="font-medium">{selectedPlayer.stripeCustomerId || "N/A"}</p>
+                  <p className="font-medium">
+                    {selectedPlayer.stripeCustomerId || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Subscription Counter</p>
+                  <p className="font-medium">
+                    {selectedPlayer.subscriptionCounter}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Medical & Comments */}
+            {/* National ID Card */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Additional Information</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-gray-500">Medical Conditions</p>
-                  <p className="font-medium">{selectedPlayer.medical_conditions || "None"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Comments</p>
-                  <p className="font-medium">{selectedPlayer.comments || "None"}</p>
-                </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                National ID Card
+              </h3>
+              <div className="flex justify-center">
+                {selectedPlayer.NationalIdCard ? (
+                  <div className="max-w-full h-40 overflow-hidden border border-gray-200 rounded-lg">
+                    <Image
+                      src={selectedPlayer.NationalIdCard}
+                      width={180}
+                      height={120}
+                      loading="lazy"
+                      alt="National ID Card"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No National ID Card available</p>
+                )}
               </div>
             </div>
 
@@ -788,27 +976,31 @@ const Overview = () => {
               <h3 className="text-lg font-medium text-gray-900 mb-3">Legal</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Liability Waiver</p>
-                  <p className="font-medium">{formatBoolean(selectedPlayer.liability_waiver)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Cancellation Policy</p>
-                  <p className="font-medium">{formatBoolean(selectedPlayer.cancellation_policy)}</p>
+                  <p className="text-sm text-gray-500">Policy Agreement</p>
+                  <p className="font-medium">
+                    {formatBoolean(selectedPlayer.policy)}
+                  </p>
                 </div>
               </div>
             </div>
-            
+
             {/* Registration Dates */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Registration Info</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                Registration Info
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Created At</p>
-                  <p className="font-medium">{formatDate(selectedPlayer.createdAt)}</p>
+                  <p className="font-medium">
+                    {formatDate(selectedPlayer.createdAt)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Last Updated</p>
-                  <p className="font-medium">{formatDate(selectedPlayer.updatedAt)}</p>
+                  <p className="font-medium">
+                    {formatDate(selectedPlayer.updatedAt)}
+                  </p>
                 </div>
               </div>
             </div>

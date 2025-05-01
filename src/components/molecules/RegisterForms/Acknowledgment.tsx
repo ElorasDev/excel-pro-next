@@ -8,26 +8,47 @@ import * as Yup from "yup";
 import { useDivisionStore } from "@/stores/divisionStore";
 
 const validationSchema = Yup.object({
-  liability_waiver: Yup.boolean().oneOf(
-    [true],
-    "You must agree to the liability waiver"
-  ),
-  cancellation_policy: Yup.boolean().oneOf(
-    [true],
-    "You must agree to the cancellation policy"
-  ),
+  policy: Yup.boolean().oneOf([true], "You must agree to the policy"),
 });
 
 // Helper function to normalize division format
 const normalizeDivision = (str: string): string => {
   try {
     // If division already has the correct format, return it directly
-    if (["U7_U12", "U13_U14", "U15_U17"].includes(str)) {
+    if (["U5_U8", "U9_U12", "U13_U14", "U15_U18"].includes(str)) {
       return str;
     }
 
-    // Otherwise normalize
-    const normalized = str.toUpperCase().replace(/–|-/g, "_");
+    // Otherwise normalize - try to handle more formats including "u5-u8"
+    const normalized = str
+      .toUpperCase()
+      .replace(/–|-/g, "_")
+      .replace(/\s+/g, "");
+
+    // Try pattern matching for cases like "u5-u8"
+    if (/^U\d+[-_]U\d+$/.test(normalized)) {
+      // Map specific formats to valid ones
+      if (
+        normalized.includes("U5") ||
+        normalized.includes("U6") ||
+        normalized.includes("U7") ||
+        normalized.includes("U8") ||
+        normalized.includes("U9") ||
+        normalized.includes("U10") ||
+        normalized.includes("U11") ||
+        normalized.includes("U12")
+      ) {
+        return "U7_U12";
+      } else if (normalized.includes("U13") || normalized.includes("U14")) {
+        return "U13_U14";
+      } else if (
+        normalized.includes("U15") ||
+        normalized.includes("U16") ||
+        normalized.includes("U17")
+      ) {
+        return "U15_U17";
+      }
+    }
 
     // Check if the result is valid
     if (["U7_U12", "U13_U14", "U15_U17"].includes(normalized)) {
@@ -50,103 +71,123 @@ const Acknowledgment: NextPage = () => {
   const [message, setMessage] = useState<string | null>(null);
 
   const {
-    liability_waiver,
-    cancellation_policy,
-    setLiabilityWaiver,
-    setCancellationPolicy,
-    stripeCustomerId,
+    policy,
+    setPolicy,
+    photoUrl,
+    nationalIdCard,
     ...userFormData
   } = useUserFormStore();
 
-  // Use formik for handling form validation
-  const formik = useFormik({
-    initialValues: {
-      liability_waiver: liability_waiver || false,
-      cancellation_policy: cancellation_policy || false,
-    },
-    validationSchema,
-    onSubmit: async (values) => {
-      setIsLoading(true);
-      setMessage(null);
+  // Main registration function that handles the full registration flow
+  const completeRegistration = async () => {
+    setIsLoading(true);
+    setMessage(null);
 
-      // Update store with form values
-      setLiabilityWaiver(values.liability_waiver);
-      setCancellationPolicy(values.cancellation_policy);
-
-      // Register user first
-      await registerUser();
-    },
-  });
-
-  // Function to register the user
-  const registerUser = async () => {
     try {
-      // Prepare user data for registration
-      const userData = {
-        fullname: userFormData.fullname,
-        age: userFormData.age,
-        gender: userFormData.gender,
-        parent_name: userFormData.parent_name,
-        phone_number: userFormData.phone_number,
-        email: userFormData.email,
-        current_skill_level: userFormData.current_skill_level,
-        player_positions: userFormData.player_positions,
-        custom_position: userFormData.custom_position
-          ? userFormData.custom_position
-          : "",
-        session_goals: userFormData.session_goals,
-        available_days: userFormData.available_days,
-        preferred_time: userFormData.preferred_time,
-        medical_conditions: userFormData.medical_conditions,
-        comments: userFormData.comments,
-        liability_waiver: formik.values.liability_waiver,
-        cancellation_policy: formik.values.cancellation_policy,
-        program: division
-          ? normalizeDivision(division).toUpperCase()
-          : "U7_U12",
-        stripeCustomerId: stripeCustomerId || "",
-      };
-
-      console.log("Registering user with data:", userData);
-
-      // Register the user
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-        credentials: "include",
-        mode: "cors",
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("User registration failed:", errorData);
+      // Check if we have the base64 image data
+      if (!photoUrl || !nationalIdCard) {
         setMessage(
-          errorData.message || "Failed to register user. Please try again."
+          "Error: Photo data is missing. Please go back and upload photos again."
         );
         setIsLoading(false);
         return;
       }
 
-      // User registration successful
-      const registeredUser = await response.json();
-      console.log("User registered successfully:", registeredUser);
+      // Create the request body with image data directly
+      const requestBody = {
+        // User data
+        fullname: userFormData.fullname,
+        dateOfBirth: userFormData.dateOfBirth,
+        gender: userFormData.gender,
+        height: userFormData.height.toString(),
+        weight: userFormData.weight.toString(),
+        tShirtSize: userFormData.tShirtSize,
+        shortSize: userFormData.shortSize,
+        jacketSize: userFormData.jacketSize,
+        pantsSize: userFormData.pantsSize,
+        address: userFormData.address,
+        postalCode: userFormData.postalCode,
+        city: userFormData.city,
+        emergencyContactName: userFormData.emergencyContactName,
+        emergencyPhone: userFormData.emergencyPhone,
+        experienceLevel: userFormData.experienceLevel || "",
+        parent_name: userFormData.parent_name,
+        phone_number: userFormData.phone_number,
+        email: userFormData.email || "",
+        current_skill_level: userFormData.current_skill_level,
+        player_positions: userFormData.player_positions || "",
+        activePlan: normalizeDivision(division!),
+        policy: true,
+        custom_position: userFormData.custom_position || "",
+        photoUrl: photoUrl,
+        NationalIdCard: nationalIdCard,
+      };
 
-      // Store user ID in localStorage
+      console.log("Sending registration data with base64 images...");
+
+      // Send request to server
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const responseData = await response.json();
+        let errorMessage = "Failed to register user. Please try again.";
+
+        if (Array.isArray(responseData.message)) {
+          errorMessage = `Validation errors: ${responseData.message.join(
+            ", "
+          )}`;
+        } else if (responseData.message) {
+          errorMessage = responseData.message;
+        }
+
+        setMessage(errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("Registration successful!");
+
+      // Handle successful registration
+      const registeredUser = await response.json();
+
+      // Save user ID in localStorage
       if (registeredUser.id) {
         localStorage.setItem("userId", registeredUser.id.toString());
       }
 
-      // Proceed to payment page
+      // Proceed to next step
+      setIsLoading(false);
       setStep(step + 1);
     } catch (error) {
-      console.error("Error registering user:", error);
-      setMessage("Error registering user. Please try again.");
+      console.error("Error during registration process:", error);
+      setMessage("Error during registration. Please try again.");
       setIsLoading(false);
     }
   };
+
+  // Use formik for handling form validation
+  const formik = useFormik({
+    initialValues: {
+      policy: policy || false,
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      // Update store with form values
+      setPolicy(values.policy);
+      // Start the registration process
+      await completeRegistration();
+    },
+  });
 
   return (
     <>
@@ -161,7 +202,13 @@ const Acknowledgment: NextPage = () => {
         </p>
 
         {message && (
-          <div className="p-4 mb-4 bg-red-50 border border-red-200 rounded-md text-red-700">
+          <div
+            className={`p-4 mb-4 ${
+              message.includes("Failed") || message.includes("Error")
+                ? "bg-red-50 border border-red-200 text-red-700"
+                : "bg-yellow-50 border border-yellow-200 text-yellow-700"
+            } rounded-md`}
+          >
             {message}
           </div>
         )}
@@ -169,73 +216,72 @@ const Acknowledgment: NextPage = () => {
         <form onSubmit={formik.handleSubmit}>
           <div className="mt-6 border rounded-lg p-5 bg-gray-50">
             <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-2">Liability Waiver</h2>
-              <p className="text-gray-700 mb-4">
-                I understand that participation in soccer sessions involves
-                risks, and I agree to release the coach and academy from any
-                liability.
-              </p>
+              <h2 className="text-lg font-semibold mb-2">Policy Agreement</h2>
+              <div className="text-gray-700 mb-4 leading-relaxed text-sm">
+                <p className="mb-2">
+                  I the parent or guardian of the above named player understand
+                  and assume all risks involved in playing soccer, including the
+                  risk of property damage, personal injury and death resulting
+                  from any cause whatsoever, including but not limited to
+                  collision with the ball, other players, persons, the ground,
+                  goal post or other man-made objects, weather and field
+                  conditions, traffic hazards while being transported to or from
+                  any location.
+                </p>
+                <p className="mb-2">
+                  I have considered these risks and hereby consent to the
+                  Player&apos;s participation in Excel Pro Soccer Academy and
+                  agree that Excel Pro Soccer Academy shall not be responsible
+                  for any such personal injury, death or property loss.
+                </p>
+                <p className="mb-2">
+                  I grant Excel Pro Soccer Academy the right to request any
+                  participant, player, parent or volunteer to withdraw from the
+                  program prior to its termination if the person is not acting
+                  in a responsible, safe, fair and/or sportsmanlike manner.
+                </p>
+                <p className="mb-2">
+                  I understand that the information collected on this form will
+                  be used by the organization to establish my child&apos;s
+                  eligibility to participate in their soccer program and to
+                  contact me when required in respect to soccer related
+                  activities. The names, addresses, phone numbers and email
+                  addresses on this form may be shared with members of the team
+                  that my child is on.
+                </p>
+                <p className="mb-2">
+                  I agree to allow Excel Pro Soccer Academy to use the
+                  player&apos;s image in photo or Video releases they deem
+                  appropriate. I further acknowledge that the likeness of the
+                  player may be captured and stored by other parents,
+                  organizations and media companies without the knowledge or
+                  consent of Excel Pro Soccer Academy.
+                </p>
+              </div>
 
               <div className="flex items-center">
                 <input
-                  id="liability_waiver"
-                  name="liability_waiver"
+                  id="policy"
+                  name="policy"
                   type="checkbox"
-                  checked={formik.values.liability_waiver}
+                  checked={formik.values.policy}
                   onChange={(e) =>
-                    formik.setFieldValue("liability_waiver", e.target.checked)
+                    formik.setFieldValue("policy", e.target.checked)
                   }
+                  className="h-4 w-4 text-red-600 focus:ring-red-500"
                 />
                 <label
-                  htmlFor="liability_waiver"
+                  htmlFor="policy"
                   className="ml-2 block text-gray-900 font-medium"
                 >
-                  Agree
+                  I agree to the policy
                 </label>
               </div>
-              {formik.touched.liability_waiver &&
-                formik.errors.liability_waiver && (
-                  <div className="text-red-500 text-sm mt-1">
-                    {formik.errors.liability_waiver}
-                  </div>
-                )}
-            </div>
-
-            <div className="border-t pt-5">
-              <h2 className="text-lg font-semibold mb-2">
-                Cancellation Policy
-              </h2>
-              <p className="text-gray-700 mb-4">
-                I acknowledge the academy&apos;s cancellation policy for private
-                sessions are not refundable.
-              </p>
-
-              <div className="flex items-center">
-                <input
-                  id="cancellation_policy"
-                  name="cancellation_policy"
-                  type="checkbox"
-                  checked={formik.values.cancellation_policy}
-                  onChange={(e) =>
-                    formik.setFieldValue(
-                      "cancellation_policy",
-                      e.target.checked
-                    )
-                  }
-                />
-                <label
-                  htmlFor="cancellation_policy"
-                  className="ml-2 block text-gray-900 font-medium"
-                >
-                  Agree
-                </label>
-              </div>
-              {formik.touched.cancellation_policy &&
-                formik.errors.cancellation_policy && (
-                  <div className="text-red-500 text-sm mt-1">
-                    {formik.errors.cancellation_policy}
-                  </div>
-                )}
+              {formik.touched.policy && formik.errors.policy && (
+                <div className="text-red-500 text-sm mt-1">
+                  {formik.errors.policy}
+                </div>
+              )}
             </div>
           </div>
 
@@ -244,17 +290,11 @@ const Acknowledgment: NextPage = () => {
             <Button
               type="submit"
               className={`font-medium w-full py-3 rounded-md ${
-                !formik.values.liability_waiver ||
-                !formik.values.cancellation_policy ||
-                isLoading
+                !formik.values.policy || isLoading
                   ? "bg-red-400 cursor-not-allowed"
                   : "bg-red-600 hover:bg-red-700 text-white"
               }`}
-              disabled={
-                !formik.values.liability_waiver ||
-                !formik.values.cancellation_policy ||
-                isLoading
-              }
+              disabled={!formik.values.policy || isLoading}
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
@@ -278,7 +318,7 @@ const Acknowledgment: NextPage = () => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Registering...
+                  Processing Registration...
                 </span>
               ) : (
                 "Complete Registration"

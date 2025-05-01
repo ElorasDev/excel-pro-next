@@ -5,6 +5,7 @@ import Image from "next/image";
 import { LogOut } from "lucide-react";
 import { navigationItems } from "./data";
 import { useMenuStore } from "@/stores/dashboardStore";
+import useAuthModel from "@/hooks/useAuthModel";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -16,6 +17,7 @@ const Sidebar: NextPage<SidebarProps> = ({ toggleSidebar }) => {
   
   // Get both the activeMenuId and the setter from your store
   const { activeMenuId, setActiveMenuId } = useMenuStore();
+  const { logout } = useAuthModel();
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -60,15 +62,10 @@ const Sidebar: NextPage<SidebarProps> = ({ toggleSidebar }) => {
       {/* User Profile Section */}
       <div className="p-4 border-t mt-auto">
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">Reza Abedian</p>
-              <p className="text-xs text-gray-500 truncate">
-                rezaabedian@gmail.com
-              </p>
-            </div>
-          </div>
-          <LogOut className="w-5 h-5 text-gray-500 cursor-pointer hover:text-gray-700" />
+          <LogOut className="w-5 h-5 text-gray-500 cursor-pointer hover:text-gray-700" onClick={() => {
+            logout();
+            router.refresh();
+          }} />
         </div>
       </div>
     </div>
