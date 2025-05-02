@@ -15,7 +15,7 @@ const Slide: NextPage<SlideProps> = ({ player_name, image_url }) => {
   return (
     <div className="min-w-full h-full relative flex-shrink-0">
       <Image
-        src={image_url ? `${image_url}` : "/images/billboard/teams.webp"}
+        src={image_url ? `${image_url}` : "/images/billboard/teams2.jpeg"}
         alt={shouldShowPlayerName ? `${player_name} player image` : "Team image"}
         quality="100"
         fill={true}
