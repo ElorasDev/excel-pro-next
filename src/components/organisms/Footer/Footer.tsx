@@ -14,9 +14,9 @@ const Footer = () => {
         <div className="hidden md:flex items-center justify-between">
           {/* Logo - Left */}
           <div className="flex-1">
-            <div className=" flex">
+            <div className="flex">
               <Logo />
-              <p className="flex items-center ml-3 text-primary max-w-xs">
+              <p className="flex items-center ml-3 text-primary max-w-xs lg:flex md:hidden">
                 Excel Pro Academy
               </p>
             </div>
@@ -44,7 +44,7 @@ const Footer = () => {
         {/* Mobile View - Hidden on Desktop */}
         <div className="md:hidden">
           <div className="flex justify-between items-center mb-6">
-            {/* Logo - Right */}
+            {/* Logo - Left */}
             <div>
               <Logo />
             </div>
@@ -67,8 +67,11 @@ const Footer = () => {
             <Menu variant="footer" orientation="vertical" />
           </div>
 
+          {/* Contact Info with proper containment */}
           <div className="flex justify-center my-4">
-            <ContactInfoCard />
+            <div className="w-full max-w-xs">
+              <ContactInfoCard />
+            </div>
           </div>
         </div>
 

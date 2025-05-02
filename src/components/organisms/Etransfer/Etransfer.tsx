@@ -155,12 +155,14 @@ const Etransfer = () => {
   const [error, setError] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
 
-  const bankAccount = {
-    name: "Soccer Training Academy",
-    accountNumber: "12345678",
-    bankName: "Royal Bank",
-    notes: "Note: Please include your order number in the transfer details.",
-  };
+  const bankEmails = [
+    {
+      id: 0,
+      email: "Abedian.1368@gmail.com",
+      notes:
+        "Note: Please include your order number, registered player name, phone number, and email in the transfer details.",
+    },
+  ];
 
   // Calculate final price
   const price = plans[selectedPlan]?.price?.split("/")[0] || "350";
@@ -399,16 +401,10 @@ const Etransfer = () => {
               Please make your payment to the following account:
             </p>
             <ul className="list-disc pl-5 mb-4">
-              <li>Account Name: {bankAccount.name}</li>
-              <li>Account Number: {bankAccount.accountNumber}</li>
-              <li>Bank: {bankAccount.bankName}</li>
+              <li>Email: {bankEmails[0].email}</li>
             </ul>
-            <p className="text-sm text-gray-600">{bankAccount.notes}</p>
+            <p className="text-sm text-gray-600">{bankEmails[0].notes}</p>
             <p className="font-bold mt-4">Amount to pay: ${finalPrice}</p>
-            <p className="mt-2">
-              Please mention reference number {transferId} in your transfer
-              notes.
-            </p>
           </div>
 
           <p className="mb-4">

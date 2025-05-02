@@ -119,15 +119,8 @@ const PlayerInformationForm: NextPage = () => {
     <>
       {/* Form Content */}
       <div className="mb-8">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4">
-          Welcome! Please fill out this form to register for private soccer
-          sessions. These sessions are tailored to help players improve their
-          skills and achieve their goals.
-        </h1>
-
         {/* Added PracticeSchedule component here */}
         <PracticeSchedule />
-
         <form onSubmit={formik.handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-1 gap-4 sm:gap-6 mt-6">
             <div>

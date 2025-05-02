@@ -53,7 +53,7 @@ const ProgramDetails: NextPage<ProgramType> = ({ program, decodedSlug }) => {
               Home
             </Link>
             <span className="mx-2">/</span>
-            <Link href="/programs" className="hover:text-gray-700">
+            <Link href="/program" className="hover:text-gray-700">
               Programs
             </Link>
             <span className="mx-2">/</span>

@@ -106,7 +106,7 @@ export const programs: ProgramType[] = [
       className: "text-gray-800",
     },
     imageSrc: "/images/programs/u15-17.png",
-    team_image: "/images/person/team/u13-u14.jpeg",
+    team_image: "/images/person/team/u7.webp",
     description:
       "Our competitive teams train with high intensity and are introduced to position-specific tactics, match strategies, and mental strength training. Players compete in regional leagues and tournaments across Toronto and the GTA. Training frequency: 2-3x per week + regular matches",
     programOutline: {
@@ -131,7 +131,7 @@ export const programs: ProgramType[] = [
       className: "text-white",
     },
     imageSrc: "/images/programs/u15-18.png",
-    team_image: "/images/person/team/u15-u18.jpeg",
+    team_image: "/images/person/team/u13-u14.jpeg",
     description:
       "This program is designed for serious players aiming to play at a high level, including university, college, and semi-professional opportunities. We focus on advanced tactical systems, strength & conditioning, video analysis, and exposure to top-level competitions. Training frequency: 3x per week + league play + showcases",
     programOutline: {
