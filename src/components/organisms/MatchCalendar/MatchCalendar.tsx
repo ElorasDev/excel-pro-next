@@ -22,9 +22,10 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
     Array<{
       day: number;
       isCurrentMonth: boolean;
-      hasU7to12: boolean;
+      hasU5to8: boolean;
+      hasU9to12: boolean;
       hasU13to14: boolean;
-      hasU15to17: boolean;
+      hasU15to18: boolean;
     }>
   >([]);
   const [hasFilteredMatches, setHasFilteredMatches] = useState(true);
@@ -104,26 +105,31 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
   // Check if a match belongs to a specific age group
   const checkAgeGroup = (ageCategory: string) => {
     if (!ageCategory)
-      return { isU7to12: false, isU13to14: false, isU15to17: false };
+      return { isU5to8: false, isU9to12: false, isU13to14: false, isU15to18: false };
 
     ageCategory = ageCategory.toUpperCase();
 
-    const isU7to12 =
-      /U(7|8|9|10|11|12)\b/.test(ageCategory) ||
-      ageCategory.includes("U7 - U12") ||
-      ageCategory.includes("U7-U12");
+    const isU5to8 =
+      /U(5|6|7|8)\b/.test(ageCategory) ||
+      ageCategory.includes("U5 - U8") ||
+      ageCategory.includes("U5-U8");
+
+    const isU9to12 =
+      /U(9|10|11|12)\b/.test(ageCategory) ||
+      ageCategory.includes("U9 - U12") ||
+      ageCategory.includes("U9-U12");
 
     const isU13to14 =
       /U(13|14)\b/.test(ageCategory) ||
       ageCategory.includes("U13 - U14") ||
       ageCategory.includes("U13-U14");
 
-    const isU15to17 =
-      /U(15|16|17)\b/.test(ageCategory) ||
-      ageCategory.includes("U15 - U17") ||
-      ageCategory.includes("U15-U17");
+    const isU15to18 =
+      /U(15|16|17|18)\b/.test(ageCategory) ||
+      ageCategory.includes("U15 - U18") ||
+      ageCategory.includes("U15-U18");
 
-    return { isU7to12, isU13to14, isU15to17 };
+    return { isU5to8, isU9to12, isU13to14, isU15to18 };
   };
 
   // Generate calendar structure
@@ -145,9 +151,10 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
     const daysArray: Array<{
       day: number;
       isCurrentMonth: boolean;
-      hasU7to12: boolean;
+      hasU5to8: boolean;
+      hasU9to12: boolean;
       hasU13to14: boolean;
-      hasU15to17: boolean;
+      hasU15to18: boolean;
     }> = [];
 
     // Previous month days that appear in first week
@@ -155,9 +162,10 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
       const day = prevMonthLastDay - firstDay + i + 1;
 
       // Check for age group matches on this day
-      let hasU7to12 = false;
+      let hasU5to8 = false;
+      let hasU9to12 = false;
       let hasU13to14 = false;
-      let hasU15to17 = false;
+      let hasU15to18 = false;
 
       if (Array.isArray(processedMatches)) {
         processedMatches.forEach((match) => {
@@ -170,12 +178,13 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
               matchDate.getMonth() === month - 1 &&
               matchDate.getFullYear() === (month === 0 ? year - 1 : year)
             ) {
-              const { isU7to12, isU13to14, isU15to17 } = checkAgeGroup(
+              const { isU5to8, isU9to12, isU13to14, isU15to18 } = checkAgeGroup(
                 match.age_category
               );
-              if (isU7to12) hasU7to12 = true;
+              if (isU5to8) hasU5to8 = true;
+              if (isU9to12) hasU9to12 = true;
               if (isU13to14) hasU13to14 = true;
-              if (isU15to17) hasU15to17 = true;
+              if (isU15to18) hasU15to18 = true;
             }
           } catch (e) {
             console.error("Error parsing date:", e);
@@ -186,18 +195,20 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
       daysArray.push({
         day,
         isCurrentMonth: false,
-        hasU7to12,
+        hasU5to8,
+        hasU9to12,
         hasU13to14,
-        hasU15to17,
+        hasU15to18,
       });
     }
 
     // Current month days
     for (let i = 1; i <= lastDay; i++) {
       // Check for age group matches on this day
-      let hasU7to12 = false;
+      let hasU5to8 = false;
+      let hasU9to12 = false;
       let hasU13to14 = false;
-      let hasU15to17 = false;
+      let hasU15to18 = false;
 
       if (Array.isArray(processedMatches)) {
         processedMatches.forEach((match) => {
@@ -210,12 +221,13 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
               matchDate.getMonth() === month &&
               matchDate.getFullYear() === year
             ) {
-              const { isU7to12, isU13to14, isU15to17 } = checkAgeGroup(
+              const { isU5to8, isU9to12, isU13to14, isU15to18 } = checkAgeGroup(
                 match.age_category
               );
-              if (isU7to12) hasU7to12 = true;
+              if (isU5to8) hasU5to8 = true;
+              if (isU9to12) hasU9to12 = true;
               if (isU13to14) hasU13to14 = true;
-              if (isU15to17) hasU15to17 = true;
+              if (isU15to18) hasU15to18 = true;
             }
           } catch (e) {
             console.error("Error parsing date:", e);
@@ -226,9 +238,10 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
       daysArray.push({
         day: i,
         isCurrentMonth: true,
-        hasU7to12,
+        hasU5to8,
+        hasU9to12,
         hasU13to14,
-        hasU15to17,
+        hasU15to18,
       });
     }
 
@@ -236,9 +249,10 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
     const remainingCells = 42 - daysArray.length; // Always show 6 rows (6 * 7 = 42)
     for (let i = 1; i <= remainingCells; i++) {
       // Check for age group matches on this day
-      let hasU7to12 = false;
+      let hasU5to8 = false;
+      let hasU9to12 = false;
       let hasU13to14 = false;
-      let hasU15to17 = false;
+      let hasU15to18 = false;
 
       if (Array.isArray(processedMatches)) {
         processedMatches.forEach((match) => {
@@ -251,12 +265,13 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
               matchDate.getMonth() === month + 1 &&
               matchDate.getFullYear() === (month === 11 ? year + 1 : year)
             ) {
-              const { isU7to12, isU13to14, isU15to17 } = checkAgeGroup(
+              const { isU5to8, isU9to12, isU13to14, isU15to18 } = checkAgeGroup(
                 match.age_category
               );
-              if (isU7to12) hasU7to12 = true;
+              if (isU5to8) hasU5to8 = true;
+              if (isU9to12) hasU9to12 = true;
               if (isU13to14) hasU13to14 = true;
-              if (isU15to17) hasU15to17 = true;
+              if (isU15to18) hasU15to18 = true;
             }
           } catch (e) {
             console.error("Error parsing date:", e);
@@ -267,9 +282,10 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
       daysArray.push({
         day: i,
         isCurrentMonth: false,
-        hasU7to12,
+        hasU5to8,
+        hasU9to12,
         hasU13to14,
-        hasU15to17,
+        hasU15to18,
       });
     }
 
@@ -373,40 +389,52 @@ const MatchCalendar: NextPage<CalendarViewProps> = ({
                   <div className="mt-1 space-y-1 text-xs">
                     {dayData.isCurrentMonth && (
                       <>
-                        {dayData.hasU7to12 && (
+                        {dayData.hasU5to8 && (
                           <div
                             className={`px-1 py-0.5 rounded ${
-                              selectedAgeGroup === "u7-12" ||
+                              selectedAgeGroup === "u5-u8" ||
+                              selectedAgeGroup === "all"
+                                ? "bg-green-100 text-green-800 font-medium"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            U5-U8
+                          </div>
+                        )}
+                        {dayData.hasU9to12 && (
+                          <div
+                            className={`px-1 py-0.5 rounded ${
+                              selectedAgeGroup === "u9-u12" ||
                               selectedAgeGroup === "all"
                                 ? "bg-indigo-100 text-indigo-900 font-medium"
                                 : "text-gray-400"
                             }`}
                           >
-                            U7-12
+                            U9-U12
                           </div>
                         )}
                         {dayData.hasU13to14 && (
                           <div
                             className={`px-1 py-0.5 rounded ${
-                              selectedAgeGroup === "u13-14" ||
+                              selectedAgeGroup === "u13-u14" ||
                               selectedAgeGroup === "all"
                                 ? "bg-orange-100 text-orange-700 font-medium"
                                 : "text-gray-400"
                             }`}
                           >
-                            U13-14
+                            U13-U14
                           </div>
                         )}
-                        {dayData.hasU15to17 && (
+                        {dayData.hasU15to18 && (
                           <div
                             className={`px-1 py-0.5 rounded ${
-                              selectedAgeGroup === "u15-17" ||
+                              selectedAgeGroup === "u15-u18" ||
                               selectedAgeGroup === "all"
                                 ? "bg-red-100 text-red-700 font-medium"
                                 : "text-gray-400"
                             }`}
                           >
-                            U15-17
+                            U15-U18
                           </div>
                         )}
                       </>

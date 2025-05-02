@@ -12,9 +12,8 @@ import { fetchAllPlayerMonth } from "@/services/getPlayerMonth";
 export const revalidate = 30;
 
 const Landing = async () => {
+  
   const players = await fetchAllPlayerMonth();
-
-  console.log(players);
 
   return (
     <div className="py-40">

@@ -22,27 +22,32 @@ const MatchdaySchedule: NextPage<MatchdayScheduleProps> = ({
   const [calendarMode, setCalendarMode] = useState(false);
   const router = useRouter();
 
-  // Age group filter options
+  // Updated age group filter options
   const ageGroups = [
     { id: "all", label: "View all" },
-    { id: "u7-12", label: "U7 - 12" },
-    { id: "u13-14", label: "U13 - 14" },
-    { id: "u15-17", label: "U15 - 17" },
+    { id: "u5-u8", label: "U5 - U8" },
+    { id: "u9-u12", label: "U9 - U12" },
+    { id: "u13-u14", label: "U13 - U14" },
+    { id: "u15-u18", label: "U15 - U18" },
   ];
 
   // Format date function
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    
-    return date.toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    }) + ', ' + date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
+
+    return (
+      date.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }) +
+      ", " +
+      date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+    );
   };
 
   // Filter matches based on selected age group and search query
@@ -50,29 +55,41 @@ const MatchdaySchedule: NextPage<MatchdayScheduleProps> = ({
     // Filter by age group
     if (selectedAgeGroup !== "all") {
       const ageCategory = match.age_category.toUpperCase();
-      
-      if (selectedAgeGroup === "u7-12") {
-        // Check if the age category contains numbers between 7-12 or the range text
-        const hasU7to12 = /U(7|8|9|10|11|12)\b/.test(ageCategory) || 
-                           ageCategory.includes("U7 - U12") ||
-                           ageCategory.includes("U7-U12");
-        if (!hasU7to12) return false;
+
+      if (selectedAgeGroup === "u5-u8") {
+        // Check if the age category contains numbers between 5-8 or the range text
+        const hasU5to8 =
+          /U(5|6|7|8)\b/.test(ageCategory) ||
+          ageCategory.includes("U5 - U8") ||
+          ageCategory.includes("U5-U8");
+        if (!hasU5to8) return false;
       }
-      
-      if (selectedAgeGroup === "u13-14") {
+
+      if (selectedAgeGroup === "u9-u12") {
+        // Check if the age category contains numbers between 9-12 or the range text
+        const hasU9to12 =
+          /U(9|10|11|12)\b/.test(ageCategory) ||
+          ageCategory.includes("U9 - U12") ||
+          ageCategory.includes("U9-U12");
+        if (!hasU9to12) return false;
+      }
+
+      if (selectedAgeGroup === "u13-u14") {
         // Check if the age category contains U13 or U14 or the range text
-        const hasU13to14 = /U(13|14)\b/.test(ageCategory) || 
-                            ageCategory.includes("U13 - U14") ||
-                            ageCategory.includes("U13-U14");
+        const hasU13to14 =
+          /U(13|14)\b/.test(ageCategory) ||
+          ageCategory.includes("U13 - U14") ||
+          ageCategory.includes("U13-U14");
         if (!hasU13to14) return false;
       }
-      
-      if (selectedAgeGroup === "u15-17") {
-        // Check if the age category contains numbers between 15-17 or the range text
-        const hasU15to17 = /U(15|16|17)\b/.test(ageCategory) || 
-                            ageCategory.includes("U15 - U17") ||
-                            ageCategory.includes("U15-U17");
-        if (!hasU15to17) return false;
+
+      if (selectedAgeGroup === "u15-u18") {
+        // Check if the age category contains numbers between 15-18 or the range text
+        const hasU15to18 =
+          /U(15|16|17|18)\b/.test(ageCategory) ||
+          ageCategory.includes("U15 - U18") ||
+          ageCategory.includes("U15-U18");
+        if (!hasU15to18) return false;
       }
     }
 
@@ -83,14 +100,14 @@ const MatchdaySchedule: NextPage<MatchdayScheduleProps> = ({
       const team2 = (match.team2 || "").toLowerCase();
       const location = (match.location || "").toLowerCase();
       const address = (match.address || "").toLowerCase();
-      
+
       // Check if any of the fields contain the search query
-      const matchesSearch = 
-        team1.includes(query) || 
-        team2.includes(query) || 
-        location.includes(query) || 
+      const matchesSearch =
+        team1.includes(query) ||
+        team2.includes(query) ||
+        location.includes(query) ||
         address.includes(query);
-        
+
       if (!matchesSearch) return false;
     }
 

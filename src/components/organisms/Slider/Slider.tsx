@@ -37,7 +37,7 @@ const Slider: NextPage<SliderProps> = ({ currentSlide, setCurrentSlide }) => {
           <Slide
             key="default"
             player_name="Default Player"
-            image_url="/images/billboard/Banner2.webp"
+            image_url="/images/billboard/teams.webp"
           />
         )}
       </div>

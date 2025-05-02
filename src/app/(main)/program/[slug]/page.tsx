@@ -50,7 +50,6 @@ const ProgramPage: NextPage<ProgramPageProps> = ({ params }) => {
     return false;
   });
 
-  // بررسی وجود برنامه
   if (!program) {
     return redirect('/programs');
   }

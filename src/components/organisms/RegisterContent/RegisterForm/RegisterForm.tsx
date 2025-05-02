@@ -10,13 +10,13 @@ const RegisterForm = () => {
   const { step } = useRegisterStepStore();
   const currentStep = step < 1 || step > steps.length ? 1 : step;
   const currentStepInfo = steps[currentStep - 1];
-  
+
   // Get the entire state without destructuring
   const userFormData = useUserFormStore();
-  
+
   // Log the entire store state - this will include both data and setter functions
   console.log("User Form Data (with functions):", userFormData);
-  
+
   // If you only want to log the data fields without the setter functions
   const userDataOnly = {
     fullname: userFormData.fullname,
@@ -39,14 +39,13 @@ const RegisterForm = () => {
     parent_name: userFormData.parent_name,
     phone_number: userFormData.phone_number,
     email: userFormData.email,
-    current_skill_level: userFormData.current_skill_level,
     player_positions: userFormData.player_positions,
     custom_position: userFormData.custom_position,
     stripeCustomerId: userFormData.stripeCustomerId,
     policy: userFormData.policy,
-    activePlan: userFormData.activePlan
+    activePlan: userFormData.activePlan,
   };
-  
+
   console.log("User Form Data (data only):", userDataOnly);
 
   if (step > 5) {

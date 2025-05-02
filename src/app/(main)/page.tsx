@@ -3,7 +3,7 @@ import Landing from "@/components/template/Landing/Landing";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://excel-pro-next.vercel.app"),
-  title: "Excel Pro Football Academy | Premier Youth Soccer Training",
+  title: "Excel Pro Soccer Academy | Premier Youth Soccer Training",
   description:
     "Excel Pro, founded by former Persepolis FC player Reza Abedian, offers Toronto youth personalized soccer training, focusing on skills, teamwork, and success.",
   keywords: [
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title:
-      "Excel Pro Football Academy | Professional Soccer Training in Toronto",
+      "Excel Pro Soccer Academy | Professional Soccer Training in Toronto",
     description:
       "Join Toronto's premier soccer academy for youth development. Professional coaches, personalized training, and competitive programs.",
     type: "website",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Excel Pro Football Academy | Toronto",
+    title: "Excel Pro Soccer Academy | Toronto",
     description:
       "Professional soccer training and development for youth players in Toronto.",
     images: ["/images/og-image.jpg"],

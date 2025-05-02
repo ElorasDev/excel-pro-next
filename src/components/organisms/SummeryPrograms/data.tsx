@@ -28,7 +28,7 @@ export const programs: ProgramType[] = [
       className: "text-green-800",
     },
     imageSrc: "/images/programs/u7-12.png",
-    team_image: "/images/person/team/u7.webp",
+    team_image: "/images/person/team/u5-u8.webp",
     description:
       "Our youngest athletes are introduced to the beautiful game in a fun and energetic environment. Sessions focus on basic ball control, coordination, teamwork, and building confidence through play-based learning. Training frequency: 2 x per week",
     programOutline: {
@@ -67,7 +67,7 @@ export const programs: ProgramType[] = [
       className: "text-gray-800",
     },
     imageSrc: "/images/programs/u13-14.png",
-    team_image: "/images/person/team/u7.webp",
+    team_image: "/images/person/team/u9-u12.webp",
     description:
       "As players grow, we emphasize technical skill development, tactical understanding, and physical fitness. This stage builds the foundation for more competitive play, with a focus on ball mastery, passing, and movement. Training frequency: 2–3x per week, optional weekend games",
     programOutline: {
@@ -81,7 +81,7 @@ export const programs: ProgramType[] = [
   },
   {
     ageGroup: "U13 – U14",
-    title: "Competitive Phase (Ages 13-17)",
+    title: "Competitive Phase (Ages 13-14)",
     backgroundClass: "bg-blue-50",
     textColorClass: "text-gray-900",
     schedule: ["Monday at 6:30PM - 8PM", "Wednesday at 6:30PM - 8PM"],

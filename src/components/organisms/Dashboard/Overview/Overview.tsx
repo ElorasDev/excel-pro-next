@@ -605,7 +605,7 @@ const Overview = () => {
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <span className="ml-2">Loading players...</span>
           </div>
         ) : (
@@ -679,7 +679,7 @@ const Overview = () => {
                                 player.activePlan === "Premium"
                                   ? "bg-purple-100 text-purple-800"
                                   : player.activePlan === "Standard"
-                                  ? "bg-blue-100 text-blue-800"
+                                  ? "bg-red-100 text-red-800"
                                   : "bg-green-100 text-green-800"
                               }`}
                             >
@@ -689,7 +689,7 @@ const Overview = () => {
                           <td className="py-4 px-6 whitespace-nowrap w-1/6 text-center">
                             <button
                               onClick={() => openPlayerModal(player.id)}
-                              className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                              className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
                               title="View player details"
                             >
                               <FiEye size={18} />
@@ -919,7 +919,7 @@ const Overview = () => {
                         selectedPlayer.activePlan === "Premium"
                           ? "bg-purple-100 text-purple-800"
                           : selectedPlayer.activePlan === "Standard"
-                          ? "bg-blue-100 text-blue-800"
+                          ? "bg-red-100 text-red-800"
                           : "bg-green-100 text-green-800"
                       }`}
                     >

@@ -32,35 +32,39 @@ const normalizeDivision = (str: string): string => {
         normalized.includes("U5") ||
         normalized.includes("U6") ||
         normalized.includes("U7") ||
-        normalized.includes("U8") ||
+        normalized.includes("U8")
+      ) {
+        return "U5_U8";
+      } else if (
         normalized.includes("U9") ||
         normalized.includes("U10") ||
         normalized.includes("U11") ||
         normalized.includes("U12")
       ) {
-        return "U7_U12";
+        return "U9_U12";
       } else if (normalized.includes("U13") || normalized.includes("U14")) {
         return "U13_U14";
       } else if (
         normalized.includes("U15") ||
         normalized.includes("U16") ||
-        normalized.includes("U17")
+        normalized.includes("U17") ||
+        normalized.includes("U18")
       ) {
-        return "U15_U17";
+        return "U15_U18";
       }
     }
 
     // Check if the result is valid
-    if (["U7_U12", "U13_U14", "U15_U17"].includes(normalized)) {
+    if (["U5_U8", "U9_U12", "U13_U14", "U15_U18"].includes(normalized)) {
       return normalized;
     }
 
     // Default value if none matched
     console.warn(`Could not normalize division "${str}", using default value`);
-    return "U7_U12";
+    return "freePlane";
   } catch (error) {
     console.error("Error in normalizeDivision:", error);
-    return "U7_U12"; // Default value in case of error
+    return "freePlane";
   }
 };
 
@@ -70,13 +74,8 @@ const Acknowledgment: NextPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const {
-    policy,
-    setPolicy,
-    photoUrl,
-    nationalIdCard,
-    ...userFormData
-  } = useUserFormStore();
+  const { policy, setPolicy, photoUrl, nationalIdCard, ...userFormData } =
+    useUserFormStore();
 
   // Main registration function that handles the full registration flow
   const completeRegistration = async () => {
@@ -92,6 +91,8 @@ const Acknowledgment: NextPage = () => {
         setIsLoading(false);
         return;
       }
+
+      console.log(normalizeDivision(division!))
 
       // Create the request body with image data directly
       const requestBody = {
@@ -114,7 +115,6 @@ const Acknowledgment: NextPage = () => {
         parent_name: userFormData.parent_name,
         phone_number: userFormData.phone_number,
         email: userFormData.email || "",
-        current_skill_level: userFormData.current_skill_level,
         player_positions: userFormData.player_positions || "",
         activePlan: normalizeDivision(division!),
         policy: true,
