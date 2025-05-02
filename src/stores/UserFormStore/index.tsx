@@ -23,13 +23,12 @@ interface UserFormState {
   city: string;
   emergencyContactName: string;
   emergencyPhone: string;
-  experienceLevel?: ExperienceLevel;
+  experienceLevel: ExperienceLevel;
   photoUrl: string;
   nationalIdCard: string;
   parent_name: string;
   phone_number: string;
   email: string;
-  current_skill_level: SkillLevel;
   player_positions?: PlayerPosition;
   custom_position?: string;
   policy: boolean;
@@ -56,7 +55,6 @@ interface UserFormState {
   setParentName: (parentName: string) => void;
   setPhoneNumber: (phoneNumber: string) => void;
   setEmail: (email: string) => void;
-  setSkillLevel: (skillLevel: SkillLevel) => void;
   setPlayerPosition: (position: PlayerPosition) => void;
   setCustomPosition: (customPosition: string) => void;
   setPolicy: (policy: boolean) => void;
@@ -113,7 +111,6 @@ const useUserFormStore = create<UserFormState>((set) => ({
   setParentName: (parentName) => set({ parent_name: parentName }),
   setPhoneNumber: (phoneNumber) => set({ phone_number: phoneNumber }),
   setEmail: (email) => set({ email }),
-  setSkillLevel: (skillLevel) => set({ current_skill_level: skillLevel }),
   setPlayerPosition: (position) => set({ player_positions: position }),
   setCustomPosition: (customPosition) =>
     set({ custom_position: customPosition }),

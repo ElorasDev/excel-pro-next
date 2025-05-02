@@ -6,7 +6,6 @@ import { useInView } from "framer-motion";
 import PrimaryIcon from "@/components/atoms/Icons/primaryIcons/PrimaryIcon";
 import { services } from "./data";
 import Script from "next/script";
-import Link from "next/link";
 
 const SummeryServices = () => {
   const sectionRef = useRef(null);
@@ -35,18 +34,18 @@ const SummeryServices = () => {
   const servicesSchema = {
     "@context": "https://schema.org",
     "@type": "SportsOrganization",
-    "name": "Excel Pro Academy",
-    "offers": services.map((service) => ({
+    name: "Excel Pro Academy",
+    offers: services.map((service) => ({
       "@type": "Service",
-      "name": service.title,
-      "provider": {
+      name: service.title,
+      provider: {
         "@type": "SportsOrganization",
-        "name": "Excel Pro Academy",
+        name: "Excel Pro Academy",
       },
-      "description": `Professional ${service.title} services offered by Excel Pro Academy.`,
-      "areaServed": {
+      description: `Professional ${service.title} services offered by Excel Pro Academy.`,
+      areaServed: {
         "@type": "Place",
-        "name": "Toronto",
+        name: "Toronto",
       },
     })),
   };
@@ -103,23 +102,15 @@ const SummeryServices = () => {
                 itemScope
                 itemType="https://schema.org/Offer"
               >
-                <Link
-                  href={`/services/${service.title
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")}`}
-                  aria-label={`Learn more about ${service.title} service`}
-                  title={`Excel Pro Academy ${service.title} Service`}
-                >
-                  <PrimaryIcon
-                    icon={`/icons/${service.title}.png`}
-                    text={service.title}
-                    variant="light"
-                    className="w-[64px] h-[64px]"
-                    fontWeight="bold"
-                    width={35}
-                    height={35}
-                  />
-                </Link>
+                <PrimaryIcon
+                  icon={`/icons/${service.title}.png`}
+                  text={service.title}
+                  variant="light"
+                  className="w-[64px] h-[64px]"
+                  fontWeight="bold"
+                  width={35}
+                  height={35}
+                />
                 <meta
                   itemProp="description"
                   content={`Professional ${service.title} services offered by Excel Pro Academy.`}

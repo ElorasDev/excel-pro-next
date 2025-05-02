@@ -100,7 +100,7 @@ const HeroSection: NextPage = () => {
             className="text-3xl md:text-4xl font-bold text-gray-900"
             variants={itemVariants}
           >
-            Excel Pro Football Academy | Professional Soccer Training for Youth
+            Excel Pro Soccer Academy | Professional Soccer Training for Youth
             in Toronto
           </motion.h1>
 
