@@ -89,7 +89,7 @@ const ProgramDetails: NextPage<ProgramType> = ({ program, decodedSlug }) => {
         className="max-w-7xl mx-auto px-4 md:px-8 mt-[-230px]"
         delay={0.8}
       >
-        <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+        <div className="bg-white rounded-xl overflow-hidden shadow-sm mt-0 lg:mt-0 md:mt-6 sm:mt-6">
           <div className="relative w-full h-[500px] md:h-[550px] lg:h-[600px]">
             <Image
               src={program.team_image}
