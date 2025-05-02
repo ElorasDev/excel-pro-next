@@ -487,7 +487,9 @@ const Overview = () => {
       {/* Header Section */}
       <div className="mb-6 flex flex-col sm:flex-row sm:justify-between">
         <div className="flex flex-col mb-4 sm:mb-0">
-          <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome To Excel Pro Dashboard</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-1">
+            Welcome To Excel Pro Dashboard
+          </h1>
           <p className="text-gray-500 text-sm md:text-base">
             Track, and manage your players
           </p>
@@ -838,7 +840,7 @@ const Overview = () => {
                   <p className="text-sm text-gray-500">Phone Number</p>
                   <p className="font-medium">{selectedPlayer.phone_number}</p>
                 </div>
-                <div>
+                <div className="break-words">
                   <p className="text-sm text-gray-500">Email</p>
                   <p className="font-medium">{selectedPlayer.email}</p>
                 </div>
