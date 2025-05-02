@@ -27,8 +27,7 @@ export const metadata: Metadata = {
     email: true,
   },
   openGraph: {
-    title:
-      "Excel Pro Soccer Academy | Professional Soccer Training in Toronto",
+    title: "Excel Pro Soccer Academy | Professional Soccer Training in Toronto",
     description:
       "Join Toronto's premier soccer academy for youth development. Professional coaches, personalized training, and competitive programs.",
     type: "website",
@@ -51,11 +50,6 @@ export const metadata: Metadata = {
       "Professional soccer training and development for youth players in Toronto.",
     images: ["/images/og-image.jpg"],
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-  },
   robots: {
     index: true,
     follow: true,
@@ -73,6 +67,12 @@ export const metadata: Metadata = {
       "en-US": "https://excel-pro-next.vercel.app/",
     },
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default async function Home() {
