@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Landing from "@/components/template/Landing/Landing";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://excel-pro-next.vercel.app"),
+  metadataBase: new URL("https://excelproso.com/"),
   title: "Excel Pro Soccer Academy | Premier Youth Soccer Training",
   description:
     "Excel Pro, founded by former Persepolis FC player Reza Abedian, offers Toronto youth personalized soccer training, focusing on skills, teamwork, and success.",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     description:
       "Join Toronto's premier soccer academy for youth development. Professional coaches, personalized training, and competitive programs.",
     type: "website",
-    url: "https://excel-pro-next.vercel.app",
+    url: "https://excelproso.com",
     siteName: "Excel Pro Football Academy",
     locale: "en_US",
     images: [
@@ -61,10 +61,10 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://excel-pro-next.vercel.app",
+    canonical: "https://excelproso.com",
     languages: {
-      en: "https://excel-pro-next.vercel.app/",
-      "en-US": "https://excel-pro-next.vercel.app/",
+      en: "https://excelproso.com",
+      "en-US": "",
     },
   },
 };
