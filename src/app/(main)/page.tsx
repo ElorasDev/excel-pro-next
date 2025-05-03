@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     canonical: "https://excelproso.com",
     languages: {
       en: "https://excelproso.com",
-      "en-US": "",
+      "en-US": "https://excelproso.com",
     },
   },
 };
