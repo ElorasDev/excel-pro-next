@@ -6,7 +6,6 @@ import ProgramCard from "@/components/molecules/ProgramCard/ProgramCard";
 import { Button } from "@/components/atoms/Button/Button";
 import { programs } from "./data";
 import { useRef } from "react";
-import Script from "next/script";
 import Link from "next/link";
 
 const SummeryPrograms: NextPage = () => {
@@ -33,49 +32,8 @@ const SummeryPrograms: NextPage = () => {
     },
   };
 
-  const programsSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    itemListElement: displayedPrograms.map((program, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "Course",
-        name: `Soccer Training - ${program.ageGroup}`,
-        description: `Soccer training program for ${program.ageGroup} age group with ${program.schedule} and ${program.gameInfo}`,
-        provider: {
-          "@type": "SportsOrganization",
-          name: "Excel Pro Academy",
-        },
-        courseCode: `EPA-${program.ageGroup.replace(/\s+/g, "-")}`,
-        hasCourseInstance: {
-          "@type": "CourseInstance",
-          courseMode: "Offline",
-          courseSchedule: {
-            "@type": "Schedule",
-            name: program.schedule,
-            repeatCount: 16,
-            repeatFrequency: "http://schema.org/Weekly",
-          },
-        },
-        offers: {
-          "@type": "Offer",
-          price: 350,
-          priceCurrency: "CAD",
-          availability: "https://schema.org/InStock",
-        },
-      },
-    })),
-  };
-
   return (
     <>
-      <Script
-        id="programs-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(programsSchema) }}
-      />
-
       <motion.section
         ref={ref}
         initial="hidden"
