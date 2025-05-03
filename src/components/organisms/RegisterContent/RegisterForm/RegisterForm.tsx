@@ -3,7 +3,6 @@ import { useRegisterStepStore } from "@/stores/registerStepStore";
 import Step from "@/components/atoms/Step/Step";
 import { steps } from "./data";
 // import PaymentPage from "../../StripeElement/PaymentPage";
-import useUserFormStore from "@/stores/UserFormStore"; // make sure the path matches your file system
 import Etransfer from "../../Etransfer/Etransfer";
 
 const RegisterForm = () => {
@@ -11,42 +10,6 @@ const RegisterForm = () => {
   const currentStep = step < 1 || step > steps.length ? 1 : step;
   const currentStepInfo = steps[currentStep - 1];
 
-  // Get the entire state without destructuring
-  const userFormData = useUserFormStore();
-
-  // Log the entire store state - this will include both data and setter functions
-  console.log("User Form Data (with functions):", userFormData);
-
-  // If you only want to log the data fields without the setter functions
-  const userDataOnly = {
-    fullname: userFormData.fullname,
-    dateOfBirth: userFormData.dateOfBirth,
-    gender: userFormData.gender,
-    height: userFormData.height,
-    weight: userFormData.weight,
-    tShirtSize: userFormData.tShirtSize,
-    shortSize: userFormData.shortSize,
-    jacketSize: userFormData.jacketSize,
-    pantsSize: userFormData.pantsSize,
-    address: userFormData.address,
-    postalCode: userFormData.postalCode,
-    nationalIdCard: userFormData.nationalIdCard,
-    city: userFormData.city,
-    emergencyContactName: userFormData.emergencyContactName,
-    emergencyPhone: userFormData.emergencyPhone,
-    experienceLevel: userFormData.experienceLevel,
-    photoUrl: userFormData.photoUrl,
-    parent_name: userFormData.parent_name,
-    phone_number: userFormData.phone_number,
-    email: userFormData.email,
-    player_positions: userFormData.player_positions,
-    custom_position: userFormData.custom_position,
-    stripeCustomerId: userFormData.stripeCustomerId,
-    policy: userFormData.policy,
-    activePlan: userFormData.activePlan,
-  };
-
-  console.log("User Form Data (data only):", userDataOnly);
 
   if (step > 5) {
     return (
