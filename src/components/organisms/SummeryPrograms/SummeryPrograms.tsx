@@ -50,7 +50,19 @@ const SummeryPrograms: NextPage = () => {
         courseCode: `EPA-${program.ageGroup.replace(/\s+/g, "-")}`,
         hasCourseInstance: {
           "@type": "CourseInstance",
-          courseSchedule: program.schedule,
+          courseMode: "Offline",
+          courseSchedule: {
+            "@type": "Schedule",
+            name: program.schedule,
+            repeatCount: 16,
+            repeatFrequency: "http://schema.org/Weekly",
+          },
+        },
+        offers: {
+          "@type": "Offer",
+          price: 350,
+          priceCurrency: "CAD",
+          availability: "https://schema.org/InStock",
         },
       },
     })),
