@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import PrimaryIcon from "@/components/atoms/Icons/primaryIcons/PrimaryIcon";
 import { services } from "./data";
-import Script from "next/script";
 
 const SummeryServices = () => {
   const sectionRef = useRef(null);
