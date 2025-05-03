@@ -30,35 +30,8 @@ const SummeryServices = () => {
     },
   };
 
-  // JSON-LD schema for services
-  const servicesSchema = {
-    "@context": "https://schema.org",
-    "@type": "SportsOrganization",
-    name: "Excel Pro Academy",
-    offers: services.map((service) => ({
-      "@type": "Service",
-      name: service.title,
-      provider: {
-        "@type": "SportsOrganization",
-        name: "Excel Pro Academy",
-      },
-      description: `Professional ${service.title} services offered by Excel Pro Academy.`,
-      areaServed: {
-        "@type": "Place",
-        name: "Toronto",
-      },
-    })),
-  };
-
   return (
     <>
-      {/* JSON-LD Structured Data */}
-      <Script
-        id="services-schema-structured-data"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesSchema) }}
-      />
-
       <motion.section
         ref={sectionRef}
         className="bg-secondary p-4 text-center"
