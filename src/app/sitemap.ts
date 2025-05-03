@@ -3,7 +3,7 @@ import { programs } from "@/components/organisms/Programs/data";
 
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = "https://excel-pro-next.vercel.app";
+    const baseUrl = "https://excelproso.com";
   
     const normalize = (str: string): string =>
       str

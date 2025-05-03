@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://excel-pro-next.vercel.app";
+  const baseUrl = "https://excelproso.com";
 
   return {
     rules: {
