@@ -1,6 +1,7 @@
 "use client";
 
 import { NextPage } from "next";
+import Script from "next/script";
 import { motion, useInView } from "framer-motion";
 import ProgramCard from "@/components/molecules/ProgramCard/ProgramCard";
 import { Button } from "@/components/atoms/Button/Button";
@@ -8,6 +9,12 @@ import { programs } from "./data";
 import { useRef } from "react";
 import Link from "next/link";
 import Head from "next/head";
+
+type ScheduleItem = {
+  day: string;
+  start: string;
+  end: string;
+};
 
 const SummeryPrograms: NextPage = () => {
   const ref = useRef(null);
@@ -56,38 +63,85 @@ const SummeryPrograms: NextPage = () => {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: "Excel Pro Academy Soccer Programs",
-    itemListElement: displayedPrograms.map((program, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "Course",
-        name: `Soccer Training - ${program.ageGroup}`,
-        description: `Soccer training program for ${program.ageGroup} age group with ${program.schedule} and ${program.gameInfo}`,
-        url: `https://excelproso.com/program/${program.ageGroup
-          .toLowerCase()
-          .replace(/\s+/g, "-")}`,
-        courseMode: "InPerson",
-        hasCourseInstance: {
-          "@type": "CourseInstance",
-          courseMode: "InPerson",
-          courseSchedule: getScheduleSchema(program.ageGroup).map((sch) => ({
-            "@type": "Schedule",
-            repeatFrequency: "https://schema.org/Weekly",
-            byDay: `https://schema.org/${sch.day}`,
-            startTime: sch.start,
-            endTime: sch.end,
-          })),
+    itemListElement: programs.map((program, index) => {
+      let schedule: ScheduleItem[] = [];
+      if (program.ageGroup === "U5 – U8" || program.ageGroup === "U9 – U12") {
+        schedule = [
+          { day: "Monday", start: "17:00", end: "18:30" },
+          { day: "Wednesday", start: "17:00", end: "18:30" },
+        ];
+      } else if (program.ageGroup === "U13 – U14") {
+        schedule = [
+          { day: "Monday", start: "18:30", end: "20:00" },
+          { day: "Wednesday", start: "18:30", end: "20:00" },
+        ];
+      }
+
+      return {
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "Course",
+          name: `Soccer Training - ${program.ageGroup}`,
+          description: `Soccer training program for ${program.ageGroup} age group with ${program.schedule} and ${program.gameInfo}`,
+          url: `https://yourdomain.com/program/${program.ageGroup
+            .toLowerCase()
+            .replace(/\s+/g, "-")}`,
+
+          provider: {
+            "@type": "Organization",
+            name: "Excel Pro Academy",
+            sameAs: "https://yourdomain.com",
+          },
+
+          offers: {
+            "@type": "Offer",
+            price: "350",
+            priceCurrency: "CAD",
+            availability: "https://schema.org/InStock",
+            url: `https://yourdomain.com/program/${program.ageGroup
+              .toLowerCase()
+              .replace(/\s+/g, "-")}`,
+            validFrom: new Date().toISOString(),
+          },
+
+          hasCourseInstance: {
+            "@type": "CourseInstance",
+            courseMode: "InPerson",
+            startDate: "2024-09-01",
+            endDate: "2025-06-01",
+            location: {
+              "@type": "Place",
+              name: "Excel Pro Academy Soccer Field",
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "123 Soccer Lane",
+                addressLocality: "Toronto",
+                addressRegion: "ON",
+                postalCode: "M1M 1M1",
+                addressCountry: "CA",
+              },
+            },
+            courseSchedule: schedule.map((sch) => ({
+              "@type": "Schedule",
+              repeatFrequency: "https://schema.org/Weekly",
+              byDay: `https://schema.org/${sch.day}`,
+              startTime: sch.start,
+              endTime: sch.end,
+            })),
+          },
         },
-      },
-    })),
+      };
+    }),
   };
 
   return (
     <>
       <Head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        <title>Soccer Programs | Excel Pro Academy</title>
+        <meta
+          name="description"
+          content="Professional soccer training for kids in Toronto. Join Excel Pro Academy now!"
         />
       </Head>
 
@@ -102,6 +156,12 @@ const SummeryPrograms: NextPage = () => {
         itemScope
         itemType="https://schema.org/CollectionPage"
       >
+        <Script
+          id="jsonld-all-programs"
+          type="application/ld+json"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <div className="flex justify-between items-center mb-10">
           <h2
             id="programs-heading"
