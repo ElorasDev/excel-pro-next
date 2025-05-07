@@ -43,19 +43,26 @@ const SummeryPrograms: NextPage = () => {
   const getScheduleSchema = (ageGroup: string) => {
     if (ageGroup.includes("U5") || ageGroup.includes("U8")) {
       return [
-        { day: "Monday", start: "17:00", end: "18:30" },
-        { day: "Wednesday", start: "17:00", end: "18:30" },
+        { day: "Monday", start: "T17:00", end: "T18:30" },
+        { day: "Wednesday", start: "T17:00", end: "T18:30" },
       ];
     }
     if (ageGroup.includes("U13") || ageGroup.includes("U14")) {
       return [
-        { day: "Monday", start: "18:30", end: "20:00" },
-        { day: "Wednesday", start: "18:30", end: "20:00" },
+        { day: "Monday", start: "T18:30", end: "T20:00" },
+        { day: "Wednesday", start: "T18:30", end: "T20:00" },
+      ];
+    }
+    // Make sure to include schedule for U15-U18
+    if (ageGroup.includes("U15") || ageGroup.includes("U16") || ageGroup.includes("U17") || ageGroup.includes("U18")) {
+      return [
+        { day: "Monday", start: "T18:30", end: "T20:00" },
+        { day: "Wednesday", start: "T18:30", end: "T20:00" },
       ];
     }
     return [
-      { day: "Monday", start: "17:00", end: "18:30" },
-      { day: "Wednesday", start: "17:00", end: "18:30" },
+      { day: "Monday", start: "T17:00", end: "T18:30" },
+      { day: "Wednesday", start: "T17:00", end: "T18:30" },
     ];
   };
 
@@ -67,13 +74,13 @@ const SummeryPrograms: NextPage = () => {
       let schedule: ScheduleItem[] = [];
       if (program.ageGroup === "U5 – U8" || program.ageGroup === "U9 – U12") {
         schedule = [
-          { day: "Monday", start: "17:00", end: "18:30" },
-          { day: "Wednesday", start: "17:00", end: "18:30" },
+          { day: "Monday", start: "T17:00", end: "T18:30" },
+          { day: "Wednesday", start: "T17:00", end: "T18:30" },
         ];
-      } else if (program.ageGroup === "U13 – U14") {
+      } else if (program.ageGroup === "U13 – U14" || program.ageGroup.includes("U15")) {
         schedule = [
-          { day: "Monday", start: "18:30", end: "20:00" },
-          { day: "Wednesday", start: "18:30", end: "20:00" },
+          { day: "Monday", start: "T18:30", end: "T20:00" },
+          { day: "Wednesday", start: "T18:30", end: "T20:00" },
         ];
       }
 
@@ -99,6 +106,7 @@ const SummeryPrograms: NextPage = () => {
             price: "350",
             priceCurrency: "CAD",
             availability: "InStock",
+            category: "SportsTraining",
             url: `https://excelproso.com/program/${program.ageGroup
               .toLowerCase()
               .replace(/\s+/g, "-")}`,
@@ -107,9 +115,11 @@ const SummeryPrograms: NextPage = () => {
 
           hasCourseInstance: {
             "@type": "CourseInstance",
-            courseMode: "https://schema.org/OfflineEventAttendanceMode",
+            courseMode: "OnSite",
             startDate: "2024-09-01",
             endDate: "2025-06-01",
+            // Add courseWorkload as a fallback
+            courseWorkload: "P1.5H2W", // 1.5 hours, 2 times per week
             location: {
               "@type": "Place",
               name: "Excel Pro Academy Soccer Field",
@@ -124,8 +134,8 @@ const SummeryPrograms: NextPage = () => {
             },
             courseSchedule: schedule.map((sch) => ({
               "@type": "Schedule",
-              repeatFrequency: "https://schema.org/Weekly",
-              byDay: `https://schema.org/${sch.day}`,
+              repeatFrequency: "Weekly",
+              byDay: sch.day,
               startTime: sch.start,
               endTime: sch.end,
               repeatCount: "36"
@@ -242,10 +252,20 @@ const SummeryPrograms: NextPage = () => {
                     .replace(/\s+/g, "-")}`}
                 />
                 
-                <meta
+                <div
                   itemProp="provider"
-                  content="Excel Pro Academy"
-                />
+                  itemScope
+                  itemType="https://schema.org/Organization"
+                >
+                  <meta
+                    itemProp="name"
+                    content="Excel Pro Academy"
+                  />
+                  <meta
+                    itemProp="sameAs"
+                    content="https://excelproso.com"
+                  />
+                </div>
                 
                 <div
                   itemProp="offers"
@@ -261,18 +281,22 @@ const SummeryPrograms: NextPage = () => {
                     content="CAD"
                   />
                   <meta
-                    itemProp="availability"
-                    content="InStock"
+                    itemProp="category"
+                    content="SportsTraining"
                   />
                   <meta
-                    itemProp="validFrom"
-                    content={new Date().toISOString()}
+                    itemProp="availability"
+                    content="InStock"
                   />
                   <meta
                     itemProp="url"
                     content={`https://excelproso.com/program/${program.ageGroup
                       .toLowerCase()
                       .replace(/\s+/g, "-")}`}
+                  />
+                  <meta
+                    itemProp="validFrom"
+                    content={new Date().toISOString()}
                   />
                 </div>
 
@@ -281,9 +305,10 @@ const SummeryPrograms: NextPage = () => {
                   itemScope
                   itemType="https://schema.org/CourseInstance"
                 >
-                  <meta itemProp="courseMode" content="https://schema.org/OfflineEventAttendanceMode" />
+                  <meta itemProp="courseMode" content="OnSite" />
                   <meta itemProp="startDate" content="2024-09-01" />
                   <meta itemProp="endDate" content="2025-06-01" />
+                  <meta itemProp="courseWorkload" content="P1.5H2W" />
                   
                   <div itemProp="location" itemScope itemType="https://schema.org/Place">
                     <meta itemProp="name" content="Excel Pro Academy Soccer Field" />
@@ -305,7 +330,7 @@ const SummeryPrograms: NextPage = () => {
                     >
                       <meta
                         itemProp="repeatFrequency"
-                        content="https://schema.org/Weekly"
+                        content="Weekly"
                       />
                       <meta
                         itemProp="repeatCount"
@@ -313,7 +338,7 @@ const SummeryPrograms: NextPage = () => {
                       />
                       <meta
                         itemProp="byDay"
-                        content={`https://schema.org/${schedule.day}`}
+                        content={schedule.day}
                       />
                       <meta itemProp="startTime" content={schedule.start} />
                       <meta itemProp="endTime" content={schedule.end} />
