@@ -84,14 +84,14 @@ const SummeryPrograms: NextPage = () => {
           "@type": "Course",
           name: `Soccer Training - ${program.ageGroup}`,
           description: `Soccer training program for ${program.ageGroup} age group with ${program.schedule} and ${program.gameInfo}`,
-          url: `https://yourdomain.com/program/${program.ageGroup
+          url: `https://excelproso.com/program/${program.ageGroup
             .toLowerCase()
             .replace(/\s+/g, "-")}`,
 
           provider: {
             "@type": "Organization",
             name: "Excel Pro Academy",
-            sameAs: "https://yourdomain.com",
+            sameAs: "https://excelproso.com",
           },
 
           offers: {
@@ -99,7 +99,7 @@ const SummeryPrograms: NextPage = () => {
             price: "350",
             priceCurrency: "CAD",
             availability: "https://schema.org/InStock",
-            url: `https://yourdomain.com/program/${program.ageGroup
+            url: `https://excelproso.com/program/${program.ageGroup
               .toLowerCase()
               .replace(/\s+/g, "-")}`,
             validFrom: new Date().toISOString(),
