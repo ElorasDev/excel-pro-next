@@ -7,6 +7,7 @@ import { Button } from "@/components/atoms/Button/Button";
 import { programs } from "./data";
 import { useRef } from "react";
 import Link from "next/link";
+import Head from "next/head";
 
 const SummeryPrograms: NextPage = () => {
   const ref = useRef(null);
@@ -32,8 +33,64 @@ const SummeryPrograms: NextPage = () => {
     },
   };
 
+  const getScheduleSchema = (ageGroup: string) => {
+    if (ageGroup.includes("U5") || ageGroup.includes("U8")) {
+      return [
+        { day: "Monday", start: "17:00", end: "18:30" },
+        { day: "Wednesday", start: "17:00", end: "18:30" },
+      ];
+    }
+    if (ageGroup.includes("U13") || ageGroup.includes("U14")) {
+      return [
+        { day: "Monday", start: "18:30", end: "20:00" },
+        { day: "Wednesday", start: "18:30", end: "20:00" },
+      ];
+    }
+    return [
+      { day: "Monday", start: "17:00", end: "18:30" },
+      { day: "Wednesday", start: "17:00", end: "18:30" },
+    ];
+  };
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Excel Pro Academy Soccer Programs",
+    itemListElement: displayedPrograms.map((program, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Course",
+        name: `Soccer Training - ${program.ageGroup}`,
+        description: `Soccer training program for ${program.ageGroup} age group with ${program.schedule} and ${program.gameInfo}`,
+        url: `https://excelproso.com/program/${program.ageGroup
+          .toLowerCase()
+          .replace(/\s+/g, "-")}`,
+        courseMode: "InPerson",
+        hasCourseInstance: {
+          "@type": "CourseInstance",
+          courseMode: "InPerson",
+          courseSchedule: getScheduleSchema(program.ageGroup).map((sch) => ({
+            "@type": "Schedule",
+            repeatFrequency: "https://schema.org/Weekly",
+            byDay: `https://schema.org/${sch.day}`,
+            startTime: sch.start,
+            endTime: sch.end,
+          })),
+        },
+      },
+    })),
+  };
+
   return (
     <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </Head>
+
       <motion.section
         ref={ref}
         initial="hidden"
@@ -123,6 +180,34 @@ const SummeryPrograms: NextPage = () => {
                     .toLowerCase()
                     .replace(/\s+/g, "-")}`}
                 />
+
+                <div
+                  itemProp="hasCourseInstance"
+                  itemScope
+                  itemType="https://schema.org/CourseInstance"
+                >
+                  <meta itemProp="courseMode" content="InPerson" />
+                  {getScheduleSchema(program.ageGroup).map((schedule, i) => (
+                    <div
+                      key={i}
+                      itemProp="courseSchedule"
+                      itemScope
+                      itemType="https://schema.org/Schedule"
+                    >
+                      <meta
+                        itemProp="repeatFrequency"
+                        content="https://schema.org/Weekly"
+                      />
+                      <meta
+                        itemProp="byDay"
+                        content={`https://schema.org/${schedule.day}`}
+                      />
+                      <meta itemProp="startTime" content={schedule.start} />
+                      <meta itemProp="endTime" content={schedule.end} />
+                    </div>
+                  ))}
+                </div>
+
                 <ProgramCard
                   ageGroup={program.ageGroup}
                   backgroundClass={program.backgroundClass}
@@ -136,25 +221,6 @@ const SummeryPrograms: NextPage = () => {
             </motion.li>
           ))}
         </motion.ul>
-
-        <div className="sr-only">
-          <h3>Excel Pro Academy Soccer Programs</h3>
-          <p>
-            Excel Pro Academy offers professional soccer training programs for
-            different age groups. Our structured programs include regular
-            training sessions and competitive games to develop young
-            players&apos; skills, teamwork, and athletic performance.
-          </p>
-          <ul>
-            {displayedPrograms.map((program, index) => (
-              <li key={`seo-${index}`}>
-                <h4>{program.ageGroup} Soccer Program</h4>
-                <p>Training schedule: {program.schedule}</p>
-                <p>Game information: {program.gameInfo}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
       </motion.section>
     </>
   );
