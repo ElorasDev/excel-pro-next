@@ -53,6 +53,13 @@ const SummeryPrograms: NextPage = () => {
         { day: "Wednesday", start: "T18:30", end: "T20:00" },
       ];
     }
+    // Make sure to include schedule for U15-U18
+    if (ageGroup.includes("U15") || ageGroup.includes("U16") || ageGroup.includes("U17") || ageGroup.includes("U18")) {
+      return [
+        { day: "Monday", start: "T18:30", end: "T20:00" },
+        { day: "Wednesday", start: "T18:30", end: "T20:00" },
+      ];
+    }
     return [
       { day: "Monday", start: "T17:00", end: "T18:30" },
       { day: "Wednesday", start: "T17:00", end: "T18:30" },
@@ -70,7 +77,7 @@ const SummeryPrograms: NextPage = () => {
           { day: "Monday", start: "T17:00", end: "T18:30" },
           { day: "Wednesday", start: "T17:00", end: "T18:30" },
         ];
-      } else if (program.ageGroup === "U13 – U14") {
+      } else if (program.ageGroup === "U13 – U14" || program.ageGroup.includes("U15")) {
         schedule = [
           { day: "Monday", start: "T18:30", end: "T20:00" },
           { day: "Wednesday", start: "T18:30", end: "T20:00" },
@@ -98,7 +105,8 @@ const SummeryPrograms: NextPage = () => {
             "@type": "Offer",
             price: "350",
             priceCurrency: "CAD",
-            availability: "https://schema.org/InStock",
+            availability: "InStock",
+            category: "SportsTraining",
             url: `https://excelproso.com/program/${program.ageGroup
               .toLowerCase()
               .replace(/\s+/g, "-")}`,
@@ -110,6 +118,8 @@ const SummeryPrograms: NextPage = () => {
             courseMode: "OnSite",
             startDate: "2024-09-01",
             endDate: "2025-06-01",
+            // Add courseWorkload as a fallback
+            courseWorkload: "P1.5H2W", // 1.5 hours, 2 times per week
             location: {
               "@type": "Place",
               name: "Excel Pro Academy Soccer Field",
@@ -242,7 +252,6 @@ const SummeryPrograms: NextPage = () => {
                     .replace(/\s+/g, "-")}`}
                 />
                 
-                {/* Added provider */}
                 <div
                   itemProp="provider"
                   itemScope
@@ -258,7 +267,6 @@ const SummeryPrograms: NextPage = () => {
                   />
                 </div>
                 
-                {/* Added offers */}
                 <div
                   itemProp="offers"
                   itemScope
@@ -273,14 +281,22 @@ const SummeryPrograms: NextPage = () => {
                     content="CAD"
                   />
                   <meta
+                    itemProp="category"
+                    content="SportsTraining"
+                  />
+                  <meta
                     itemProp="availability"
-                    content="https://schema.org/InStock"
+                    content="InStock"
                   />
                   <meta
                     itemProp="url"
                     content={`https://excelproso.com/program/${program.ageGroup
                       .toLowerCase()
                       .replace(/\s+/g, "-")}`}
+                  />
+                  <meta
+                    itemProp="validFrom"
+                    content={new Date().toISOString()}
                   />
                 </div>
 
@@ -290,6 +306,21 @@ const SummeryPrograms: NextPage = () => {
                   itemType="https://schema.org/CourseInstance"
                 >
                   <meta itemProp="courseMode" content="OnSite" />
+                  <meta itemProp="startDate" content="2024-09-01" />
+                  <meta itemProp="endDate" content="2025-06-01" />
+                  <meta itemProp="courseWorkload" content="P1.5H2W" />
+                  
+                  <div itemProp="location" itemScope itemType="https://schema.org/Place">
+                    <meta itemProp="name" content="Excel Pro Academy Soccer Field" />
+                    <div itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                      <meta itemProp="streetAddress" content="123 Soccer Lane" />
+                      <meta itemProp="addressLocality" content="Toronto" />
+                      <meta itemProp="addressRegion" content="ON" />
+                      <meta itemProp="postalCode" content="M1M 1M1" />
+                      <meta itemProp="addressCountry" content="CA" />
+                    </div>
+                  </div>
+                  
                   {getScheduleSchema(program.ageGroup).map((schedule, i) => (
                     <div
                       key={i}
