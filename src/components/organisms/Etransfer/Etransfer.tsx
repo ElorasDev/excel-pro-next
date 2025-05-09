@@ -158,7 +158,7 @@ const Etransfer = () => {
   const bankEmails = [
     {
       id: 0,
-      email: "Abedian.1368@gmail.com",
+      email: "Excelpro.Etransfer@gmail.com",
       notes:
         "Note: Please include your order number, registered player name, phone number, and email in the transfer details.",
     },
