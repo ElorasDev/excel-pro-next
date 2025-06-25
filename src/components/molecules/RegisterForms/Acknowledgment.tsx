@@ -82,96 +82,97 @@ const Acknowledgment: NextPage = () => {
     setIsLoading(true);
     setMessage(null);
 
-    try {
-      // Check if we have the base64 image data
-      if (!photoUrl || !nationalIdCard) {
-        setMessage(
-          "Error: Photo data is missing. Please go back and upload photos again."
+    const maxRetries = 3;
+    let attempt = 0;
+
+    while (attempt < maxRetries) {
+      try {
+        if (!photoUrl || !nationalIdCard) {
+          setMessage(
+            "Error: Photo data is missing. Please go back and upload photos again."
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        const requestBody = {
+          fullname: userFormData.fullname,
+          dateOfBirth: userFormData.dateOfBirth,
+          gender: userFormData.gender,
+          height: userFormData.height.toString(),
+          weight: userFormData.weight.toString(),
+          tShirtSize: userFormData.tShirtSize,
+          shortSize: userFormData.shortSize,
+          jacketSize: userFormData.jacketSize,
+          pantsSize: userFormData.pantsSize,
+          address: userFormData.address,
+          postalCode: userFormData.postalCode,
+          city: userFormData.city,
+          emergencyContactName: userFormData.emergencyContactName,
+          emergencyPhone: userFormData.emergencyPhone,
+          experienceLevel: userFormData.experienceLevel || "",
+          parent_name: userFormData.parent_name,
+          phone_number: userFormData.phone_number,
+          email: userFormData.email || "",
+          player_positions: userFormData.player_positions || "",
+          activePlan: normalizeDivision(division!),
+          policy: true,
+          custom_position: userFormData.custom_position || "",
+          photoUrl: photoUrl,
+          NationalIdCard: nationalIdCard,
+        };
+
+        console.log(`Attempt ${attempt + 1}: Sending registration data...`);
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/register`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          }
         );
-        setIsLoading(false);
-        return;
-      }
 
-      console.log(normalizeDivision(division!))
+        if (!response.ok) {
+          const responseData = await response.json();
+          let errorMessage = "Failed to register user. Please try again.";
 
-      // Create the request body with image data directly
-      const requestBody = {
-        // User data
-        fullname: userFormData.fullname,
-        dateOfBirth: userFormData.dateOfBirth,
-        gender: userFormData.gender,
-        height: userFormData.height.toString(),
-        weight: userFormData.weight.toString(),
-        tShirtSize: userFormData.tShirtSize,
-        shortSize: userFormData.shortSize,
-        jacketSize: userFormData.jacketSize,
-        pantsSize: userFormData.pantsSize,
-        address: userFormData.address,
-        postalCode: userFormData.postalCode,
-        city: userFormData.city,
-        emergencyContactName: userFormData.emergencyContactName,
-        emergencyPhone: userFormData.emergencyPhone,
-        experienceLevel: userFormData.experienceLevel || "",
-        parent_name: userFormData.parent_name,
-        phone_number: userFormData.phone_number,
-        email: userFormData.email || "",
-        player_positions: userFormData.player_positions || "",
-        activePlan: normalizeDivision(division!),
-        policy: true,
-        custom_position: userFormData.custom_position || "",
-        photoUrl: photoUrl,
-        NationalIdCard: nationalIdCard,
-      };
+          if (Array.isArray(responseData.message)) {
+            errorMessage = `Validation errors: ${responseData.message.join(
+              ", "
+            )}`;
+          } else if (responseData.message) {
+            errorMessage = responseData.message;
+          }
 
-      console.log("Sending registration data with base64 images...");
-
-      // Send request to server
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        const responseData = await response.json();
-        let errorMessage = "Failed to register user. Please try again.";
-
-        if (Array.isArray(responseData.message)) {
-          errorMessage = `Validation errors: ${responseData.message.join(
-            ", "
-          )}`;
-        } else if (responseData.message) {
-          errorMessage = responseData.message;
+          setMessage(errorMessage);
+          break;
         }
 
-        setMessage(errorMessage);
+        const registeredUser = await response.json();
+
+        if (registeredUser.id) {
+          localStorage.setItem("userId", registeredUser.id.toString());
+        }
+
         setIsLoading(false);
+        setStep(step + 1);
         return;
+      } catch (error) {
+        console.error(`Error on attempt ${attempt + 1}:`, error);
+        attempt++;
+        if (attempt >= maxRetries) {
+          setMessage(
+            "Error during registration. Please check your internet and try again."
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        await new Promise((res) => setTimeout(res, 1000));
       }
-
-      console.log("Registration successful!");
-
-      // Handle successful registration
-      const registeredUser = await response.json();
-
-      // Save user ID in localStorage
-      if (registeredUser.id) {
-        localStorage.setItem("userId", registeredUser.id.toString());
-      }
-
-      // Proceed to next step
-      setIsLoading(false);
-      setStep(step + 1);
-    } catch (error) {
-      console.error("Error during registration process:", error);
-      setMessage("Error during registration. Please try again.");
-      setIsLoading(false);
     }
   };
 
